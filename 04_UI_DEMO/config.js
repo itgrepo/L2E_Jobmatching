@@ -3,7 +3,7 @@
 // Production: update PROD_API_URL to your Hugging Face Space URL
 //   e.g. https://YOUR-HF-USERNAME-l2e-api.hf.space
 
-const PROD_API_URL = 'https://YOUR-HF-USERNAME-l2e-api.hf.space';
+const PROD_API_URL = 'https://thanaponcbm-mlbackend.hf.space';
 
 const API = (
   window.location.hostname === '127.0.0.1' ||
