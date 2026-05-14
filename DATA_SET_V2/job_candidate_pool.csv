@@ -1,0 +1,6 @@
+﻿candidate_pool_id,candidate_pool_title,Candicate_Pool_descript,is_pinned,is_archved,created_by,created_at,updated_by,updated_at
+POOL-0001,Software Engineering Core,"Software, web, and application engineering candidates with strong coding fundamentals.",True,False,SYSTEM_ADMIN,2026-03-23 10:00:00,SYSTEM_ADMIN,2026-03-23 10:00:00
+POOL-0002,Data & AI Talent,"Analytics, machine learning, and data platform candidates for insight-driven teams.",True,False,SYSTEM_ADMIN,2026-03-23 10:00:00,SYSTEM_ADMIN,2026-03-23 10:00:00
+POOL-0003,"Cloud, Security & Infra","Infrastructure, operations, support, and cybersecurity candidates for reliable systems.",True,False,SYSTEM_ADMIN,2026-03-23 10:00:00,SYSTEM_ADMIN,2026-03-23 10:00:00
+POOL-0004,"Business, Finance & Growth","Candidates focused on marketing, commercial growth, and finance operations.",False,False,SYSTEM_ADMIN,2026-03-23 10:00:00,SYSTEM_ADMIN,2026-03-23 10:00:00
+POOL-0005,Design & Engineering Projects,Design and project-delivery candidates for product experience and engineering execution.,False,False,SYSTEM_ADMIN,2026-03-23 10:00:00,SYSTEM_ADMIN,2026-03-23 10:00:00

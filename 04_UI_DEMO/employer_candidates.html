@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>L2E | ค้นหาผู้สมัคร</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bs-primary: #10b981;
+      --bs-primary-rgb: 16, 185, 129;
+      --green: #16a34a;
+      --navy: #0f1f3d;
+    }
+
+    * { font-family: 'Sarabun', sans-serif; }
+
+    body { background: #f0f4f8; }
+
+    /* --- Navbar --- */
+    .navbar-custom {
+      background: linear-gradient(135deg, var(--navy), var(--green));
+      padding: 0 20px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .nav-link-c {
+      color: rgba(255,255,255,.8);
+      font-weight: 600;
+      font-size: .88rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: .15s;
+    }
+
+    .nav-link-c:hover,
+    .nav-link-c.active {
+      background: rgba(255,255,255,.15);
+      color: #fff;
+    }
+
+    /* --- Layout --- */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout { grid-template-columns: 1fr; }
+    }
+
+    /* --- Sidebar --- */
+    .sidebar-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
+      padding: 20px;
+      position: sticky;
+      top: 56px;
+      height: fit-content;
+      max-height: calc(100vh - 76px);
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar-card::-webkit-scrollbar { width: 6px; }
+    .sidebar-card::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .sidebar-card::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .sidebar-card::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* --- Form elements --- */
+    .form-label-sm {
+      font-size: .8rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .form-control,
+    .form-select {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: .88rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: var(--green) !important;
+      box-shadow: 0 0 0 3px rgba(22,163,74,.12) !important;
+    }
+
+    /* --- Certificate tags --- */
+    .cert-tag {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--green);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin: 2px;
+    }
+
+    .cert-tag .rm { cursor: pointer; color: #94a3b8; }
+    .cert-tag .rm:hover { color: #ef4444; }
+
+    /* --- Weight preset button-group --- */
+    .weight-btn-group {
+      display: flex;
+      gap: 4px;
+      flex-wrap: nowrap;
+    }
+
+    .weight-btn {
+      flex: 1;
+      padding: 6px 4px;
+      font-size: .72rem;
+      font-weight: 700;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      text-align: center;
+      transition: .15s;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+
+    .weight-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+      background: #f0fdf4;
+    }
+
+    .weight-btn.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .weight-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .weight-pill {
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    /* --- Match button --- */
+    .btn-match {
+      width: 100%;
+      background: linear-gradient(135deg, var(--green), #15803d);
+      border: none;
+      color: #fff;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 1rem;
+      transition: .2s;
+    }
+
+    .btn-match:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(22,163,74,.35);
+      color: #fff;
+    }
+
+    /* --- Filter bar --- */
+    .filter-bar {
+      background: #fff;
+      border-radius: 14px;
+      padding: 10px 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 56px;
+      z-index: 100;
+    }
+
+    .filter-pill {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 50px;
+      padding: 5px 28px 5px 12px;
+      font-size: .82rem;
+      font-weight: 600;
+      color: #374151;
+      background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394a3b8'/%3E%3C/svg%3E") no-repeat right 10px center;
+      background-size: 8px;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    .filter-pill:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(22,163,74,.12);
+    }
+
+    /* --- Candidate cards --- */
+    .premium-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+      margin-bottom: 10px;
+      display: flex;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      transition: .15s;
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    .premium-card:hover {
+      box-shadow: 0 4px 12px rgba(22,163,74,.1);
+      transform: translateY(-1px);
+      border-color: var(--green);
+    }
+
+    .premium-card-body {
+      padding: 0 10px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .match-pane {
+      width: 110px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-align: center;
+      gap: 6px;
+    }
+
+    /* --- Score circles --- */
+    .score-circle-wrapper {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 2px;
+    }
+
+    .score-circle-svg {
+      transform: rotate(-90deg);
+      width: 80px;
+      height: 80px;
+    }
+
+    .score-circle-bg { fill: none; stroke: #e8f0ee; stroke-width: 7; }
+    .score-circle-progress { fill: none; stroke: var(--green); stroke-width: 7; stroke-linecap: round; }
+
+    .score-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #374151;
+    }
+
+    .score-circle-container {
+      position: relative;
+      width: 90px;
+      height: 90px;
+    }
+
+    .score-circle-container svg { transform: rotate(-90deg); }
+
+    .score-circle-value {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .score-circle-num { font-size: 1.3rem; font-weight: 800; color: #fff; }
+    .score-circle-lbl { font-size: .6rem; color: rgba(255,255,255,.75); font-weight: 600; }
+
+    /* --- Avatar --- */
+    .cand-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green), #10b981);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: .95rem;
+      flex-shrink: 0;
+    }
+
+    /* --- Skill / cert chips --- */
+    .skill-chip {
+      background: #e8f0fe;
+      color: #10b981;
+      border-radius: 10px;
+      padding: 3px 10px;
+      font-size: .74rem;
+      font-weight: 700;
+      display: inline-block;
+      margin: 2px;
+    }
+
+    .cert-chip-match {
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 10px;
+      padding: 3px 10px;
+      font-size: .74rem;
+      font-weight: 700;
+      display: inline-block;
+      margin: 2px;
+    }
+
+    .cert-chip-miss {
+      background: #fef2f2;
+      color: #ef4444;
+      border-radius: 10px;
+      padding: 3px 10px;
+      font-size: .74rem;
+      font-weight: 700;
+      display: inline-block;
+      margin: 2px;
+    }
+
+    /* --- Score bars (modal) --- */
+    .score-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .score-bar-label {
+      font-size: .8rem;
+      font-weight: 700;
+      color: #374151;
+      width: 260px;
+      flex-shrink: 0;
+    }
+
+    .score-bar-track {
+      flex: 1;
+      height: 8px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill { height: 100%; border-radius: 4px; transition: width 1s; }
+    .score-bar-val { font-size: .8rem; font-weight: 800; min-width: 36px; text-align: right; }
+
+    /* --- KPI boxes --- */
+    .kpi-box {
+      background: #f8faff;
+      border-radius: 12px;
+      padding: 10px 14px;
+      text-align: center;
+    }
+
+    .kpi-val { font-size: 1rem; font-weight: 800; color: var(--navy); }
+    .kpi-label { font-size: .7rem; color: #94a3b8; font-weight: 600; }
+
+    /* --- Modal --- */
+    .modal-content { border-radius: 20px; border: none; }
+
+    .modal-header-emp {
+      background: linear-gradient(135deg, var(--navy), var(--green));
+      border-radius: 20px 20px 0 0;
+      padding: 24px;
+    }
+
+    .modal-section-title {
+      font-size: .78rem;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin: 14px 0 8px;
+    }
+
+    .edu-item {
+      background: #f8faff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      font-size: .85rem;
+    }
+
+    .exp-item-m {
+      border-left: 3px solid var(--green);
+      padding: 6px 12px;
+      margin-bottom: 8px;
+      background: #f8faff;
+      border-radius: 0 8px 8px 0;
+    }
+
+    /* --- Loading overlay --- */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.92);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay.hidden { display: none; }
+
+    .spinner-ring {
+      width: 56px;
+      height: 56px;
+      border: 5px solid #e2e8f0;
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- Bootstrap overrides --- */
+    .btn-primary { background-color: var(--bs-primary) !important; border-color: var(--bs-primary) !important; }
+    .text-primary { color: var(--bs-primary) !important; }
+    .bg-primary { background-color: var(--bs-primary) !important; }
+    .btn-outline-primary { color: var(--bs-primary) !important; border-color: var(--bs-primary) !important; }
+    .btn-outline-primary:hover { background-color: var(--bs-primary) !important; color: white !important; }
+
+    /* --- Visible weight buttons --- */
+    .visible-weight-btn {
+      font-size: .73rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      transition: .15s;
+      line-height: 1.3;
+    }
+
+    .visible-weight-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+      background: #f0fdf4;
+    }
+
+    .visible-weight-btn.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+  </style>
+    <script src="config.js"></script>
+</head>
+
+<body>
+  <nav class="navbar-custom">
+    <a href="employer_dashboard.html" class="nav-logo me-4">ค้นหาผู้สมัคร</a>
+    <div class="d-flex gap-1 me-auto">
+      <a href="employer_dashboard.html" class="nav-link-c"><i class="fas fa-tachometer-alt me-1"></i>ภาพรวม</a>
+      <a href="employer_candidates.html" class="nav-link-c active"><i class="fas fa-users me-1"></i>ค้นหาผู้สมัคร</a>
+      <a href="employer_job_analytics.html" class="nav-link-c"><i class="fas fa-chart-bar me-1"></i>สถิติงาน</a>
+      <a href="#" class="nav-link-c"><i class="fas fa-users-cog me-1"></i>จัดการทีม</a>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-white fw-bold small" id="navCompany"></span>
+      <a href="index.html" class="nav-link-c ms-2"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+  </nav>
+
+  <div class="main-layout">
+
+    <!-- LEFT: Job Info + Pool -->
+    <aside>
+      <div class="sidebar-card">
+        <!-- Company header -->
+        <div class="d-flex align-items-center gap-3 p-3 mb-3 rounded-3" style="background:linear-gradient(135deg,var(--navy),var(--green));">
+          <div style="width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;color:#fff;flex-shrink:0;" id="companyInitialBadge">ไ</div>
+          <div>
+            <div class="fw-bold text-white" style="font-size:.95rem;" id="sideCompanyName">ไลน์ (ประเทศไทย)</div>
+          </div>
+        </div>
+
+        <!-- Job info -->
+        <div class="mb-3">
+          <div class="form-label-sm"><i class="fas fa-briefcase me-1"></i>ตำแหน่งที่เปิดรับ</div>
+          <div class="fw-bold" style="font-size:.95rem;color:#0f1f3d;" id="sideJobTitle">ไม่ระบุ</div>
+          <a href="employer_dashboard.html?section=jobs" class="d-inline-flex align-items-center gap-1 mt-1" style="font-size:.75rem;color:#10b981;text-decoration:none;">
+            <i class="fas fa-th-list" style="font-size:.7rem;"></i> ดูประกาศงานทั้งหมด
+          </a>
+        </div>
+
+        <div class="mb-3">
+          <div class="form-label-sm"><i class="fas fa-tools me-1"></i>ทักษะที่ต้องการ</div>
+          <div id="sideSkillTags" class="d-flex flex-wrap gap-1 mt-1"></div>
+        </div>
+
+        <div class="mb-3">
+          <div class="form-label-sm"><i class="fas fa-certificate me-1"></i>ใบรองที่ต้องการ</div>
+          <div id="sideCertTags" class="d-flex flex-wrap gap-1 mt-1">
+            <span style="font-size:.78rem;color:#94a3b8;">ไม่ระบุ</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="form-label-sm"><i class="fas fa-money-bill-wave me-1"></i>งบประมาณ (บาท/เดือน)</div>
+          <div class="fw-bold" style="font-size:.9rem;color:#0f1f3d;" id="sideBudget">ไม่ระบุ</div>
+        </div>
+
+        <hr style="border-color:#e8f0ee;">
+
+        <!-- Candidate Pool dropdown -->
+        <div class="mb-3">
+          <div class="form-label-sm fw-bold" style="color:#10b981;"><i class="fas fa-layer-group me-1"></i>CANDIDATE POOL</div>
+          <select id="poolSelect" class="form-select border-success" onchange="applyPoolSelection()">
+            <option value="">-- ไม่ใช้ Pool --</option>
+          </select>
+        </div>
+
+        <!-- Hidden inputs for match params -->
+        <input type="hidden" id="fTitle">
+        <input type="hidden" id="fDesc">
+        <input type="hidden" id="fSkills">
+        <input type="hidden" id="fSkillLevel">
+        <input type="hidden" id="fBudgetMin" value="40000">
+        <input type="hidden" id="fBudgetMax" value="80000">
+        <input type="hidden" id="fJobType">
+        <div id="certPills" style="display:none"></div>
+        <div id="weightBadges" style="display:none"></div>
+        <div id="weightPreset" style="display:none"></div>
+        <input type="text" id="certInput" style="display:none">
+
+        <!-- Weight Preset - Visible -->
+        <div class="mb-3">
+          <div class="form-label-sm fw-bold mb-2" style="color:#10b981;"><i class="fas fa-sliders me-1"></i>น้ำหนักการค้นหา</div>
+          <div class="d-flex flex-wrap gap-1" id="visibleWeightBtns">
+            <button class="visible-weight-btn active" data-preset="balanced" onclick="selectVisiblePreset(this,'balanced')">สมดุล</button>
+            <button class="visible-weight-btn" data-preset="skill_focus" onclick="selectVisiblePreset(this,'skill_focus')">เน้นทักษะ</button>
+            <button class="visible-weight-btn" data-preset="cert_focus" onclick="selectVisiblePreset(this,'cert_focus')">เน้นใบรับรอง</button>
+            <button class="visible-weight-btn" data-preset="title_focus" onclick="selectVisiblePreset(this,'title_focus')">เน้นตำแหน่ง</button>
+            <button class="visible-weight-btn" data-preset="salary_focus" onclick="selectVisiblePreset(this,'salary_focus')">เน้นเงินเดือน</button>
+          </div>
+          <div id="visibleWeightDesc" class="mt-2" style="font-size:.72rem;color:#64748b;line-height:1.5;"></div>
+        </div>
+
+        <button class="btn-match btn mb-2" onclick="runMatch()">
+          <i class="fas fa-search me-2"></i>ค้นหาผู้สมัคร
+        </button>
+        <button class="btn w-100" style="border:1.5px solid #cbd5e1;color:#475569;border-radius:10px;font-weight:600;font-size:.88rem;padding:10px;" onclick="showEditPanel()">
+          <i class="fas fa-pencil-alt me-2"></i>แก้ไขข้อมูลการค้นหา
+        </button>
+      </div>
+
+      <!-- Edit panel (hidden by default) -->
+      <div class="sidebar-card mt-3" id="editPanel" style="display:none;">
+        <div class="fw-bold mb-3" style="font-size:.9rem;color:var(--navy);"><i class="fas fa-sliders-h text-success me-2"></i>แก้ไขเงื่อนไข</div>
+        <div class="mb-3">
+          <div class="form-label-sm">ตำแหน่งที่ต้องการ</div>
+          <input type="text" id="fTitleEdit" class="form-control" placeholder="Data Scientist, Developer...">
+        </div>
+        <div class="mb-3">
+          <div class="form-label-sm">รายละเอียดงาน</div>
+          <textarea id="fDescEdit" class="form-control" rows="3" placeholder="อธิบายเนื้องาน..."></textarea>
+        </div>
+        <div class="mb-3">
+          <div class="form-label-sm">ทักษะที่ต้องการ (คั่นด้วย comma)</div>
+          <textarea id="fSkillsEdit" class="form-control" rows="2" placeholder="Python, SQL..."></textarea>
+        </div>
+        <div class="mb-3">
+          <div class="form-label-sm">ช่วงงบประมาณ (บาท/เดือน)</div>
+          <div class="d-flex gap-2">
+            <input type="number" id="fBudgetMinEdit" class="form-control" placeholder="Min" value="40000">
+            <input type="number" id="fBudgetMaxEdit" class="form-control" placeholder="Max" value="80000">
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="form-label-sm">ใบรับรอง (Certificate)</div>
+          <div class="input-group mb-2">
+            <input type="text" id="certInputEdit" class="form-control" placeholder="พิมพ์ Certificate...">
+            <button class="btn btn-outline-success" onclick="addCertEdit()"><i class="fas fa-plus"></i></button>
+          </div>
+          <div id="certPillsEdit" class="d-flex flex-wrap gap-1 mb-2"></div>
+        </div>
+        <div class="mb-3">
+          <div class="form-label-sm fw-bold mb-2" style="color:#10b981;"><i class="fas fa-sliders me-1"></i>น้ำหนักการให้คะแนน</div>
+          <div class="weight-btn-group" id="weightPresetEdit">
+            <button class="weight-btn active" data-preset="balanced" onclick="selectPreset('balanced')">สมดุล</button>
+            <button class="weight-btn" data-preset="skill_focus" onclick="selectPreset('skill_focus')">ทักษะ</button>
+            <button class="weight-btn" data-preset="cert_focus" onclick="selectPreset('cert_focus')">ใบรับรอง</button>
+            <button class="weight-btn" data-preset="title_focus" onclick="selectPreset('title_focus')">ตำแหน่ง</button>
+            <button class="weight-btn" data-preset="salary_focus" onclick="selectPreset('salary_focus')">เงินเดือน</button>
+          </div>
+        </div>
+        <button class="btn-match btn" onclick="applyEdit()">
+          <i class="fas fa-search me-2"></i>ค้นหาใหม่
+        </button>
+      </div>
+    </aside>
+
+    <!-- RIGHT: Candidates -->
+    <main>
+      <div class="filter-bar">
+        <div class="d-flex align-items-center gap-1">
+          <span class="text-muted small fw-semibold" style="font-size:.82rem;">แสดง</span>
+          <select class="filter-pill" style="width:72px;" onchange="pageSize=parseInt(this.value);renderCandidates()">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <span class="text-muted small fw-semibold" style="font-size:.82rem;">รายการ</span>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <i class="fas fa-sort-amount-down text-muted" style="font-size:.8rem;"></i>
+          <span class="text-muted small fw-semibold" style="font-size:.82rem;">เรียงตาม</span>
+          <select id="sortBy" class="filter-pill" onchange="renderCandidates()">
+            <option value="fitness">คะแนนความเหมาะสม</option>
+            <option value="salary">เงินเดือน (น้อย→มาก)</option>
+            <option value="exp">ประสบการณ์</option>
+          </select>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <i class="fas fa-baht-sign text-muted" style="font-size:.8rem;"></i>
+          <span class="text-muted small fw-semibold" style="font-size:.82rem;">ช่วงเงินเดือน</span>
+          <select id="salaryFilter" class="filter-pill" onchange="renderCandidates()">
+            <option value="">ทั้งหมด</option>
+            <option value="30000">≤30,000</option>
+            <option value="50000">≤50,000</option>
+            <option value="80000">≤80,000</option>
+            <option value="100000">≤100,000</option>
+          </select>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <i class="fas fa-building text-muted" style="font-size:.8rem;"></i>
+          <input type="text" id="filterCompany" class="filter-pill" placeholder="ค้นหาจากบริษัทเก่า..." style="width:160px;background-image:none;padding-right:12px;" oninput="currentPage=1;renderCandidates()">
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <i class="fas fa-university text-muted" style="font-size:.8rem;"></i>
+          <input type="text" id="filterUniversity" class="filter-pill" placeholder="ค้นหาจากมหาวิทยาลัย..." style="width:170px;background-image:none;padding-right:12px;" oninput="currentPage=1;renderCandidates()">
+        </div>
+        <div class="ms-auto">
+          <span class="badge py-2 px-3 fw-bold" style="background:#16a34a;color:#fff;font-size:.82rem;border-radius:20px;" id="resultCount">พบ 0 รายการ</span>
+        </div>
+      </div>
+
+      <div id="candidateList">
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-users fa-3x mb-3 d-block opacity-25"></i>กรอกเงื่อนไขและกด "ค้นหาผู้สมัคร"
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination pagination-sm" id="paginationUI"></ul>
+      </div>
+      <div class="text-center text-muted small mt-2" id="paginationInfo"></div>
+    </main>
+
+  </div>
+
+  <!-- CANDIDATE DETAIL MODAL -->
+  <div class="modal fade" id="candModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header-emp">
+          <div class="d-flex align-items-center gap-4">
+            <div class="cand-avatar" id="mAvatar" style="width:60px;height:60px;font-size:1.3rem;">?</div>
+            <div class="flex-grow-1">
+              <h4 class="fw-bold text-white mb-1" id="mName">—</h4>
+              <div class="text-white opacity-75 fw-bold" id="mRole">—</div>
+              <div class="d-flex gap-3 mt-1 flex-wrap">
+                <span class="text-white opacity-75 small" id="mSalary"><i class="fas fa-baht-sign me-1"></i>—</span>
+                <span class="text-white opacity-75 small" id="mLocation"><i class="fas fa-map-marker-alt me-1"></i>—</span>
+                <span class="text-white opacity-75 small" id="mWorkType"><i class="fas fa-laptop-house me-1"></i>—</span>
+                <span class="text-white opacity-75 small" id="mExpYears"><i class="fas fa-clock me-1"></i>—</span>
+              </div>
+            </div>
+            <div class="score-circle-container flex-shrink-0">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
+                <circle id="mScoreCircle" cx="45" cy="45" r="38" fill="none" stroke="#4ade80" stroke-width="7" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="239"/>
+              </svg>
+              <div class="score-circle-value">
+                <span class="score-circle-num" id="mScoreNum">—</span>
+                <span class="score-circle-lbl">เหมาะสม</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" data-bs-dismiss="modal" class="position-absolute top-0 end-0 m-3 btn-close btn-close-white"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <div class="row g-2 mb-3">
+                <div class="col-4">
+                  <div class="kpi-box">
+                    <div class="kpi-val" id="mKpiSal">—</div>
+                    <div class="kpi-label">เงินเดือน</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="kpi-box">
+                    <div class="kpi-val" id="mKpiExp">—</div>
+                    <div class="kpi-label">ประสบการณ์</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="kpi-box">
+                    <div class="kpi-val" id="mKpiWork">—</div>
+                    <div class="kpi-label">รูปแบบงาน</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-section-title"><i class="fas fa-comment-alt me-1"></i>เกี่ยวกับผู้เรียน (ABOUT Learner)</div>
+              <div id="mAbout" class="small text-muted" style="line-height:1.7;"></div>
+
+              <div class="modal-section-title"><i class="fas fa-chart-bar me-1"></i>คะแนนความเหมาะสม (SCORE BREAKDOWN)</div>
+              <div id="mScoreBars"></div>
+
+              <div class="modal-section-title"><i class="fas fa-graduation-cap me-1"></i>การศึกษา (EDUCATION)</div>
+              <div id="mEdu"></div>
+
+              <div class="modal-section-title"><i class="fas fa-briefcase me-1"></i>ประสบการณ์ทำงาน (WORK EXPERIENCE)</div>
+              <div id="mExp"></div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="modal-section-title"><i class="fas fa-tools me-1"></i>ทักษะที่ต้องการ (REQUIRED SKILLS)</div>
+              <div id="mSkills"></div>
+
+              <div class="modal-section-title"><i class="fas fa-certificate me-1"></i>ใบรับรองที่ต้องการ (REQUIRED CERTIFICATIONS)</div>
+              <div id="mCerts"></div>
+
+              <div class="mt-3 p-3 bg-light rounded-3">
+                <div class="small fw-bold text-muted mb-2"><i class="fas fa-file-alt text-success me-1"></i>Resume</div>
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="viewResume()">
+                  <i class="fas fa-eye me-1"></i>ดู Resume
+                </button>
+                <div class="small text-muted mt-2">ไฟล์ Resume ของผู้สมัคร (จำลอง)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">ปิด</button>
+          <button type="button" class="btn btn-success rounded-pill px-5 fw-bold">
+            <i class="fas fa-envelope me-2"></i>ติดต่อผู้สมัคร
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Pool Picker Modal -->
+  <div class="modal fade" id="poolPickerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:380px;">
+      <div class="modal-content" style="border-radius:16px;border:none;">
+        <div class="modal-header border-0 pb-0">
+          <h6 class="modal-title fw-bold" style="color:#0f1f3d;"><i class="fas fa-bookmark text-success me-2"></i>บันทึกผู้สมัคร</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4" id="poolPickerBody"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // API URL loaded from config.js
+    let allCandidates = [];
+    let currentPage = 1;
+    let pageSize = 25;
+    let jobData = null;
+    let currentCands = [];
+    let certSet = new Set();
+    let _matchRunning = false;
+    let activePreset = 'balanced';
+
+    function getCompanyKey() {
+      return jobData ? (jobData.company_id || jobData.company_name || 'default') : 'default';
+    }
+
+    const WEIGHT_PRESETS = {
+      balanced:     { title: 0.20, skill: 0.20, budget: 0.20, cert: 0.20, semantic: 0.20 },
+      skill_focus:  { title: 0.15, skill: 0.50, budget: 0.10, cert: 0.15, semantic: 0.10 },
+      cert_focus:   { title: 0.15, skill: 0.15, budget: 0.10, cert: 0.50, semantic: 0.10 },
+      title_focus:  { title: 0.50, skill: 0.20, budget: 0.10, cert: 0.10, semantic: 0.10 },
+      salary_focus: { title: 0.15, skill: 0.15, budget: 0.50, cert: 0.10, semantic: 0.10 },
+    };
+
+    const WEIGHT_DESC = {
+      balanced:     'เน้นทุกด้านเท่ากัน เหมาะสำหรับหาผู้สมัครทั่วไป',
+      skill_focus:  'เหมาะกับการหาผู้สมัครที่มีทักษะตรงกับที่ต้องการ',
+      cert_focus:   'เหมาะกับการหาผู้สมัครที่ต้องการใบรับรองเฉพาะทาง',
+      title_focus:  'เหมาะกับการหาผู้สมัครที่มีตำแหน่งงานตรงกับที่ต้องการ',
+      salary_focus: 'เหมาะกับการหาผู้สมัครที่เงินเดือนตรงกับงบประมาณ',
+    };
+
+    const WEIGHT_LABELS = { title: 'ตำแหน่ง', skill: 'ทักษะ', budget: 'เงินเดือน', cert: 'ใบรับรอง', semantic: 'ความหมาย' };
+    const WEIGHT_COLORS = { title: '#3b82f6', skill: '#10b981', budget: '#f59e0b', cert: '#8b5cf6', semantic: '#64748b' };
+
+    function selectPreset(preset) {
+      activePreset = preset;
+      document.querySelectorAll('.weight-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.preset === preset);
+      });
+      updateWeightDisplay();
+    }
+
+    function recomputeFitness(preset) {
+      const w = WEIGHT_PRESETS[preset];
+      allCandidates.forEach(c => {
+        const b = c.score_breakdown || {};
+        c.fitness = (
+          (b.title     || 0) * w.title  +
+          (b.skill     || 0) * w.skill  +
+          (b.budget_fit|| 0) * w.budget +
+          (b.cert      || 0) * w.cert   +
+          (b.semantic  || 0) * w.semantic
+        );
+      });
+    }
+
+    function selectVisiblePreset(el, preset) {
+      activePreset = preset;
+      document.querySelectorAll('.visible-weight-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      const desc = document.getElementById('visibleWeightDesc');
+      if (desc) desc.textContent = WEIGHT_DESC[preset] || '';
+      document.querySelectorAll('.weight-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.preset === preset);
+      });
+      updateWeightDisplay();
+      // Re-score client-side instantly if we already have candidates loaded
+      if (allCandidates.length > 0) {
+        recomputeFitness(preset);
+        currentPage = 1;
+        renderCandidates();
+      } else {
+        runMatch();
+      }
+    }
+
+    function updateWeightDisplay() {
+      const w = WEIGHT_PRESETS[activePreset];
+      document.getElementById('weightBadges').innerHTML = Object.entries(w).map(([k, v]) =>
+        `<span class="weight-pill" style="background:${WEIGHT_COLORS[k]}18;color:${WEIGHT_COLORS[k]};border:1px solid ${WEIGHT_COLORS[k]}40;">${WEIGHT_LABELS[k]} ${Math.round(v * 100)}%</span>`
+      ).join('');
+    }
+
+    function renderPoolSelect() {
+      const pools = JSON.parse(localStorage.getItem('employerPools_' + getCompanyKey()) || '[]');
+      const select = document.getElementById('poolSelect');
+      if (!select) return;
+      pools.forEach((p, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.text = p.name;
+        select.appendChild(opt);
+      });
+    }
+
+    function applyPoolSelection() {
+      const index = document.getElementById('poolSelect').value;
+      if (index === '') return;
+      const pools = JSON.parse(localStorage.getItem('employerPools_' + getCompanyKey()) || '[]');
+      const p = pools[index];
+      if (!p) return;
+      document.getElementById('fTitle').value = p.title || p.name;
+      document.getElementById('fDesc').value = '';
+      document.getElementById('fSkills').value = p.skills || '';
+      document.getElementById('fBudgetMin').value = p.min || 40000;
+      document.getElementById('fBudgetMax').value = p.max || 80000;
+      certSet.clear();
+      if (p.certs) {
+        p.certs.split(',').forEach(c => { const t = c.trim(); if (t) certSet.add(t); });
+      }
+      renderCertPills();
+      runMatch();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      jobData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const urlParams = new URLSearchParams(window.location.search);
+      const poolIndex = urlParams.get('pool');
+
+      renderPoolSelect();
+      updateWeightDisplay();
+      const desc = document.getElementById('visibleWeightDesc');
+      if (desc) desc.textContent = WEIGHT_DESC[activePreset] || '';
+
+      // Set company header
+      const companyName = jobData.company_name || 'บริษัท';
+      document.getElementById('navCompany').textContent = companyName;
+      const sideCompany = document.getElementById('sideCompanyName');
+      if (sideCompany) sideCompany.textContent = companyName;
+      const badge = document.getElementById('companyInitialBadge');
+      if (badge) badge.textContent = companyName.substring(0, 1);
+
+      // Apply job data from currentUser
+      if (jobData) applyJobData(jobData);
+
+      if (poolIndex !== null) {
+        const selectElement = document.getElementById('poolSelect');
+        if (selectElement) selectElement.value = poolIndex;
+        applyPoolSelection();
+      } else {
+        const jid = jobData.job_post_id || jobData.job_id;
+        const cached = jid ? sessionStorage.getItem('cachedCands_v2_' + jid) : null;
+        if (cached) {
+          allCandidates = JSON.parse(cached);
+          renderCandidates();
+          const candUid = urlParams.get('cand_uid');
+          if (candUid !== null) {
+            const targetIdx = currentCands.findIndex(c => String(c.user_id) === String(candUid));
+            const i = targetIdx !== -1 ? targetIdx : parseInt(candUid);
+            if (!isNaN(i) && i >= 0 && i < currentCands.length) setTimeout(() => openCandModal(i), 300);
+          }
+        } else {
+          runMatch();
+        }
+      }
+
+      const certInputEdit = document.getElementById('certInputEdit');
+      if (certInputEdit) {
+        certInputEdit.addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); addCertEdit(); }
+        });
+      }
+    });
+
+    function applyJobData(j) {
+      jobData = Object.assign(jobData, j);  // merge into global jobData
+      const jobTitle = j.title || 'ไม่ระบุ';
+      const el = document.getElementById('sideJobTitle');
+      if (el) el.textContent = jobTitle;
+      document.getElementById('fTitle').value = jobTitle;
+      document.getElementById('fDesc').value = j.description || j.summary || '';
+      document.getElementById('fTitleEdit').value = jobTitle;
+      document.getElementById('fDescEdit').value = j.description || j.summary || '';
+
+      const skills = j.required_skills || [];
+      document.getElementById('fSkills').value = skills.join(', ');
+      document.getElementById('fSkillsEdit').value = skills.join(', ');
+      const skillContainer = document.getElementById('sideSkillTags');
+      if (skillContainer) skillContainer.innerHTML = skills.length
+        ? skills.map(s => `<span style="font-size:.75rem;font-weight:700;background:#f0fdf4;color:#16a34a;border:1px solid #86efac;border-radius:12px;padding:2px 10px;">${s}</span>`).join('')
+        : '<span style="font-size:.78rem;color:#94a3b8;">ไม่ระบุ</span>';
+
+      certSet.clear();
+      const certs = j.required_certs || [];
+      certs.forEach(c => certSet.add(c));
+      const certContainer = document.getElementById('sideCertTags');
+      if (certContainer) certContainer.innerHTML = certs.length
+        ? certs.map(c => `<span style="font-size:.75rem;font-weight:700;background:#fefce8;color:#b45309;border:1px solid #fde68a;border-radius:12px;padding:2px 10px;">${c}</span>`).join('')
+        : '<span style="font-size:.78rem;color:#94a3b8;">ไม่ระบุ</span>';
+
+      document.getElementById('fBudgetMin').value = j.salary_min || 40000;
+      document.getElementById('fBudgetMax').value = j.salary_max || 80000;
+      document.getElementById('fBudgetMinEdit').value = j.salary_min || 40000;
+      document.getElementById('fBudgetMaxEdit').value = j.salary_max || 80000;
+      const bMin = parseInt(j.salary_min || 40000).toLocaleString();
+      const bMax = parseInt(j.salary_max || 80000).toLocaleString();
+      const sideBudget = document.getElementById('sideBudget');
+      if (sideBudget) sideBudget.textContent = `฿${bMin} – ฿${bMax}`;
+    }
+
+    function addCert() {
+      const v = document.getElementById('certInput') ? document.getElementById('certInput').value.trim() : '';
+      if (v) { certSet.add(v); document.getElementById('certInput').value = ''; }
+    }
+
+    function addCertEdit() {
+      const v = document.getElementById('certInputEdit').value.trim();
+      if (v) { certSet.add(v); document.getElementById('certInputEdit').value = ''; renderCertPillsEdit(); }
+    }
+
+    function renderCertPillsEdit() {
+      const el = document.getElementById('certPillsEdit');
+      if (el) el.innerHTML = [...certSet].map(c =>
+        `<span class="cert-tag">${c}<span class="rm" onclick="removeCert('${c}')">&times;</span></span>`
+      ).join('');
+    }
+
+    function removeCert(c) { certSet.delete(c); renderCertPillsEdit(); }
+
+    function showEditPanel() {
+      const p = document.getElementById('editPanel');
+      if (p) p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function applyEdit() {
+      document.getElementById('fTitle').value = document.getElementById('fTitleEdit').value;
+      document.getElementById('fDesc').value = document.getElementById('fDescEdit').value;
+      document.getElementById('fSkills').value = document.getElementById('fSkillsEdit').value;
+      document.getElementById('fBudgetMin').value = document.getElementById('fBudgetMinEdit').value;
+      document.getElementById('fBudgetMax').value = document.getElementById('fBudgetMaxEdit').value;
+      document.getElementById('editPanel').style.display = 'none';
+      runMatch();
+    }
+
+    function addToPool(event, candidateId) {
+      event.stopPropagation();
+      const pools = JSON.parse(localStorage.getItem('employerPools_' + getCompanyKey()) || '[]');
+      const cand = allCandidates.find(c => String(c.user_id) === String(candidateId));
+      if (!cand) return;
+
+      // Build pool picker modal
+      const optionsHtml = pools.map((p, i) =>
+        `<button class="btn btn-sm w-100 mb-2 text-start" style="border:1.5px solid #e2e8f0;border-radius:10px;padding:8px 14px;" onclick="confirmSaveToPool('${candidateId}', ${i})">
+           <i class="fas fa-layer-group text-success me-2"></i>${p.name}
+         </button>`
+      ).join('');
+
+      document.getElementById('poolPickerBody').innerHTML = `
+        <div class="mb-3 p-3 rounded-3" style="background:#f0fdf4;">
+          <div class="fw-bold" style="color:#0f1f3d;">${cand.name || ''}</div>
+          <div class="text-success small">${cand.title || ''}</div>
+        </div>
+        <div class="form-label-sm fw-bold mb-2" style="color:#10b981;">เลือก Pool ที่จะบันทึกเข้า</div>
+        ${optionsHtml || '<div class="text-muted small">ยังไม่มี Pool</div>'}
+        <hr>
+        <button class="btn btn-sm w-100" style="border:1.5px solid #e2e8f0;border-radius:10px;padding:8px 14px;" onclick="confirmSaveToPool('${candidateId}', null)">
+          <i class="fas fa-user-plus text-muted me-2"></i>ไม่กำหนด Pool
+        </button>
+      `;
+      new bootstrap.Modal(document.getElementById('poolPickerModal')).show();
+    }
+
+    function confirmSaveToPool(candidateId, poolIndex) {
+      const cand = allCandidates.find(c => String(c.user_id) === String(candidateId));
+      if (!cand) return;
+      const pools = JSON.parse(localStorage.getItem('employerPools_' + getCompanyKey()) || '[]');
+      const poolName = poolIndex !== null ? (pools[poolIndex] ? pools[poolIndex].name : '') : null;
+
+      const saved = JSON.parse(localStorage.getItem('savedCandidates_' + getCompanyKey()) || '[]');
+      const alreadySaved = saved.some(s => String(s.user_id) === String(candidateId) && s.poolName === poolName);
+      if (!alreadySaved) {
+        saved.push({ ...cand, poolName, savedAt: Date.now() });
+        localStorage.setItem('savedCandidates_' + getCompanyKey(), JSON.stringify(saved));
+      }
+      bootstrap.Modal.getInstance(document.getElementById('poolPickerModal')).hide();
+      const btn = document.querySelector(`button[onclick*="addToPool(event,'${candidateId}')"]`);
+      if (btn) { btn.style.background = '#16a34a'; btn.style.color = '#fff'; setTimeout(() => { btn.style.background = ''; btn.style.color = ''; }, 1200); }
+    }
+
+    async function runMatch() {
+      if (_matchRunning) return;
+      _matchRunning = true;
+      document.getElementById('resultCount').textContent = 'กำลังค้นหา...';
+      const title = document.getElementById('fTitle').value;
+      const desc = document.getElementById('fDesc').value;
+      const skills = document.getElementById('fSkills').value;
+      const skillLevel = document.getElementById('fSkillLevel').value;
+      const jobType = document.getElementById('fJobType').value;
+      const budgetMin = document.getElementById('fBudgetMin').value;
+      const budgetMax = document.getElementById('fBudgetMax').value;
+      try {
+        const res = await fetch(`${API}/api/match_candidates`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            job_id: jobData ? (jobData.job_post_id || jobData.job_id || '') : '',
+            jd_text: `${title} ${desc} ${skills}`,
+            job_title: title,
+            required_skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+            skill_level: skillLevel,
+            job_type: jobType,
+            budget_min: parseFloat(budgetMin) || 40000,
+            budget_max: parseFloat(budgetMax) || 80000,
+            required_certs: [...certSet],
+            job_location: (jobData) ? jobData.location : '',
+            job_work_style: (jobData) ? jobData.work_style : '',
+            preset: activePreset,
+          })
+        });
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error(data.error || 'Invalid response');
+        allCandidates = data;
+        allCandidates.forEach(c => {
+          if (!c.funnel) c.funnel = 'Applied';
+          if (!c.tags) c.tags = [];
+          if (c.hidden === undefined) c.hidden = false;
+        });
+        if (jobData && (jobData.job_post_id || jobData.job_id)) {
+          sessionStorage.setItem('cachedCands_v2_' + (jobData.job_post_id || jobData.job_id), JSON.stringify(allCandidates));
+        }
+        currentPage = 1;
+        renderCandidates();
+      } catch (e) {
+        document.getElementById('candidateList').innerHTML =
+          '<div class="text-center text-danger py-4">ไม่สามารถเชื่อมต่อ API ได้ กรุณา run api_server.py</div>';
+        document.getElementById('resultCount').textContent = 'เกิดข้อผิดพลาด';
+      } finally {
+        _matchRunning = false;
+      }
+    }
+
+    function renderCandidates() {
+      const sortBy = document.getElementById('sortBy').value;
+      const salaryFilter = parseFloat(document.getElementById('salaryFilter').value) || 0;
+      const companyQ = (document.getElementById('filterCompany')?.value || '').trim().toLowerCase();
+      const uniQ = (document.getElementById('filterUniversity')?.value || '').trim().toLowerCase();
+
+      let filtered = allCandidates.filter(c => {
+        if (c.hidden) return false;
+        if (salaryFilter && c.expected_salary > salaryFilter) return false;
+        if (companyQ) {
+          const expCompanies = (c.experience || []).map(e => (e.company || e.COMPANY_NAME || '').toLowerCase());
+          if (!expCompanies.some(co => co.includes(companyQ))) return false;
+        }
+        if (uniQ) {
+          const unis = (c.education || []).map(e => (e.university || e.UNIVERSITY_NAME || '').toLowerCase());
+          if (!unis.some(u => u.includes(uniQ))) return false;
+        }
+        return true;
+      });
+
+      if (sortBy === 'salary') filtered.sort((a, b) => a.expected_salary - b.expected_salary);
+      else if (sortBy === 'exp') filtered.sort((a, b) => b.exp_years_total - a.exp_years_total);
+      else filtered.sort((a, b) => b.fitness - a.fitness);
+
+      currentCands = filtered;
+      const total = filtered.length;
+      const start = (currentPage - 1) * pageSize;
+      const paginated = filtered.slice(start, start + pageSize);
+      const list = document.getElementById('candidateList');
+
+      if (paginated.length === 0) {
+        list.innerHTML = '<div class="text-center py-5 text-muted">ไม่พบผู้สมัครที่ตรงตามเงื่อนไข</div>';
+        document.getElementById('paginationUI').innerHTML = '';
+        document.getElementById('paginationInfo').textContent = '';
+        document.getElementById('resultCount').textContent = 'พบ 0 รายการ';
+        return;
+      }
+
+      list.innerHTML = paginated.map((c, i) => renderCard(c, start + i)).join('');
+      document.getElementById('resultCount').textContent = `พบ ${total} รายการ`;
+      renderPaginationUI(total);
+    }
+
+    function renderPaginationUI(total) {
+      const pages = Math.ceil(total / pageSize);
+      const ui = document.getElementById('paginationUI');
+      const info = document.getElementById('paginationInfo');
+
+      if (pages <= 1) {
+        ui.innerHTML = '';
+        info.textContent = total > 0 ? `แสดงรายการที่ 1-${total} จาก ${total} รายการ` : '';
+        return;
+      }
+
+      let html = `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="javascript:void(0)" onclick="changePage(${currentPage - 1})">ก่อนหน้า</a></li>`;
+      for (let i = 1; i <= pages; i++) {
+        if (i === 1 || i === pages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+          html += `<li class="page-item ${currentPage === i ? 'active' : ''}"><a class="page-link" href="javascript:void(0)" onclick="changePage(${i})">${i}</a></li>`;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+      }
+      html += `<li class="page-item ${currentPage === pages ? 'disabled' : ''}"><a class="page-link" href="javascript:void(0)" onclick="changePage(${currentPage + 1})">ถัดไป</a></li>`;
+      ui.innerHTML = html;
+
+      const startRange = (currentPage - 1) * pageSize + 1;
+      const endRange = Math.min(currentPage * pageSize, total);
+      info.textContent = `แสดงรายการที่ ${startRange}-${endRange} จาก ${total} รายการ (หน้าละ ${pageSize})`;
+    }
+
+    function changePage(p) {
+      currentPage = p;
+      renderCandidates();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const AVATAR_COLORS = ['#10b981','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#0891b2','#16a34a','#db2777'];
+
+    function renderCard(c, i) {
+      const certM = c.cert_matched || [];
+      const skills = c.skills || [];
+      const initials = (c.name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      const score = Math.round(c.fitness || 0);
+      const r = 33;
+      const circumference = (2 * Math.PI * r).toFixed(2);
+      const offset = Math.max(0, circumference - (score / 100) * circumference).toFixed(2);
+      let label = 'เหมาะสม';
+      let color = '#10b981';
+      if (score >= 90) { label = 'เหมาะสมมาก'; color = '#15803d'; }
+      else if (score < 50) { label = 'ปานกลาง'; color = '#f59e0b'; }
+      const avatarBg = AVATAR_COLORS[(c.name || '').charCodeAt(0) % AVATAR_COLORS.length] || '#10b981';
+
+      return `
+<div class="premium-card" onclick="openCandModal(${i})">
+  <div class="premium-card-body d-flex flex-row align-items-center gap-3">
+    <div class="flex-shrink-0" style="width:42px;height:42px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.95rem;">${initials}</div>
+    <div class="flex-grow-1 min-w-0">
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="fw-bold text-truncate" style="font-size:.9rem;color:#0f1f3d;">${c.name || 'ไม่ระบุ'}</div>
+        <div class="text-muted" style="font-size:.72rem;white-space:nowrap;margin-left:8px;"><i class="fas fa-map-marker-alt me-1"></i>${c.location || '—'}</div>
+      </div>
+      <div class="text-success fw-bold text-truncate" style="font-size:.8rem;">${c.title || '—'}</div>
+      <div class="mt-1 d-flex flex-wrap gap-2 align-items-center" style="font-size:.74rem;color:#64748b;">
+        <span><i class="fas fa-money-bill-wave me-1"></i>฿${(c.expected_salary || 0).toLocaleString()}</span>
+        <span><i class="fas fa-clock me-1"></i>${c.exp_years_total || 0} ปี</span>
+        <span class="text-truncate" style="max-width:160px;"><i class="fas fa-envelope me-1"></i>${c.email || '—'}</span>
+      </div>
+      <div class="mt-1 text-truncate">
+        ${skills.slice(0, 3).map(s => `<span class="skill-chip">${s}</span>`).join('')}
+        ${certM.length > 0 ? `<span class="small text-success fw-bold ms-1" style="font-size:.72rem;"><i class="fas fa-certificate"></i> +${certM.length}</span>` : ''}
+      </div>
+    </div>
+  </div>
+  <div class="match-pane">
+    <div class="score-circle-wrapper">
+      <svg class="score-circle-svg" viewBox="0 0 80 80">
+        <circle class="score-circle-bg" cx="40" cy="40" r="33"></circle>
+        <circle class="score-circle-progress" cx="40" cy="40" r="33" style="stroke-dasharray:${circumference};stroke-dashoffset:${offset};stroke:${color};"></circle>
+      </svg>
+      <div class="score-text">${score}%</div>
+    </div>
+    <div style="font-size:.68rem;font-weight:800;color:${color};line-height:1;">${label}</div>
+    <button class="btn btn-sm mt-1" style="border:1.5px solid #16a34a;color:#16a34a;border-radius:20px;font-size:.72rem;font-weight:700;padding:3px 10px;background:#fff;" onclick="addToPool(event,'${c.user_id}')">
+      <i class="fas fa-plus me-1"></i>Pool
+    </button>
+  </div>
+</div>`;
+    }
+
+    function updateFunnel(candidateId, status) {
+      const candidate = allCandidates.find(c => String(c.user_id) === String(candidateId));
+      if (candidate) candidate.funnel = status;
+    }
+
+    function hideCandidate(event, candidateId) {
+      event.stopPropagation();
+      const candidate = allCandidates.find(c => String(c.user_id) === String(candidateId));
+      if (candidate) { candidate.hidden = true; renderCandidates(); }
+    }
+
+    function openCandModal(i) {
+      const c = currentCands[i];
+      if (!c) return;
+      const initials = (c.name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('mAvatar').textContent = initials;
+      document.getElementById('mName').textContent = c.name || '—';
+      document.getElementById('mRole').textContent = c.title || '—';
+      document.getElementById('mSalary').innerHTML = `<i class="fas fa-baht-sign me-1"></i>${c.expected_salary ? '฿' + parseInt(c.expected_salary).toLocaleString() : 'Negotiable'}`;
+      document.getElementById('mLocation').innerHTML = `<i class="fas fa-map-marker-alt me-1"></i>${c.location || '—'}`;
+      document.getElementById('mWorkType').innerHTML = `<i class="fas fa-laptop-house me-1"></i>${c.work_style_pref || '—'}`;
+      document.getElementById('mExpYears').innerHTML = `<i class="fas fa-clock me-1"></i>${c.exp_years_total || 0} ปีประสบการณ์`;
+      document.getElementById('mKpiSal').textContent = c.expected_salary ? '฿' + parseInt(c.expected_salary).toLocaleString() : 'Nego';
+      document.getElementById('mKpiExp').textContent = (c.exp_years_total || 0) + ' ปี';
+      document.getElementById('mKpiWork').textContent = c.work_style_pref || '—';
+      document.getElementById('mAbout').textContent = c.about_me || '—';
+
+      const score = c.fitness;
+      document.getElementById('mScoreNum').textContent = score + '%';
+      const offset = 239 - (239 * score / 100);
+      const circle = document.getElementById('mScoreCircle');
+      circle.setAttribute('stroke-dashoffset', 239);
+      const color = score >= 90 ? '#15803d' : score >= 50 ? '#10b981' : '#f59e0b';
+      circle.setAttribute('stroke', color);
+      setTimeout(() => circle.setAttribute('stroke-dashoffset', offset), 100);
+
+      const sb = c.score_breakdown || {};
+      document.getElementById('mScoreBars').innerHTML = [
+        { label: 'ความสอดคล้องของตำแหน่ง (Title Match)', val: sb.title || 0, color: '#10b981' },
+        { label: 'ความสามารถตามคุณสมบัติ (Semantic Match)', val: sb.semantic || 0, color: '#10b981' },
+        { label: 'ทักษะตรงกัน (Skill Tag)', val: sb.skill || 0, color: '#16a34a' },
+        { label: 'ค่าตอบแทน (Salary)', val: sb.budget_fit || 0, color: '#16a34a' },
+        { label: 'ใบรับรอง (Certificate)', val: sb.cert || 0, color: '#f59e0b' },
+      ].map(b =>
+        `<div class="score-bar-row"><span class="score-bar-label">${b.label}</span><div class="score-bar-track"><div class="score-bar-fill" style="width:${b.val}%;background:${b.color};"></div></div><span class="score-bar-val" style="color:${b.color};">${b.raw || Math.round(b.val) + '%'}</span></div>`
+      ).join('');
+
+      const edu = c.education || [];
+      document.getElementById('mEdu').innerHTML = edu.length
+        ? edu.map(e => `<div class="edu-item"><div class="fw-bold">${e.degree} — ${e.major}</div><div class="text-muted small">${e.university} | GPA: ${e.gpa || '—'} | จบ: ${e.grad_year || '—'}</div></div>`).join('')
+        : '<div class="text-muted small">ไม่มีข้อมูล</div>';
+
+      const exp = c.experience || [];
+      document.getElementById('mExp').innerHTML = exp.length
+        ? exp.map(e => `<div class="exp-item-m"><div class="fw-bold small">${e.position || '—'}</div><div class="text-muted" style="font-size:.78rem;">${e.company || '—'} | ${e.start_date || '?'} - ${e.end_date || 'ปัจจุบัน'}</div>${e.tech_tools && e.tech_tools.length ? `<div style="font-size:.74rem;color:#10b981;">${e.tech_tools.join(', ')}</div>` : ''}</div>`).join('')
+        : '<div class="text-muted small">ไม่มีข้อมูล</div>';
+
+      const skills = c.skills || [];
+      document.getElementById('mSkills').innerHTML = skills.length
+        ? skills.map(s => `<span class="skill-chip">${s}</span>`).join('')
+        : '<span class="text-muted small">ไม่มีข้อมูล</span>';
+
+      const certs = c.certificates || [];
+      const certM = c.cert_matched || [];
+      const certMiss = c.cert_missing || [];
+      document.getElementById('mCerts').innerHTML = [
+        ...certM.map(cert => `<span class="cert-chip-match"><i class="fas fa-check-circle me-1"></i>${cert} <small>(ตรงกับที่ต้องการ)</small></span>`),
+        ...certs.filter(cert => !certM.includes(cert)).slice(0, 5).map(cert => `<span class="skill-chip">${cert}</span>`),
+        ...certMiss.map(cert => `<span class="cert-chip-miss"><i class="fas fa-times-circle me-1"></i>${cert} <small>(ยังขาด)</small></span>`),
+      ].join('') || '<span class="text-muted small">ไม่มีข้อมูล</span>';
+
+      new bootstrap.Modal(document.getElementById('candModal')).show();
+    }
+
+    function viewResume() {
+      alert('ฟีเจอร์ดู Resume: ในระบบจริง จะเปิดไฟล์ที่ผู้สมัครอัปโหลดไว้\n(จำลองสำหรับ Prototype)');
+    }
+  </script>
+</body>
+</html>

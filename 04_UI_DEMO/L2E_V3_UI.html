@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>L2E V3 — AI Job Matching</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+const LEARNERS = [
+  { id: "LNR-202600002", name: "Piywdi D.", title: "Programmer", skills: ["Python", "Java", "JavaScript", "Git"], exp: 3, salary: 57000 },
+  { id: "LNR-202600003", name: "Suthinanth P.", title: "UX/UI Designer", skills: ["Figma", "UX Design", "Wireframing", "Prototyping"], exp: 2, salary: 74000 },
+  { id: "LNR-202600005", name: "Phiphiththn K.", title: "DevOps Engineer", skills: ["Docker", "Kubernetes", "CI/CD", "AWS"], exp: 5, salary: 36000 },
+];
+
+const JOBS = [
+  { id: "JOB-202600001", title: "Cybersecurity Analyst", company: "Bangkok Bank", type: "Full-time", location: "On-site", province: "กรุงเทพฯ", salaryMin: 65000, salaryMax: 102000, skills: ["JavaScript", "Git", "Java", "Docker"], category: "ไอที" },
+  { id: "JOB-202600002", title: "DevOps Engineer", company: "PTT Digital", type: "Full-time", location: "On-site", province: "กรุงเทพฯ", salaryMin: 40000, salaryMax: 62000, skills: ["CI/CD", "Linux", "Docker", "Kubernetes"], category: "ไอที" },
+  { id: "JOB-202600003", title: "Data Scientist", company: "SCG", type: "Full-time", location: "Hybrid", province: "นนทบุรี", salaryMin: 55000, salaryMax: 86000, skills: ["Statistics", "Machine Learning", "SQL", "Tableau"], category: "ไอที" },
+  { id: "JOB-202600004", title: "Data Analyst", company: "Grab Thailand", type: "Full-time", location: "Hybrid", province: "กรุงเทพฯ", salaryMin: 50000, salaryMax: 78000, skills: ["SQL", "Machine Learning", "Python", "Tableau"], category: "ไอที" },
+  { id: "JOB-202600005", title: "UX/UI Designer", company: "LINE Thailand", type: "Full-time", location: "Hybrid", province: "กรุงเทพฯ", salaryMin: 45000, salaryMax: 70000, skills: ["Figma", "UX Design", "Prototyping", "User Research"], category: "ดิจิทัล" },
+  { id: "JOB-202600006", title: "Web Developer", company: "Sansiri", type: "Full-time", location: "On-site", province: "กรุงเทพฯ", salaryMin: 35000, salaryMax: 55000, skills: ["JavaScript", "React", "Node.js", "Git"], category: "ไอที" },
+];
+
+const POOL_JOB = { id: "JOB-202601570", title: "Data Analyst", company: "Sansiri", salaryMin: 45000, salaryMax: 70000, skills: ["Python", "Machine Learning", "SQL", "Tableau", "Presentation"] };
+const POOL_CANDIDATES = [
+  { id: "LNR-202604978", name: "Oaaeoesaa W.", title: "Data Scientist", source: "direct_apply", status: "hired",     score: 91, matched: ["Python", "ML", "SQL"],   missing: ["Tableau"] },
+  { id: "LNR-202605199", name: "Phrebyya S.",  title: "Programmer",     source: "pool",         status: "offer",     score: 73, matched: ["Python", "Java"],        missing: ["SQL", "ML"] },
+  { id: "LNR-202603720", name: "Oophas T.",    title: "Civil Engineer", source: "recommendation",status: "applied",   score: 38, matched: ["Presentation"],         missing: ["Python", "SQL", "ML"] },
+  { id: "LNR-202601894", name: "Thara N.",     title: "UX/UI Designer", source: "direct_apply", status: "applied",   score: 25, matched: [],                        missing: ["Python", "SQL", "ML", "Tableau"] },
+  { id: "LNR-202605649", name: "Suprani K.",   title: "Digital Marketer",source: "direct_apply",status: "screening", score: 18, matched: [],                        missing: ["Python", "SQL", "ML"] },
+  { id: "LNR-202609177", name: "Khmkchy R.",   title: "Civil Engineer", source: "direct_apply", status: "rejected",  score: 12, matched: [],                        missing: ["Python", "SQL", "ML", "Tableau"] },
+];
+
+const EXTRA_LEARNERS = [
+  { id: "LNR-202600010", name: "Somchai T.",  title: "Security Engineer", skills: ["JavaScript","Git","Docker","Java"], exp: 5, salary: 80000 },
+  { id: "LNR-202600011", name: "Pranee K.",   title: "IT Specialist",     skills: ["JavaScript","Java","Git"],          exp: 3, salary: 60000 },
+  { id: "LNR-202600012", name: "Wanchai P.",  title: "Network Engineer",  skills: ["Git","Linux"],                      exp: 2, salary: 45000 },
+  { id: "LNR-202600013", name: "Malee S.",    title: "Frontend Dev",      skills: ["JavaScript","React","Git"],         exp: 4, salary: 65000 },
+  { id: "LNR-202600014", name: "Nattapong R.",title: "Data Engineer",     skills: ["Python","SQL","Docker"],            exp: 3, salary: 70000 },
+];
+
+function getScore(ls, js) {
+  const m = js.filter(s => ls.includes(s));
+  const seed = ls.join("").length + js.join("").length;
+  return Math.min(Math.round((m.length / js.length) * 65 + (seed % 20) + 8), 98);
+}
+function matched(ls, js) { return js.filter(s => ls.includes(s)); }
+function missing(ls, js) { return js.filter(s => !ls.includes(s)); }
+
+function Score({ v }) {
+  const c = v >= 75 ? "text-green-600" : v >= 50 ? "text-amber-500" : "text-red-500";
+  return <span className={`text-xl font-bold ${c}`}>{v}%</span>;
+}
+function SkTag({ name, ok }) {
+  return ok
+    ? <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">{name} ✓</span>
+    : <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-500">{name} ↗</span>;
+}
+function SrcBadge({ src }) {
+  if (src === "recommendation") return <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">🤖 AI</span>;
+  if (src === "direct_apply")   return <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">📝 สมัครเอง</span>;
+  return <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">👆 HR เพิ่ม</span>;
+}
+function StatusDot({ s }) {
+  const m = { hired:"bg-green-500", offer:"bg-amber-400", interview:"bg-blue-500", screening:"bg-sky-400", applied:"bg-gray-400", rejected:"bg-red-400" };
+  return <span className="flex items-center gap-1 text-xs text-gray-500"><span className={`w-2 h-2 rounded-full ${m[s]||"bg-gray-300"}`}/>{s}</span>;
+}
+function Spinner() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full text-gray-400">
+      <div className="w-8 h-8 border-2 border-gray-200 border-t-green-500 rounded-full animate-spin mb-3"/>
+      <p className="text-sm">AI กำลังวิเคราะห์...</p>
+    </div>
+  );
+}
+
+/* ── LEARNER ── */
+function LearnerView() {
+  const [learner, setLearner] = useState(LEARNERS[0]);
+  const [sel, setSel]         = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState(null);
+
+  function search() {
+    setLoading(true); setSel(null);
+    setTimeout(() => {
+      setResults(JOBS.map(j => ({ ...j, score: getScore(learner.skills, j.skills), matched: matched(learner.skills, j.skills), missing: missing(learner.skills, j.skills) })).sort((a,b) => b.score - a.score));
+      setLoading(false);
+    }, 900);
+  }
+
+  return (
+    <div className="flex" style={{height:"calc(100vh - 96px)"}}>
+      {/* sidebar */}
+      <div className="w-60 bg-white border-r flex flex-col shrink-0">
+        <div className="p-4 border-b">
+          <p className="text-xs text-gray-400 mb-1">เลือกผู้เรียน</p>
+          <select className="w-full text-sm border rounded-lg px-2 py-1.5"
+            onChange={e => { setLearner(LEARNERS.find(l=>l.id===e.target.value)); setResults(null); setSel(null); }}>
+            {LEARNERS.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+        </div>
+        <div className="p-4 flex-1 overflow-y-auto">
+          <p className="text-xs text-gray-400 mb-2">โปรไฟล์</p>
+          <p className="font-semibold text-sm">{learner.name}</p>
+          <p className="text-xs text-gray-500">{learner.title} · {learner.exp} ปี</p>
+          <div className="flex flex-wrap gap-1 mt-2">
+            {learner.skills.map(s => <span key={s} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{s}</span>)}
+          </div>
+        </div>
+        <div className="p-4 border-t">
+          <button onClick={search} className="w-full bg-[#1a3a2a] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-green-800 transition">
+            {loading ? "กำลังค้นหา..." : "🔍 หางานที่เหมาะ"}
+          </button>
+        </div>
+      </div>
+
+      {/* list */}
+      <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+        {!results && !loading && (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+            <p className="text-4xl mb-3">💼</p><p className="text-sm">กดปุ่มให้ AI แนะนำงาน</p>
+          </div>
+        )}
+        {loading && <Spinner />}
+        {results && (
+          <div>
+            <p className="text-sm text-gray-500 mb-3">งานที่เหมาะกับคุณที่สุด ({results.length} ตำแหน่ง)</p>
+            <div className="grid grid-cols-2 gap-3">
+              {results.map(j => (
+                <div key={j.id} onClick={() => setSel(j)}
+                  className={`bg-white rounded-xl p-4 cursor-pointer border-2 transition ${sel?.id===j.id ? "border-green-500 shadow" : "border-transparent hover:border-green-200"}`}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-lg shrink-0">🏢</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate">{j.title}</p>
+                      <p className="text-xs text-gray-500 truncate">{j.company}</p>
+                      <div className="flex gap-1 mt-1.5 flex-wrap">
+                        <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">{j.location}</span>
+                        <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{j.category}</span>
+                      </div>
+                    </div>
+                    <Score v={j.score} />
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">{j.province} · {j.type}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* detail */}
+      {sel && (
+        <div className="w-68 bg-white border-l overflow-y-auto p-5 shrink-0" style={{width:272}}>
+          <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-2xl mb-3">🏢</div>
+          <p className="font-bold">{sel.title}</p>
+          <p className="text-sm text-gray-500 mb-4">{sel.company}</p>
+          <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 mb-4">
+            <span className="text-sm text-gray-500">คุณ Match กับงานนี้</span>
+            <Score v={sel.score} />
+          </div>
+          <button className="w-full bg-green-500 text-white text-sm font-semibold py-2.5 rounded-xl mb-3 hover:bg-green-600">สมัครงาน</button>
+          <div className="grid grid-cols-2 gap-y-2 text-xs mb-4">
+            <span className="text-gray-400">ประเภท</span><span className="font-medium text-green-700">{sel.type}</span>
+            <span className="text-gray-400">สถานที่</span><span className="font-medium text-green-700">{sel.location}</span>
+            <span className="text-gray-400">จังหวัด</span><span className="font-medium">{sel.province}</span>
+            <span className="text-gray-400">เงินเดือน</span><span className="font-medium">{sel.salaryMin.toLocaleString()}–{sel.salaryMax.toLocaleString()}</span>
+          </div>
+          <p className="text-xs text-gray-400 mb-1.5">ทักษะ</p>
+          <div className="flex flex-wrap gap-1">
+            {sel.matched.map(s => <SkTag key={s} name={s} ok />)}
+            {sel.missing.map(s => <SkTag key={s} name={s} ok={false} />)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── EMPLOYER ── */
+function EmployerView() {
+  const [job, setJob]         = useState(JOBS[0]);
+  const [sel, setSel]         = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState(null);
+
+  function search() {
+    setLoading(true); setSel(null);
+    setTimeout(() => {
+      const all = [...LEARNERS, ...EXTRA_LEARNERS];
+      setResults(all.map(l => ({ ...l, score: getScore(l.skills, job.skills), matched: matched(l.skills, job.skills), missing: missing(l.skills, job.skills) })).sort((a,b)=>b.score-a.score));
+      setLoading(false);
+    }, 900);
+  }
+
+  return (
+    <div className="flex" style={{height:"calc(100vh - 96px)"}}>
+      <div className="w-60 bg-white border-r flex flex-col shrink-0">
+        <div className="p-4 border-b">
+          <p className="text-xs text-gray-400 mb-1">เลือกประกาศงาน</p>
+          <select className="w-full text-sm border rounded-lg px-2 py-1.5"
+            onChange={e => { setJob(JOBS.find(j=>j.id===e.target.value)); setResults(null); setSel(null); }}>
+            {JOBS.map(j => <option key={j.id} value={j.id}>{j.title}</option>)}
+          </select>
+        </div>
+        <div className="p-4 flex-1 overflow-y-auto">
+          <p className="text-xs text-gray-400 mb-2">รายละเอียดงาน</p>
+          <p className="font-semibold text-sm">{job.title}</p>
+          <p className="text-xs text-gray-500">{job.company}</p>
+          <p className="text-xs text-gray-500 mt-1">{job.salaryMin.toLocaleString()}–{job.salaryMax.toLocaleString()} บาท</p>
+          <div className="flex flex-wrap gap-1 mt-2">
+            {job.skills.map(s => <span key={s} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{s}</span>)}
+          </div>
+        </div>
+        <div className="p-4 border-t">
+          <button onClick={search} className="w-full bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition">
+            {loading ? "กำลังค้นหา..." : "🤖 แนะนำด้วย AI"}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+        {!results && !loading && (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+            <p className="text-4xl mb-3">👥</p><p className="text-sm">กดปุ่มให้ AI แนะนำผู้สมัคร</p>
+          </div>
+        )}
+        {loading && <Spinner />}
+        {results && (
+          <div className="space-y-2">
+            <p className="text-sm text-gray-500 mb-3">ผู้สมัครที่เหมาะสม ({results.length} คน)</p>
+            {results.map((c, i) => (
+              <div key={c.id} onClick={() => setSel(c)}
+                className={`bg-white rounded-xl p-4 cursor-pointer border-2 flex items-center gap-3 transition ${sel?.id===c.id ? "border-blue-500" : "border-transparent hover:border-blue-200"}`}>
+                <span className="w-6 text-center text-sm font-bold text-gray-400 shrink-0">{i+1}</span>
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-lg shrink-0">👤</div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm">{c.name}</p>
+                  <p className="text-xs text-gray-500">{c.title} · {c.exp} ปี</p>
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {c.matched.map(s => <SkTag key={s} name={s} ok />)}
+                    {c.missing.slice(0,2).map(s => <SkTag key={s} name={s} ok={false} />)}
+                  </div>
+                </div>
+                <Score v={c.score} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {sel && (
+        <div className="w-68 bg-white border-l overflow-y-auto p-5 shrink-0" style={{width:272}}>
+          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-2xl mb-3">👤</div>
+          <p className="font-bold">{sel.name}</p>
+          <p className="text-sm text-gray-500 mb-4">{sel.title} · {sel.exp} ปี</p>
+          <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 mb-4">
+            <span className="text-sm text-gray-500">Match Score</span>
+            <Score v={sel.score} />
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+            <div className="h-2 rounded-full bg-blue-500" style={{width:`${sel.score}%`}}/>
+          </div>
+          <div className="flex gap-2 mb-4">
+            <button className="flex-1 bg-blue-700 text-white text-sm font-semibold py-2 rounded-xl hover:bg-blue-800">เชิญสัมภาษณ์</button>
+            <button className="flex-1 border text-sm py-2 rounded-xl hover:bg-gray-50">บันทึก</button>
+          </div>
+          <p className="text-xs text-gray-400 mb-1.5">ทักษะ</p>
+          <div className="flex flex-wrap gap-1">
+            {sel.matched.map(s => <SkTag key={s} name={s} ok />)}
+            {sel.missing.map(s => <SkTag key={s} name={s} ok={false} />)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── POOL ── */
+function PoolView() {
+  const [loading, setLoading] = useState(false);
+  const [done, setDone]       = useState(false);
+  const [sel, setSel]         = useState(null);
+
+  function analyze() {
+    setLoading(true); setDone(false); setSel(null);
+    setTimeout(() => { setLoading(false); setDone(true); }, 1200);
+  }
+
+  const sorted = [...POOL_CANDIDATES].sort((a,b) => b.score - a.score);
+
+  return (
+    <div className="flex" style={{height:"calc(100vh - 96px)"}}>
+      <div className="w-60 bg-white border-r flex flex-col shrink-0">
+        <div className="p-4 flex-1 overflow-y-auto">
+          <p className="text-xs text-gray-400 mb-2">ตำแหน่งงาน</p>
+          <p className="font-semibold text-sm">{POOL_JOB.title}</p>
+          <p className="text-xs text-gray-500">{POOL_JOB.company}</p>
+          <p className="text-xs text-gray-500 mt-1">{POOL_JOB.salaryMin.toLocaleString()}–{POOL_JOB.salaryMax.toLocaleString()} บาท</p>
+          <div className="flex flex-wrap gap-1 mt-2">
+            {POOL_JOB.skills.map(s => <span key={s} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{s}</span>)}
+          </div>
+          <div className="mt-4 pt-4 border-t">
+            <p className="text-xs text-gray-400 mb-2">Pool ({POOL_CANDIDATES.length} คน)</p>
+            <div className="space-y-1.5 text-xs">
+              <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-purple-500 shrink-0"/><span>AI แนะนำ: 1 คน</span></div>
+              <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500 shrink-0"/><span>สมัครเอง: 4 คน</span></div>
+              <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500 shrink-0"/><span>HR เพิ่ม: 1 คน</span></div>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 border-t">
+          <button onClick={analyze} className="w-full bg-purple-700 text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-purple-800 transition">
+            {loading ? "กำลังวิเคราะห์..." : "🔍 วิเคราะห์ทั้ง Pool"}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+        {!done && !loading && (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+            <p className="text-4xl mb-3">📊</p><p className="text-sm">กดวิเคราะห์เพื่อดู % Match ทุกคน</p>
+          </div>
+        )}
+        {loading && <Spinner />}
+        {done && (
+          <div className="space-y-2">
+            <p className="text-sm text-gray-500 mb-3">เรียงตาม % Match</p>
+            {sorted.map((c, i) => (
+              <div key={c.id} onClick={() => setSel(c)}
+                className={`bg-white rounded-xl p-4 cursor-pointer border-2 flex items-center gap-3 transition ${sel?.id===c.id ? "border-purple-500" : "border-transparent hover:border-purple-200"}`}>
+                <span className="w-5 text-center text-sm font-bold text-gray-400 shrink-0">{i+1}</span>
+                <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-lg shrink-0">👤</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                    <span className="font-semibold text-sm">{c.name}</span>
+                    <SrcBadge src={c.source} />
+                  </div>
+                  <p className="text-xs text-gray-500">{c.title}</p>
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {c.matched.map(s => <SkTag key={s} name={s} ok />)}
+                    {c.missing.slice(0,2).map(s => <SkTag key={s} name={s} ok={false} />)}
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <Score v={c.score} />
+                  <StatusDot s={c.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {sel && (
+        <div className="w-68 bg-white border-l overflow-y-auto p-5 shrink-0" style={{width:272}}>
+          <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-2xl mb-3">👤</div>
+          <p className="font-bold">{sel.name}</p>
+          <p className="text-sm text-gray-500 mb-1">{sel.title}</p>
+          <div className="mb-4"><SrcBadge src={sel.source} /></div>
+          <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 mb-3">
+            <span className="text-sm text-gray-500">Match Score</span>
+            <Score v={sel.score} />
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+            <div className="h-2 rounded-full bg-purple-500" style={{width:`${sel.score}%`}}/>
+          </div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs text-gray-500">สถานะ</span>
+            <StatusDot s={sel.status} />
+          </div>
+          <div className="flex gap-2 mb-4">
+            <button className="flex-1 bg-purple-700 text-white text-sm font-semibold py-2 rounded-xl hover:bg-purple-800">เชิญสัมภาษณ์</button>
+            <button className="flex-1 border text-sm py-2 rounded-xl hover:bg-gray-50">ข้าม</button>
+          </div>
+          <p className="text-xs text-gray-400 mb-1.5">ทักษะที่ตรง</p>
+          <div className="flex flex-wrap gap-1 mb-3">
+            {sel.matched.length ? sel.matched.map(s => <SkTag key={s} name={s} ok />) : <span className="text-xs text-gray-400">ไม่มี</span>}
+          </div>
+          <p className="text-xs text-gray-400 mb-1.5">ทักษะที่ขาด</p>
+          <div className="flex flex-wrap gap-1">
+            {sel.missing.map(s => <SkTag key={s} name={s} ok={false} />)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── APP ── */
+function App() {
+  const [tab, setTab] = useState("learner");
+  const tabs = [
+    { id:"learner",  label:"👤 ผู้เรียนหางาน" },
+    { id:"employer", label:"🏢 บริษัทหาผู้สมัคร" },
+    { id:"pool",     label:"🔍 วิเคราะห์ Pool" },
+  ];
+  return (
+    <div className="min-h-screen font-sans">
+      <div className="bg-[#1a3a2a] text-white px-6 py-3 flex items-center gap-4">
+        <span className="text-lg font-bold text-green-400">L2E</span>
+        <span className="text-xs text-green-300">AI Job Matching — V3</span>
+        <div className="flex gap-1 ml-auto">
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${tab===t.id ? "bg-green-400 text-[#1a3a2a] font-bold" : "text-gray-300 hover:text-white"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {tab === "learner"  && <LearnerView />}
+      {tab === "employer" && <EmployerView />}
+      {tab === "pool"     && <PoolView />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

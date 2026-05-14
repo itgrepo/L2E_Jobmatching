@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-03-23 10:00:00",
+  "source_dataset": "/Users/thanaponchueaboonmee/Library/CloudStorage/OneDrive-IntelligistPublicCompanyLimited/BDE LEARN TO EARN/L2E_V2/DATA_SET",
+  "output_dataset": "/Users/thanaponchueaboonmee/Library/CloudStorage/OneDrive-IntelligistPublicCompanyLimited/BDE LEARN TO EARN/L2E_V2/DATA_SET_V2",
+  "rows": {
+    "learners": 10000,
+    "preferences": 10000,
+    "educations": 13059,
+    "jobs": 3000,
+    "job_skills": 15001,
+    "candidates": 5000
+  },
+  "education_alignment": {
+    "mismatched_rows_fixed": 117
+  },
+  "candidate_status_counts": {
+    "hired": 900,
+    "interview": 850,
+    "offer": 850,
+    "screening": 850,
+    "applied": 800,
+    "rejected": 750
+  },
+  "avg_compatibility_by_status": {
+    "applied": 0.4467,
+    "hired": 0.8899,
+    "interview": 0.7002,
+    "offer": 0.8167,
+    "rejected": 0.2499,
+    "screening": 0.5757
+  },
+  "avg_skill_overlap_by_status": {
+    "applied": 0.0685,
+    "hired": 0.7218,
+    "interview": 0.4445,
+    "offer": 0.6064,
+    "rejected": 0.0204,
+    "screening": 0.2128
+  },
+  "avg_title_match_by_status": {
+    "applied": 0.5332,
+    "hired": 0.9996,
+    "interview": 0.9862,
+    "offer": 0.9982,
+    "rejected": 0.1461,
+    "screening": 0.777
+  }
+}

@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Candidate Workspace - L2E</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-light: #e8f0fe;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --gold: #f59e0b;
+            --bg-gray: #f3f2ef;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            font-family: 'Sarabun', sans-serif;
+            padding-top: 70px;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .pulse-logo {
+            font-size: 3rem;
+            color: var(--primary);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+        }
+
+        /* Layout */
+        .layout-center {
+            max-width: 900px;
+            margin: 0 auto;
+            transition: 0.35s;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            padding: 28px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 14px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 6px;
+        }
+
+        .exp-item {
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .btn-remove-exp {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #dc3545;
+            cursor: pointer;
+        }
+
+        /* Resume Upload */
+        .resume-drop-zone {
+            border: 2px dashed #10b981;
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #f0f7ff;
+            position: relative;
+        }
+
+        .resume-drop-zone:hover,
+        .resume-drop-zone.drag-over {
+            background: #dbeafe;
+            border-color: #059669;
+        }
+
+        .resume-drop-zone input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .resume-file-info {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 8px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        /* Job Card */
+        .job-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            overflow: hidden;
+        }
+
+        .job-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 6px 20px rgba(10, 102, 194, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .job-card-header {
+            padding: 14px 16px 10px;
+        }
+
+        .job-card-footer {
+            background: #f8f9fb;
+            border-top: 1px solid #f0f0f0;
+            padding: 10px 16px;
+        }
+
+        /* Score Badge */
+        .score-badge {
+            font-size: 1rem;
+            font-weight: 800;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .score-gold {
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: white;
+        }
+
+        .score-green {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .score-blue {
+            background: linear-gradient(135deg, #3b82f6, #059669);
+            color: white;
+        }
+
+        /* Mini Score Bars */
+        .mini-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+        }
+
+        .mini-bar-bg {
+            background: #e5e7eb;
+            height: 5px;
+            border-radius: 3px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .mini-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        /* Modal */
+        .match-bar-bg {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .match-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.8s ease;
+        }
+
+        .tag-pill {
+            background: #f3f2ef;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: #555;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .cert-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .cert-match {
+            background: #dcfce7;
+            color: #16a34a;
+            border: 1px solid #86efac;
+        }
+
+        .cert-required {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        /* Score Circle */
+        .score-circle-wrap {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
+
+        .score-circle-svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-circle-number {
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-circle-label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #888;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Salary Analysis Box */
+        .salary-box {
+            border-left: 5px solid #0dcaf0;
+            background-color: #f0f9ff;
+            border-radius: 0 12px 12px 0;
+        }
+    </style>
+
+    <style>
+        /* Bootstrap Primary Override to Emerald Green */
+        :root {
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+        }
+
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        /* Extra fix for gradient inputs and focus rings */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loadingOverlay" class="d-none">
+        <div class="pulse-logo"><i class="fas fa-brain"></i></div>
+        <h4 class="mt-3 fw-bold text-dark">กำลังวิเคราะห์โปรไฟล์และจับคู่งาน...</h4>
+        <p class="text-muted">AI กำลังเปรียบเทียบทักษะ ประสบการณ์ และ Certifications ของคุณ</p>
+        <div class="progress mt-3" style="width:280px; height:6px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width:100%"></div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg bg-white border-bottom fixed-top px-4">
+        <span class="navbar-brand fw-bold text-primary" onclick="window.location.reload()" style="cursor:pointer">
+            ค้นหางาน
+        </span>
+        <div class="d-flex align-items-center ms-auto">
+            <a href="market_dashboard.html" class="btn btn-link text-decoration-none text-secondary fw-bold me-3">
+                <i class="fas fa-chart-line"></i> ตลาดแรงงาน
+            </a>
+            <span class="border-start mx-2" style="height:24px;"></span>
+            <span id="navName" class="me-3 fw-bold text-dark ms-2">User</span>
+            <a href="index.html" class="btn btn-sm btn-outline-danger">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-3">
+        <div class="row" id="mainRow">
+            <div id="formCol" class="col-12 layout-center">
+
+                <!-- Profile Form Card -->
+                <div class="form-card">
+                    <h3 class="fw-bold text-primary mb-4 text-center"><i class="fas fa-id-card"></i> แก้ไขข้อมูลผู้สมัคร
+                        (PROFILE EDITOR)</h3>
+
+                    <div class="section-header"><i class="fas fa-user"></i> ข้อมูลส่วนตัว</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6"><label class="small fw-bold">User ID</label><input type="text" id="userId"
+                                class="form-control" readonly></div>
+                        <div class="col-md-6"><label class="small fw-bold">ชื่อ-นามสกุล</label><input type="text"
+                                id="fullname" class="form-control"></div>
+                        <div class="col-md-4"><label class="small fw-bold">อายุ</label><input type="number" id="age"
+                                class="form-control"></div>
+                        <div class="col-md-4"><label class="small fw-bold">สถานที่ที่ต้องการทำงาน</label><input
+                                type="text" id="location" class="form-control"></div>
+                        <div class="col-md-4">
+                            <label class="small fw-bold">รูปแบบงาน</label>
+                            <select id="workStyle" class="form-select">
+                                <option value="Onsite">Onsite</option>
+                                <option value="Hybrid">Hybrid</option>
+                                <option value="Remote">Remote</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6"><label class="small fw-bold">ตำแหน่งที่สนใจ</label><input type="text"
+                                id="role" class="form-control text-primary fw-bold"></div>
+                        <div class="col-md-6"><label class="small fw-bold">เงินเดือนที่คาดหวัง (บาท)</label><input
+                                type="number" id="salary" class="form-control"></div>
+                        <div class="col-12"><label class="small fw-bold">เกี่ยวกับฉัน (About Me)</label><textarea
+                                id="aboutMe" class="form-control" rows="2"></textarea></div>
+                        <div class="col-12"><label class="small fw-bold">ทักษะ (Skills) — คั่นด้วย
+                                comma</label><textarea id="skills" class="form-control" rows="2"></textarea></div>
+                    </div>
+
+                    <!-- Certifications Section -->
+                    <div class="section-header"><i class="fas fa-certificate"></i> ใบรับรอง / Certifications</div>
+                    <div class="mb-4">
+                        <label class="small fw-bold text-muted mb-2 d-block">ระบุ certifications ที่มี (คั่นด้วย comma)
+                            เช่น Oracle DB Certified, AWS SAA, GCP Professional</label>
+                        <textarea id="certifications" class="form-control" rows="2"
+                            placeholder="Oracle Database Administrator Certified, AWS Solutions Architect, Google Data Analytics..."></textarea>
+                        <div id="certPills" class="mt-2 d-flex flex-wrap gap-1"></div>
+                    </div>
+
+                    <!-- Education Section -->
+                    <div class="section-header"><i class="fas fa-graduation-cap"></i> การศึกษา (Education)</div>
+                    <div class="row g-3 mb-3 p-3 bg-light rounded border">
+                        <div class="col-md-4"><label class="small fw-bold">ระดับปริญญา</label><input type="text"
+                                id="degree" class="form-control" placeholder="Bachelor"></div>
+                        <div class="col-md-4"><label class="small fw-bold">คณะ/สาขา</label><input type="text" id="major"
+                                class="form-control" placeholder="Computer Science"></div>
+                        <div class="col-md-4"><label class="small fw-bold">มหาวิทยาลัย</label><input type="text"
+                                id="uni" class="form-control"></div>
+                        <div class="col-md-6"><label class="small fw-bold">GPA</label><input type="number" id="gpa"
+                                class="form-control" step="0.01"></div>
+                        <div class="col-md-6"><label class="small fw-bold">ปีที่จบ</label><input type="number"
+                                id="gradYear" class="form-control"></div>
+                    </div>
+
+                    <!-- Experience Section -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="section-header mb-0 border-0"><i class="fas fa-briefcase"></i> ประสบการณ์ทำงาน
+                            (Experience)</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addExpField()">+
+                            เพิ่มประสบการณ์</button>
+                    </div>
+                    <div id="expContainer"></div>
+
+                    <button onclick="runMatch()" class="btn btn-primary w-100 btn-lg fw-bold mt-4 shadow-sm py-3">
+                        <i class="fas fa-rocket"></i> บันทึกข้อมูล & เริ่มจับคู่งาน (Analyze & Match)
+                    </button>
+                </div>
+
+                <!-- Resume Upload Card -->
+                <div class="form-card">
+                    <div class="section-header"><i class="fas fa-file-alt"></i> เรซูเม่ / Resume</div>
+                    <p class="text-muted small mb-3"><i class="fas fa-info-circle"></i> อัปโหลด Resume
+                        ใหม่เพื่ออัปเดตข้อมูลล่าสุดของคุณ (รองรับ PDF, DOCX)</p>
+
+                    <div class="resume-drop-zone" id="dropZone"
+                        ondragover="event.preventDefault(); this.classList.add('drag-over');"
+                        ondragleave="this.classList.remove('drag-over');" ondrop="handleDrop(event);">
+                        <input type="file" id="resumeFile" accept=".pdf,.docx,.doc" onchange="handleFileSelect(this)">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                        <p class="fw-bold text-primary mb-1">ลากไฟล์มาวางที่นี่</p>
+                        <p class="text-muted small">หรือคลิกเพื่อเลือกไฟล์ (PDF, DOCX, DOC)</p>
+                        <span class="badge bg-light text-muted border">ขนาดไม่เกิน 5MB</span>
+                    </div>
+
+                    <div id="resumeFileInfo" class="d-none resume-file-info mt-3">
+                        <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold text-dark" id="resumeFileName">—</div>
+                            <small class="text-muted" id="resumeFileSize">—</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="clearResume()">
+                            <i class="fas fa-times"></i> ลบ
+                        </button>
+                    </div>
+
+                    <div class="mt-3 d-flex gap-2">
+                        <button class="btn btn-success fw-bold" onclick="uploadResume()">
+                            <i class="fas fa-upload"></i> อัปโหลด Resume
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="clearResume()">
+                            <i class="fas fa-redo"></i> เลือกใหม่
+                        </button>
+                    </div>
+                    <div id="resumeStatus" class="mt-2"></div>
+                </div>
+            </div>
+
+            <!-- Results Column -->
+            <div id="resultCol" class="col-md-8 d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold m-0">ผลการจับคู่ (AI MATCHING RESULTS)</h5>
+                        <small class="text-muted" id="resultCount"></small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="showForm()">
+                        <i class="fas fa-edit"></i> แก้ไขข้อมูล
+                    </button>
+                </div>
+
+                <!-- Salary Analysis -->
+                <div id="salaryAnalysisBox" class="alert salary-box d-none mb-4 shadow-sm">
+                    <h5 class="fw-bold text-primary mb-3"><i class="fas fa-coins"></i> ช่วงเงินเดือนที่แนะนำ
+                        (RECOMMENDED SALARY)</h5>
+                    <div class="d-flex justify-content-between align-items-center px-2">
+                        <div class="text-center">
+                            <small class="text-muted fw-bold d-block mb-1">คาดหวัง (Minimum)</small>
+                            <div class="fs-4 fw-bold text-dark">฿<span id="salMin">0</span></div>
+                        </div>
+                        <div class="fs-3 text-secondary opacity-50"><i class="fas fa-arrow-right"></i></div>
+                        <div class="text-center">
+                            <small class="text-muted fw-bold d-block mb-1">ตลาด (Market Avg Max)</small>
+                            <div class="fs-4 fw-bold text-success">฿<span id="salMax">0</span></div>
+                        </div>
+                    </div>
+                    <hr class="my-2">
+                    <small class="text-muted"><i class="fas fa-info-circle"></i> คำนวณจากเงินเดือนที่คาดหวัง
+                        เทียบกับค่าเฉลี่ยสูงสุดของงานที่แมตช์ 10 อันดับแรก</small>
+                </div>
+
+                <div id="jobList"></div>
+
+                <div class="text-center mt-4 mb-5">
+                    <button id="loadMoreBtn" class="btn btn-outline-primary rounded-pill px-4" onclick="loadMoreJobs()">
+                        ดูงานเพิ่มเติม <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Detail Modal -->
+    <div class="modal fade" id="jobModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <!-- Header Row -->
+                    <div class="d-flex align-items-center mb-4">
+                        <img id="mLogo" src="" class="rounded me-3 border" width="70" height="70"
+                            style="object-fit:contain;">
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold mb-0" id="mTitle">Title</h4>
+                            <div class="text-secondary fw-bold" id="mCompany">Company</div>
+                        </div>
+                        <!-- Score Circle -->
+                        <div class="text-center ms-3">
+                            <div class="score-circle-wrap">
+                                <svg class="score-circle-svg" width="90" height="90" viewBox="0 0 90 90">
+                                    <circle cx="45" cy="45" r="38" fill="none" stroke="#e5e7eb" stroke-width="9" />
+                                    <circle id="scoreArc" cx="45" cy="45" r="38" fill="none" stroke="#10b981"
+                                        stroke-width="9" stroke-dasharray="239" stroke-dashoffset="239"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <div class="score-circle-text">
+                                    <div class="score-circle-number text-primary" id="mScoreNum">0</div>
+                                    <div class="score-circle-label">MATCH<br>SCORE</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- คะแนนความเหมาะสม (SCORE BREAKDOWN) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-4">
+                            <small class="fw-bold text-muted">EXPERIENCE</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold small" id="scExp">0%</span>
+                                <div class="match-bar-bg flex-grow-1">
+                                    <div id="barExp" class="match-bar-fill bg-success" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <small class="fw-bold text-muted">SKILLS</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold small" id="scSkill">0%</span>
+                                <div class="match-bar-bg flex-grow-1">
+                                    <div id="barSkill" class="match-bar-fill bg-info" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <small class="fw-bold text-muted">CERT MATCH</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold small" id="scCert">0%</span>
+                                <div class="match-bar-bg flex-grow-1">
+                                    <div id="barCert" class="match-bar-fill bg-warning" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="mb-4">
+                        <div id="mTags"></div>
+                        <div class="mt-2 fw-bold text-dark"><i class="fas fa-money-bill-wave text-success"></i> <span
+                                id="mSalary"></span></div>
+                    </div>
+
+                    <!-- Required Certs Section -->
+                    <div id="certSection" class="mb-4 d-none">
+                        <h6 class="fw-bold border-bottom pb-2"><i class="fas fa-certificate text-warning"></i>
+                            ใบรับรองที่ต้องการ (REQUIRED CERTIFICATIONS)</h6>
+                        <div id="mRequiredCerts"></div>
+                    </div>
+
+                    <!-- About Job -->
+                    <h6 class="fw-bold border-bottom pb-2">รายละเอียดงาน (JOB DESCRIPTION)</h6>
+                    <p id="mDesc" class="text-secondary small" style="white-space: pre-line;"></p>
+
+                    <!-- Benefits -->
+                    <div id="benefitSection" class="d-none mt-4">
+                        <h6 class="fw-bold border-bottom pb-2">สวัสดิการ (BENEFITS)</h6>
+                        <div id="mBenefits"></div>
+                    </div>
+
+                    <!-- Missing Skills -->
+                    <div class="mt-4 p-3 bg-danger bg-opacity-10 rounded border border-danger">
+                        <h6 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-circle"></i> ทักษะที่ขาด
+                            (MISSING SKILLS)</h6>
+                        <div id="mMissing"></div>
+                    </div>
+
+                    <!-- Courses -->
+                    <div class="mt-4 p-3 bg-light rounded border">
+                        <h6 class="fw-bold text-dark mb-2"><i class="fas fa-book-open"></i> หลักสูตรแนะนำ (RECOMMENDED
+                            COURSES)</h6>
+                        <ul id="mCourses" class="list-unstyled mb-0 small"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Experience Template -->
+    <template id="expTemplate">
+        <div class="exp-item">
+            <i class="fas fa-times btn-remove-exp" onclick="this.parentElement.remove()"></i>
+            <div class="row g-2">
+                <div class="col-md-6"><label class="small fw-bold">ตำแหน่ง</label><input type="text"
+                        class="form-control form-control-sm exp-pos"></div>
+                <div class="col-md-6"><label class="small fw-bold">บริษัท</label><input type="text"
+                        class="form-control form-control-sm exp-comp"></div>
+                <div class="col-md-6"><label class="small fw-bold">เริ่ม</label><input type="date"
+                        class="form-control form-control-sm exp-start"></div>
+                <div class="col-md-6"><label class="small fw-bold">สิ้นสุด</label><input type="date"
+                        class="form-control form-control-sm exp-end"></div>
+                <div class="col-12"><label class="small fw-bold">Tech Stack</label><input type="text"
+                        class="form-control form-control-sm exp-tech"></div>
+                <div class="col-12"><label class="small fw-bold">รายละเอียด</label><textarea
+                        class="form-control form-control-sm exp-desc" rows="2"></textarea></div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        let allJobs = [];
+        let displayCount = 0;
+        const PAGE_SIZE = 10;
+
+        // ---- Load user data ----
+        document.addEventListener('DOMContentLoaded', () => {
+            const u = JSON.parse(localStorage.getItem('currentUser'));
+            if (u) {
+                document.getElementById('navName').innerText = u.name || 'User';
+                document.getElementById('userId').value = u.user_id;
+                document.getElementById('fullname').value = u.name || '';
+                document.getElementById('age').value = u.age || 25;
+                document.getElementById('location').value = u.location_pref || u.location || 'Bangkok';
+
+                const role = u.interested_jobs ? u.interested_jobs[0] :
+                    u.interested_role || u.current_role || '';
+                document.getElementById('role').value = role;
+                document.getElementById('aboutMe').value = u.about_me || '';
+                document.getElementById('skills').value = (u.skills || []).join(', ');
+                document.getElementById('salary').value = u.expected_salary || 50000;
+
+                // Certs
+                const certs = u.certificates || [];
+                document.getElementById('certifications').value = certs.join(', ');
+                updateCertPills(certs);
+
+                // Education
+                if (u.education && u.education.length > 0) {
+                    const e = u.education[0];
+                    document.getElementById('degree').value = e.degree || '';
+                    document.getElementById('major').value = e.major || '';
+                    document.getElementById('uni').value = e.university || '';
+                    document.getElementById('gpa').value = e.gpa || '';
+                    document.getElementById('gradYear').value = e.grad_year || '';
+                }
+
+                // Experience
+                if (u.experience && u.experience.length > 0) {
+                    u.experience.forEach(addExpField);
+                } else {
+                    addExpField();
+                }
+            }
+
+            // Cert input live pills
+            document.getElementById('certifications').addEventListener('input', function () {
+                const certs = this.value.split(',').map(s => s.trim()).filter(Boolean);
+                updateCertPills(certs);
+            });
+        });
+
+        function updateCertPills(certs) {
+            const container = document.getElementById('certPills');
+            container.innerHTML = certs.map(c => `
+                <span class="badge border" style="background:#e8f0fe; color:#10b981; font-size:0.8rem; font-weight:600; padding:5px 10px;">
+                    <i class="fas fa-certificate me-1"></i>${c}
+                </span>`).join('');
+        }
+
+        function addExpField(data = null) {
+            const t = document.getElementById('expTemplate');
+            const c = t.content.cloneNode(true);
+            if (data) {
+                c.querySelector('.exp-pos').value = data.position || data.role || '';
+                c.querySelector('.exp-comp').value = data.company || '';
+                c.querySelector('.exp-start').value = data.start_date || '';
+                c.querySelector('.exp-end').value = data.end_date || '';
+                c.querySelector('.exp-tech').value = data.tech_tools ? data.tech_tools.join(', ') : '';
+                c.querySelector('.exp-desc').value = data.description || '';
+            }
+            document.getElementById('expContainer').appendChild(c);
+        }
+
+        // ---- Resume Upload ----
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) showResumeInfo(input.files[0]);
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            document.getElementById('dropZone').classList.remove('drag-over');
+            const file = event.dataTransfer.files[0];
+            if (file) {
+                document.getElementById('resumeFile').files = event.dataTransfer.files;
+                showResumeInfo(file);
+            }
+        }
+
+        function showResumeInfo(file) {
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|docx|doc)$/i)) {
+                alert('กรุณาเลือกไฟล์ PDF หรือ DOCX เท่านั้น');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) { alert('ไฟล์ต้องมีขนาดไม่เกิน 5MB'); return; }
+            document.getElementById('resumeFileName').innerText = file.name;
+            document.getElementById('resumeFileSize').innerText = (file.size / 1024).toFixed(1) + ' KB';
+            document.getElementById('resumeFileInfo').classList.remove('d-none');
+            const icon = document.querySelector('#resumeFileInfo .fa-file-pdf');
+            icon.className = file.name.endsWith('.pdf')
+                ? 'fas fa-file-pdf fa-2x text-danger'
+                : 'fas fa-file-word fa-2x text-primary';
+        }
+
+        function clearResume() {
+            document.getElementById('resumeFile').value = '';
+            document.getElementById('resumeFileInfo').classList.add('d-none');
+            document.getElementById('resumeStatus').innerHTML = '';
+        }
+
+        function uploadResume() {
+            const file = document.getElementById('resumeFile').files[0];
+            if (!file) { alert('กรุณาเลือกไฟล์ก่อน'); return; }
+            const statusEl = document.getElementById('resumeStatus');
+            statusEl.innerHTML = '<div class="alert alert-info py-2"><i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลด...</div>';
+            setTimeout(() => {
+                statusEl.innerHTML = `<div class="alert alert-success py-2"><i class="fas fa-check-circle"></i> อัปโหลด <strong>${file.name}</strong> สำเร็จ! ระบบจะนำข้อมูลไปใช้ในการ match</div>`;
+            }, 1200);
+        }
+
+        // ---- Main Match ----
+        async function runMatch() {
+            document.getElementById('loadingOverlay').classList.remove('d-none');
+
+            const expList = [];
+            document.querySelectorAll('.exp-item').forEach(item => {
+                const desc = item.querySelector('.exp-desc').value;
+                const tech = item.querySelector('.exp-tech').value;
+                if (desc || tech) expList.push(desc + ' ' + tech);
+            });
+
+            const certsRaw = document.getElementById('certifications').value;
+            const certs = certsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+            const payload = {
+                interested_role: document.getElementById('role').value,
+                skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean),
+                exp_years: document.querySelectorAll('.exp-item').length * 2,
+                gpa: parseFloat(document.getElementById('gpa').value) || 0,
+                location_city: document.getElementById('location').value,
+                about_me: document.getElementById('aboutMe').value,
+                work_experiences: expList,
+                expected_salary: document.getElementById('salary').value,
+                certificates: certs
+            };
+
+            try {
+                const res = await fetch('http://127.0.0.1:5001/api/match_jobs', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                allJobs = data.jobs || data;
+
+                if (data.analysis) {
+                    document.getElementById('salaryAnalysisBox').classList.remove('d-none');
+                    document.getElementById('salMin').innerText = parseInt(data.analysis.user_min).toLocaleString();
+                    document.getElementById('salMax').innerText = parseInt(data.analysis.market_max_avg).toLocaleString();
+                }
+
+                document.getElementById('resultCount').innerText = `พบงานที่ตรงกับโปรไฟล์ ${allJobs.length} ตำแหน่ง`;
+                displayCount = 0;
+                document.getElementById('jobList').innerHTML = '';
+                loadMoreJobs();
+
+                document.getElementById('formCol').classList.remove('layout-center', 'col-12');
+                document.getElementById('formCol').classList.add('col-md-4');
+                document.getElementById('resultCol').classList.remove('d-none');
+
+            } catch (e) {
+                console.error(e);
+                alert('ไม่สามารถเชื่อมต่อ API Server ได้ กรุณาตรวจสอบว่า api_server.py กำลังทำงานอยู่');
+            } finally {
+                document.getElementById('loadingOverlay').classList.add('d-none');
+            }
+        }
+
+        function getScoreBadgeClass(score) {
+            if (score >= 85) return 'score-gold';
+            if (score >= 70) return 'score-green';
+            return 'score-blue';
+        }
+
+        function loadMoreJobs() {
+            const container = document.getElementById('jobList');
+            const nextBatch = allJobs.slice(displayCount, displayCount + PAGE_SIZE);
+
+            nextBatch.forEach((j, idx) => {
+                const globalIdx = displayCount + idx;
+                const badgeClass = getScoreBadgeClass(j.match_score);
+                const sb = j.score_breakdown || {};
+                const skillPct = sb.skill || j.score_skills || 0;
+                const expPct = sb.exp || j.score_exp || 0;
+                const certPct = sb.cert || 0;
+                const hasCerts = (j.required_certs || []).length > 0;
+
+                container.innerHTML += `
+                <div class="job-card" onclick="openModal(${globalIdx})">
+                    <div class="job-card-header d-flex">
+                        <img src="${j.logo_url || 'https://ui-avatars.com/api/?name=Job&background=0a66c2&color=fff'}"
+                             class="rounded me-3 border" width="50" height="50" style="object-fit:contain;">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h6 class="fw-bold text-primary mb-0">${j.title}</h6>
+                                <span class="score-badge ${badgeClass} ms-2">${j.match_score}%</span>
+                            </div>
+                            <div class="small fw-bold text-dark mt-1">${j.company}</div>
+                            <div class="small text-muted">${j.location} • ${j.salary_text}</div>
+                        </div>
+                    </div>
+                    <div class="job-card-footer">
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="mini-bar-wrap">
+                                    <span class="text-muted" style="min-width:28px;">Exp</span>
+                                    <div class="mini-bar-bg"><div class="mini-bar-fill bg-success" style="width:${expPct}%"></div></div>
+                                    <span class="fw-bold">${expPct}%</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mini-bar-wrap">
+                                    <span class="text-muted" style="min-width:28px;">Skill</span>
+                                    <div class="mini-bar-bg"><div class="mini-bar-fill bg-info" style="width:${skillPct}%"></div></div>
+                                    <span class="fw-bold">${skillPct}%</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mini-bar-wrap">
+                                    <span class="text-muted" style="min-width:28px;">Cert</span>
+                                    <div class="mini-bar-bg"><div class="mini-bar-fill bg-warning" style="width:${certPct}%"></div></div>
+                                    <span class="fw-bold">${hasCerts ? certPct + '%' : 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            displayCount += nextBatch.length;
+            document.getElementById('loadMoreBtn').style.display = displayCount >= allJobs.length ? 'none' : 'inline-block';
+        }
+
+        function openModal(idx) {
+            const j = allJobs[idx];
+            document.getElementById('mTitle').innerText = j.title;
+            document.getElementById('mCompany').innerText = j.company;
+            document.getElementById('mLogo').src = j.logo_url || 'https://ui-avatars.com/api/?name=Job&background=0a66c2&color=fff';
+            document.getElementById('mDesc').innerText = j.description || '—';
+            document.getElementById('mSalary').innerText = j.salary_text;
+
+            // Score Circle Animation
+            const score = j.match_score;
+            document.getElementById('mScoreNum').innerText = score + '%';
+            const circ = 2 * Math.PI * 38;
+            const offset = circ - (score / 100) * circ;
+            const arc = document.getElementById('scoreArc');
+            arc.style.strokeDashoffset = circ;
+            arc.style.transition = 'none';
+            setTimeout(() => {
+                arc.style.transition = 'stroke-dashoffset 1s ease';
+                arc.style.strokeDashoffset = offset;
+                arc.setAttribute('stroke', score >= 85 ? '#f59e0b' : score >= 70 ? '#16a34a' : '#10b981');
+            }, 100);
+
+            // Score Breakdown Bars
+            const sb = j.score_breakdown || {};
+            const expPct = sb.exp || j.score_exp || 0;
+            const skillPct = sb.skill || j.score_skills || 0;
+            const certPct = sb.cert || 0;
+
+            document.getElementById('scExp').innerText = expPct + '%';
+            document.getElementById('barExp').style.width = expPct + '%';
+            document.getElementById('scSkill').innerText = skillPct + '%';
+            document.getElementById('barSkill').style.width = skillPct + '%';
+            document.getElementById('scCert').innerText = certPct + '%';
+            document.getElementById('barCert').style.width = certPct + '%';
+
+            // Tags
+            const tags = [j.location, j.type, j.level, j.exp_req].filter(Boolean);
+            document.getElementById('mTags').innerHTML = tags.map(t => `<span class="tag-pill">${t}</span>`).join('');
+
+            // Required Certs
+            const reqCerts = j.required_certs || [];
+            const certMatched = j.cert_matched || [];
+            const certSec = document.getElementById('certSection');
+            if (reqCerts.length > 0) {
+                certSec.classList.remove('d-none');
+                document.getElementById('mRequiredCerts').innerHTML = reqCerts.map(rc => {
+                    const matched = certMatched.some(mc => mc.toLowerCase().includes(rc.toLowerCase()) || rc.toLowerCase().includes(mc.toLowerCase()));
+                    return matched
+                        ? `<span class="cert-badge cert-match"><i class="fas fa-check-circle me-1"></i>${rc}</span>`
+                        : `<span class="cert-badge cert-required"><i class="fas fa-star me-1"></i>${rc} <small>(ต้องการ)</small></span>`;
+                }).join('');
+            } else {
+                certSec.classList.add('d-none');
+            }
+
+            // Benefits
+            const bSec = document.getElementById('benefitSection');
+            if (j.benefits && j.benefits.length > 0) {
+                bSec.classList.remove('d-none');
+                document.getElementById('mBenefits').innerHTML = j.benefits.map(b => `<span class="badge bg-light text-dark border me-1 mb-1">${b}</span>`).join('');
+            } else {
+                bSec.classList.add('d-none');
+            }
+
+            // Missing Skills & Courses
+            const mDiv = document.getElementById('mMissing');
+            const cList = document.getElementById('mCourses');
+            if (j.missing_skills && j.missing_skills.length > 0) {
+                mDiv.innerHTML = j.missing_skills.map(s => `<span class="badge bg-white text-danger border border-danger me-1">${s}</span>`).join('');
+                cList.innerHTML = j.rec_courses.map(c => `
+                    <li class="mb-1">
+                        <span class="text-danger fw-bold">${c.skill}:</span>
+                        <span class="text-muted"> แนะนำ "${c.course_name}"</span>
+                    </li>`).join('');
+            } else {
+                mDiv.innerHTML = '<span class="text-success fw-bold"><i class="fas fa-check"></i> คุณมีทักษะครบถ้วนแล้ว!</span>';
+                cList.innerHTML = '';
+            }
+
+            new bootstrap.Modal(document.getElementById('jobModal')).show();
+        }
+
+        function showForm() {
+            document.getElementById('resultCol').classList.add('d-none');
+            document.getElementById('formCol').classList.remove('col-md-4');
+            document.getElementById('formCol').classList.add('col-12', 'layout-center');
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

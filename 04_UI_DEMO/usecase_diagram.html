@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Use Case Diagram - ระบบ Job Matching</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mxgraph/4.10.38/mxClient.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        #graphContainer {
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+            min-height: 600px;
+            margin-bottom: 30px;
+        }
+        .legend {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .legend h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .legend-item {
+            display: inline-block;
+            margin-right: 30px;
+            margin-bottom: 10px;
+        }
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .actor-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+        }
+        .actor-box h4 {
+            margin: 0 0 10px 0;
+            color: #1976D2;
+        }
+        .actor-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .actor-box li {
+            margin: 5px 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Use Case Diagram - ระบบ Job Matching</h1>
+        <p class="subtitle">แสดงความสัมพันธ์ระหว่าง Actors และ Use Cases ในระบบจับคู่งาน</p>
+        
+        <div id="graphContainer"></div>
+        
+        <div class="legend">
+            <h3>🔍 คำอธิบาย:</h3>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #FFE082;"></span>
+                <strong>Actors:</strong> ผู้ใช้ของระบบ (Candidate, Employer, Admin)
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #C8E6C9;"></span>
+                <strong>Use Cases:</strong> การกระทำที่ผู้ใช้สามารถทำได้
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #81D4FA;"></span>
+                <strong>System:</strong> ขอบเขตของระบบ
+            </div>
+        </div>
+
+        <div class="details">
+            <div class="actor-box">
+                <h4>👨‍💼 Candidate (ผู้สมัคร)</h4>
+                <ul>
+                    <li>สมัครสมาชิก</li>
+                    <li>ตั้งค่าโปรไฟล์</li>
+                    <li>ค้นหางาน</li>
+                    <li>สมัครงาน</li>
+                    <li>ดูสถานะใบสมัคร</li>
+                    <li>รับคำแนะนำงาน</li>
+                    <li>บันทึกงานโปรด</li>
+                </ul>
+            </div>
+
+            <div class="actor-box">
+                <h4>🏢 Employer (ผู้จ้างงาน)</h4>
+                <ul>
+                    <li>สมัครสมาชิก</li>
+                    <li>ลงประกาศงาน</li>
+                    <li>แก้ไขประกาศ</li>
+                    <li>ค้นหาผู้สมัคร</li>
+                    <li>ดูใบสมัคร</li>
+                    <li>เลือกผู้สมัครที่มีศักยภาพ</li>
+                    <li>ติดต่อผู้สมัคร</li>
+                </ul>
+            </div>
+
+            <div class="actor-box">
+                <h4>👨‍💻 Admin (ผู้ดูแลระบบ)</h4>
+                <ul>
+                    <li>จัดการผู้ใช้</li>
+                    <li>จัดการงาน</li>
+                    <li>สร้างรายงาน</li>
+                    <li>ตรวจสอบข้อมูล</li>
+                    <li>จัดการสิทธิ์</li>
+                    <li>บำรุงรักษาระบบ</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create a new mxGraph instance
+        var container = document.getElementById('graphContainer');
+        var graph = new mxGraph(container);
+        graph.setConnectable(true);
+        
+        var parent = graph.getDefaultParent();
+
+        graph.getModel().beginUpdate();
+        try {
+            // Define styles
+            var actorStyle = 'shape=ellipse;perimeter=ellipsePerimeter;whiteSpace=wrap;html=1;fillColor=#FFE082;strokeColor=#FBC02D;strokeWidth=2;fontSize=12;fontStyle=1;';
+            var useCaseStyle = 'ellipse;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#66BB6A;strokeWidth=2;fontSize=11;';
+            var systemStyle = 'rectangle;rounded=0;whiteSpace=wrap;html=1;fillColor=#81D4FA;strokeColor=#0288D1;strokeWidth=3;fontSize=13;fontStyle=1;dashed=0;dashPattern=1;';
+            var lineStyle = 'edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;';
+            
+            // System boundary
+            var system = new mxCell('Job Matching System', new mxGeometry(150, 50, 500, 550), systemStyle);
+            system.vertex = true;
+            graph.addCell(system);
+
+            // Actors (outside system)
+            var candidate = new mxCell('Candidate\n(ผู้สมัคร)', new mxGeometry(20, 200, 80, 60), actorStyle);
+            candidate.vertex = true;
+            graph.addCell(candidate);
+
+            var employer = new mxCell('Employer\n(ผู้จ้างงาน)', new mxGeometry(680, 200, 80, 60), actorStyle);
+            employer.vertex = true;
+            graph.addCell(employer);
+
+            var admin = new mxCell('Admin\n(ผู้ดูแล)', new mxGeometry(350, 650, 80, 60), actorStyle);
+            admin.vertex = true;
+            graph.addCell(admin);
+
+            // Use Cases for Candidate
+            var uc1 = new mxCell('Register\n(สมัครสมาชิก)', new mxGeometry(180, 100, 90, 50), useCaseStyle);
+            uc1.vertex = true;
+            graph.addCell(uc1);
+
+            var uc2 = new mxCell('Edit Profile\n(แก้ไขโปรไฟล์)', new mxGeometry(280, 100, 90, 50), useCaseStyle);
+            uc2.vertex = true;
+            graph.addCell(uc2);
+
+            var uc3 = new mxCell('Search Jobs\n(ค้นหางาน)', new mxGeometry(380, 100, 90, 50), useCaseStyle);
+            uc3.vertex = true;
+            graph.addCell(uc3);
+
+            var uc4 = new mxCell('Apply Job\n(สมัครงาน)', new mxGeometry(180, 170, 90, 50), useCaseStyle);
+            uc4.vertex = true;
+            graph.addCell(uc4);
+
+            var uc5 = new mxCell('View Application\nStatus\n(ดูสถานะ)', new mxGeometry(280, 170, 90, 50), useCaseStyle);
+            uc5.vertex = true;
+            graph.addCell(uc5);
+
+            var uc6 = new mxCell('Get Job\nRecommendation\n(รับแนะนำ)', new mxGeometry(380, 170, 90, 50), useCaseStyle);
+            uc6.vertex = true;
+            graph.addCell(uc6);
+
+            var uc7 = new mxCell('Save Favorite\nJobs\n(บันทึกโปรด)', new mxGeometry(480, 100, 90, 50), useCaseStyle);
+            uc7.vertex = true;
+            graph.addCell(uc7);
+
+            // Use Cases for Employer
+            var uc8 = new mxCell('Post Job\n(ลงประกาศ)', new mxGeometry(180, 280, 90, 50), useCaseStyle);
+            uc8.vertex = true;
+            graph.addCell(uc8);
+
+            var uc9 = new mxCell('Edit Job Post\n(แก้ไขประกาศ)', new mxGeometry(280, 280, 90, 50), useCaseStyle);
+            uc9.vertex = true;
+            graph.addCell(uc9);
+
+            var uc10 = new mxCell('Search\nCandidates\n(ค้นหาผู้สมัคร)', new mxGeometry(380, 280, 90, 50), useCaseStyle);
+            uc10.vertex = true;
+            graph.addCell(uc10);
+
+            var uc11 = new mxCell('View\nApplications\n(ดูใบสมัคร)', new mxGeometry(480, 280, 90, 50), useCaseStyle);
+            uc11.vertex = true;
+            graph.addCell(uc11);
+
+            var uc12 = new mxCell('Shortlist\nCandidates\n(เลือกสมัครชน)', new mxGeometry(180, 350, 90, 50), useCaseStyle);
+            uc12.vertex = true;
+            graph.addCell(uc12);
+
+            var uc13 = new mxCell('Contact\nCandidates\n(ติดต่อ)', new mxGeometry(280, 350, 90, 50), useCaseStyle);
+            uc13.vertex = true;
+            graph.addCell(uc13);
+
+            // Use Cases for Admin
+            var uc14 = new mxCell('Manage Users\n(จัดการผู้ใช้)', new mxGeometry(180, 450, 90, 50), useCaseStyle);
+            uc14.vertex = true;
+            graph.addCell(uc14);
+
+            var uc15 = new mxCell('Manage Jobs\n(จัดการงาน)', new mxGeometry(280, 450, 90, 50), useCaseStyle);
+            uc15.vertex = true;
+            graph.addCell(uc15);
+
+            var uc16 = new mxCell('Generate\nReports\n(สร้างรายงาน)', new mxGeometry(380, 450, 90, 50), useCaseStyle);
+            uc16.vertex = true;
+            graph.addCell(uc16);
+
+            var uc17 = new mxCell('System\nMaintenance\n(บำรุงรักษา)', new mxGeometry(480, 450, 90, 50), useCaseStyle);
+            uc17.vertex = true;
+            graph.addCell(uc17);
+
+            // Connections - Candidate
+            graph.insertEdge(parent, null, '', candidate, uc1, lineStyle);
+            graph.insertEdge(parent, null, '', candidate, uc2, lineStyle);
+            graph.insertEdge(parent, null, '', candidate, uc3, lineStyle);
+            graph.insertEdge(parent, null, '', candidate, uc4, lineStyle);
+            graph.insertEdge(parent, null, '', candidate, uc5, lineStyle);
+            graph.insertEdge(parent, null, '', candidate, uc6, lineStyle);
+            graph.insertEdge(parent, null, '', candidate, uc7, lineStyle);
+
+            // Connections - Employer
+            graph.insertEdge(parent, null, '', employer, uc8, lineStyle);
+            graph.insertEdge(parent, null, '', employer, uc9, lineStyle);
+            graph.insertEdge(parent, null, '', employer, uc10, lineStyle);
+            graph.insertEdge(parent, null, '', employer, uc11, lineStyle);
+            graph.insertEdge(parent, null, '', employer, uc12, lineStyle);
+            graph.insertEdge(parent, null, '', employer, uc13, lineStyle);
+
+            // Connections - Admin
+            graph.insertEdge(parent, null, '', admin, uc14, lineStyle);
+            graph.insertEdge(parent, null, '', admin, uc15, lineStyle);
+            graph.insertEdge(parent, null, '', admin, uc16, lineStyle);
+            graph.insertEdge(parent, null, '', admin, uc17, lineStyle);
+
+        } finally {
+            graph.getModel().endUpdate();
+        }
+
+        // Auto layout
+        var layout = new mxHierarchicalLayout(graph, mxConstants.DIRECTION_WEST);
+        layout.execute(parent);
+    </script>
+</body>
+</html>

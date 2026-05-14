@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L2E V3 — ภาพรวมระบบ AI Matching</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a202c; }
+
+  /* NAV */
+  .nav { background: #1a3a2a; color: white; padding: 16px 32px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; }
+  .nav-logo { font-size: 22px; font-weight: 800; color: #4ade80; }
+  .nav-sub { font-size: 13px; color: #86efac; }
+  .nav-tabs { display: flex; gap: 8px; margin-left: auto; }
+  .nav-tab { padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1.5px solid transparent; transition: all .2s; color: #ccc; }
+  .nav-tab.active { background: #4ade80; color: #1a3a2a; font-weight: 700; }
+  .nav-tab:hover:not(.active) { border-color: #4ade80; color: white; }
+
+  /* SECTIONS */
+  .section { display: none; padding: 32px; max-width: 1300px; margin: 0 auto; }
+  .section.active { display: block; }
+  .section-title { font-size: 24px; font-weight: 800; color: #1a3a2a; margin-bottom: 6px; }
+  .section-desc { color: #64748b; margin-bottom: 28px; font-size: 15px; }
+
+  /* ARCH DIAGRAM */
+  .arch-grid { display: grid; grid-template-columns: 1fr 60px 1fr 60px 1fr; gap: 0; align-items: stretch; margin-bottom: 32px; }
+  .arch-box { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+  .arch-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .arch-box .tag { display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px; font-weight: 600; }
+  .arch-arrow { display: flex; align-items: center; justify-content: center; font-size: 28px; color: #4ade80; }
+  .arch-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; margin-bottom: 6px; }
+  .arch-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* FLOW DEMO */
+  .flow-container { display: grid; grid-template-columns: 340px 1fr; gap: 24px; }
+  .flow-panel { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+  .flow-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #1a3a2a; }
+  .flow-step { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .step-content p { font-size: 12px; color: #64748b; line-height: 1.5; }
+
+  /* JSON VIEWER */
+  .json-block { background: #0f172a; border-radius: 12px; padding: 16px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.7; color: #e2e8f0; overflow-x: auto; margin-bottom: 12px; }
+  .json-key { color: #93c5fd; }
+  .json-str { color: #86efac; }
+  .json-num { color: #fbbf24; }
+  .json-bool { color: #f472b6; }
+  .json-label { font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .badge-in { background: #dbeafe; color: #1d4ed8; padding: 2px 10px; border-radius: 20px; font-size: 11px; }
+  .badge-out { background: #dcfce7; color: #15803d; padding: 2px 10px; border-radius: 20px; font-size: 11px; }
+
+  /* RESULT CARDS */
+  .result-card { background: white; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; transition: all .2s; }
+  .result-card:hover { border-color: #4ade80; box-shadow: 0 4px 16px rgba(74,222,128,.15); }
+  .result-rank { width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #475569; flex-shrink: 0; }
+  .result-rank.gold { background: #fef3c7; color: #92400e; }
+  .result-rank.silver { background: #f1f5f9; color: #374151; }
+  .result-rank.bronze { background: #fed7aa; color: #92400e; }
+  .result-info { flex: 1; }
+  .result-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .result-info p { font-size: 12px; color: #64748b; }
+  .match-score { font-size: 22px; font-weight: 800; }
+  .match-score.high { color: #16a34a; }
+  .match-score.mid { color: #d97706; }
+  .match-score.low { color: #dc2626; }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .skill-tag { font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+  .skill-tag.match { background: #dcfce7; color: #15803d; }
+  .skill-tag.missing { background: #fee2e2; color: #dc2626; }
+
+  /* PIPELINE */
+  .pipeline { display: flex; align-items: stretch; gap: 0; margin-bottom: 32px; overflow-x: auto; padding-bottom: 8px; }
+  .pipe-step { background: white; border-radius: 12px; padding: 20px 18px; min-width: 180px; box-shadow: 0 2px 8px rgba(0,0,0,.06); flex-shrink: 0; }
+  .pipe-step h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+  .pipe-step p { font-size: 11px; color: #64748b; line-height: 1.5; }
+  .pipe-arrow { display: flex; align-items: center; padding: 0 6px; color: #94a3b8; font-size: 22px; flex-shrink: 0; }
+  .pipe-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; margin-bottom: 8px; }
+
+  /* BUTTON */
+  .btn { padding: 10px 22px; border-radius: 10px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; }
+  .btn-primary { background: #1a3a2a; color: white; }
+  .btn-primary:hover { background: #16a34a; }
+  .btn-green { background: #4ade80; color: #1a3a2a; }
+  .btn-green:hover { background: #22c55e; }
+
+  /* POOL TABLE */
+  .pool-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .pool-table th { background: #f8fafc; padding: 12px 16px; text-align: left; font-size: 12px; color: #64748b; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+  .pool-table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
+  .pool-table tr:hover td { background: #f8fffe; }
+  .source-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .src-ai { background: #ede9fe; color: #6d28d9; }
+  .src-direct { background: #dbeafe; color: #1d4ed8; }
+  .src-manual { background: #fef3c7; color: #92400e; }
+  .progress-bar { height: 6px; border-radius: 3px; background: #e2e8f0; width: 80px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+
+  /* STATUS */
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+  /* SUMMARY CARDS */
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .summary-card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  .summary-card .num { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
+  .summary-card .lbl { font-size: 13px; color: #64748b; }
+
+  /* TABS */
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 0; }
+  .tab-btn { padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; background: none; color: #94a3b8; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .2s; }
+  .tab-btn.active { color: #1a3a2a; border-bottom-color: #4ade80; }
+
+  /* SIMULATE ANIMATION */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn .4s ease forwards; }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #e2e8f0; border-top-color: #4ade80; border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div>
+    <div class="nav-logo">L2E V3</div>
+    <div class="nav-sub">AI Job Matching System — ภาพรวมระบบ</div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showSection('arch')">🗺 ภาพรวมระบบ</div>
+    <div class="nav-tab" onclick="showSection('flow1')">👤 ผู้เรียนหางาน</div>
+    <div class="nav-tab" onclick="showSection('flow2')">🏢 บริษัทหาผู้สมัคร</div>
+    <div class="nav-tab" onclick="showSection('flow3')">🔍 วิเคราะห์ Pool</div>
+    <div class="nav-tab" onclick="showSection('training')">🧠 การเทรนโมเดล</div>
+  </div>
+</nav>
+
+<!-- ===== SECTION 1: ARCHITECTURE ===== -->
+<div id="arch" class="section active">
+  <div class="section-title">🗺 ภาพรวมระบบทั้งหมด</div>
+  <div class="section-desc">แสดงให้เห็นว่าข้อมูล → โมเดล → API → UI เชื่อมกันอย่างไร</div>
+
+  <!-- Summary -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="num" style="color:#16a34a">10,000</div>
+      <div class="lbl">👤 ผู้เรียนในระบบ</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" style="color:#2563eb">3,000</div>
+      <div class="lbl">💼 ประกาศงาน</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" style="color:#7c3aed">5,000</div>
+      <div class="lbl">📋 ประวัติการสมัคร</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" style="color:#d97706">3</div>
+      <div class="lbl">🤖 AI Endpoints</div>
+    </div>
+  </div>
+
+  <!-- Architecture -->
+  <div class="arch-grid">
+    <!-- DATA -->
+    <div class="arch-box">
+      <div class="tag" style="background:#dbeafe;color:#1d4ed8">📦 ข้อมูล (CSV / Database)</div>
+      <h3>ข้อมูลที่ใช้</h3>
+      <div style="margin-top:12px">
+        <div class="arch-item"><div class="dot" style="background:#60a5fa"></div>TBL_LEARNER — โปรไฟล์ผู้เรียน</div>
+        <div class="arch-item"><div class="dot" style="background:#60a5fa"></div>TBL_LEARNER_SKILL — ทักษะ</div>
+        <div class="arch-item"><div class="dot" style="background:#60a5fa"></div>TBL_LEARNER_EXPERINCE — ประสบการณ์</div>
+        <div class="arch-item"><div class="dot" style="background:#60a5fa"></div>TBL_LEARNER_PREFERENCE — ความต้องการ</div>
+        <div class="arch-item"><div class="dot" style="background:#4ade80"></div>job_post — ประกาศงาน</div>
+        <div class="arch-item"><div class="dot" style="background:#4ade80"></div>job_post_skill — ทักษะที่ต้องการ</div>
+        <div class="arch-item"><div class="dot" style="background:#fb923c"></div>job_candidate — ผลการสมัคร (hired/rejected)</div>
+      </div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <!-- MODEL -->
+    <div class="arch-box">
+      <div class="tag" style="background:#ede9fe;color:#6d28d9">🧠 AI Model (BERT)</div>
+      <h3>การประมวลผล</h3>
+      <div style="margin-top:12px">
+        <div class="arch-item"><div class="dot" style="background:#a78bfa"></div>แปลงข้อความ → Vector 384 มิติ</div>
+        <div class="arch-item"><div class="dot" style="background:#a78bfa"></div>คำนวณ Cosine Similarity</div>
+        <div class="arch-item"><div class="dot" style="background:#a78bfa"></div>ผลลัพธ์ = % Match (0–100)</div>
+        <div style="margin-top:16px;padding:12px;background:#f5f3ff;border-radius:8px;font-size:12px;">
+          <div style="font-weight:700;margin-bottom:6px;color:#6d28d9">สูตรคำนวณ:</div>
+          <div style="font-family:monospace;color:#4c1d95">similarity = (A·B) / (|A|×|B|)</div>
+          <div style="color:#64748b;margin-top:4px">ผลลัพธ์ × 100 = % Match</div>
+        </div>
+        <div style="margin-top:12px">
+          <div class="arch-item"><div class="dot" style="background:#4ade80"></div>Skill Breakdown = เปรียบเทียบ List ตรงๆ</div>
+        </div>
+      </div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <!-- API + UI -->
+    <div class="arch-box">
+      <div class="tag" style="background:#dcfce7;color:#15803d">🔌 API + UI</div>
+      <h3>3 Endpoints หลัก</h3>
+      <div style="margin-top:12px">
+        <div style="background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:8px;">
+          <div style="font-size:12px;font-weight:700;color:#16a34a">/api/match_jobs</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">ผู้เรียนหางาน → ส่ง learner_id → รับ Top Jobs + %</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:8px;">
+          <div style="font-size:12px;font-weight:700;color:#2563eb">/api/match_candidates</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">บริษัทหาคน → ส่ง job_id → รับ Top Candidates + %</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:8px;padding:10px;">
+          <div style="font-size:12px;font-weight:700;color:#7c3aed">/api/analyze_pool</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">วิเคราะห์ Pool → ส่ง job_id + [ids] → รับ % ทุกคน</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Flow -->
+  <div style="background:white;border-radius:16px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;color:#1a3a2a">🔄 Data Flow — จากคลิกจนถึงแสดงผล</h3>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-num" style="background:#2563eb">1</div>
+        <h4>👤 User คลิก</h4>
+        <p>ผู้เรียนกด "หางาน" บนหน้าเว็บ</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-num" style="background:#0891b2">2</div>
+        <h4>📤 ส่ง JSON</h4>
+        <p>UI ส่ง <code style="background:#f1f5f9;padding:1px 4px;border-radius:4px">learner_id</code> ไปที่ API</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-num" style="background:#7c3aed">3</div>
+        <h4>🗄️ ดึงข้อมูล</h4>
+        <p>API ดึงโปรไฟล์, ทักษะ, ประสบการณ์จาก DB</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-num" style="background:#dc2626">4</div>
+        <h4>🧠 คำนวณ</h4>
+        <p>BERT แปลงเป็น Vector → คำนวณ % Match กับทุกงาน</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-num" style="background:#d97706">5</div>
+        <h4>🔍 Skill Gap</h4>
+        <p>เปรียบเทียบ Skill ผู้เรียน vs Skill ที่งานต้องการ</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-num" style="background:#16a34a">6</div>
+        <h4>📥 ส่งกลับ</h4>
+        <p>ส่ง JSON ผลลัพธ์กลับ → UI แสดงผล</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-num" style="background:#0f766e">7</div>
+        <h4>🖥️ แสดงผล</h4>
+        <p>UI แสดง Card งาน + % Match + Skill ✅/❌</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION 2: LEARNER FLOW ===== -->
+<div id="flow1" class="section">
+  <div class="section-title">👤 Flow ที่ 1 — ผู้เรียนหางาน</div>
+  <div class="section-desc">จำลองการทำงานจริงตั้งแต่ UI ส่ง JSON จนถึงได้ผลลัพธ์กลับมา</div>
+
+  <div class="flow-container">
+    <!-- LEFT: Steps -->
+    <div>
+      <div class="flow-panel" style="margin-bottom:16px">
+        <h3>📋 ขั้นตอนการทำงาน</h3>
+        <div class="flow-step">
+          <div class="step-num" style="background:#dbeafe;color:#1d4ed8">1</div>
+          <div class="step-content">
+            <h4>ผู้เรียนกด "หางาน"</h4>
+            <p>UI เตรียม JSON แล้วส่งหา API</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#ede9fe;color:#6d28d9">2</div>
+          <div class="step-content">
+            <h4>API รับ JSON</h4>
+            <p>ดึงโปรไฟล์ผู้เรียนจาก CSV/DB ตาม learner_id</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#fef3c7;color:#92400e">3</div>
+          <div class="step-content">
+            <h4>BERT คำนวณ % Match</h4>
+            <p>แปลง Profile + Job Description → Vector → Cosine Similarity</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#dcfce7;color:#15803d">4</div>
+          <div class="step-content">
+            <h4>Skill Gap Analysis</h4>
+            <p>เปรียบเทียบ skill ผู้เรียน vs skill ที่งานต้องการ</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#fce7f3;color:#9d174d">5</div>
+          <div class="step-content">
+            <h4>ส่งผลกลับ UI</h4>
+            <p>Top Jobs เรียงตาม % Match พร้อม Skill Breakdown</p>
+          </div>
+        </div>
+        <button class="btn btn-green" style="width:100%;margin-top:8px" onclick="simulateLearner()">▶ จำลองการทำงาน</button>
+      </div>
+
+      <!-- Input JSON -->
+      <div class="flow-panel">
+        <h3>📤 JSON ที่ UI ส่งมา</h3>
+        <div class="json-label"><span class="badge-in">INPUT</span> POST /api/match_jobs</div>
+        <div class="json-block">{
+  <span class="json-key">"learner_id"</span>: <span class="json-str">"LNR-202600002"</span>,
+  <span class="json-key">"limit"</span>: <span class="json-num">10</span>
+}</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:4px">
+          → API จะไปดึงข้อมูลทั้งหมดของ LNR-202600002 จาก DB เอง<br>
+          → ไม่ต้องส่งข้อมูลทั้งหมดมาทาง JSON
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div>
+      <div class="flow-panel">
+        <h3>📥 ผลลัพธ์จาก API <span id="learner-loading" class="hidden"><span class="spinner"></span></span></h3>
+        <div class="json-label"><span class="badge-out">OUTPUT</span> Response JSON (ตัวอย่าง)</div>
+        <div class="json-block" id="learner-json-out">{
+  <span class="json-key">"learner_id"</span>: <span class="json-str">"LNR-202600002"</span>,
+  <span class="json-key">"learner_name"</span>: <span class="json-str">"Piywdi"</span>,
+  <span class="json-key">"job_title"</span>: <span class="json-str">"Programmer"</span>,
+  <span class="json-key">"jobs"</span>: [
+    {
+      <span class="json-key">"job_id"</span>: <span class="json-str">"JOB-202600045"</span>,
+      <span class="json-key">"title"</span>: <span class="json-str">"Web Developer"</span>,
+      <span class="json-key">"company"</span>: <span class="json-str">"Grab Thailand"</span>,
+      <span class="json-key">"match_score"</span>: <span class="json-num">87</span>,
+      <span class="json-key">"skill_matched"</span>: [<span class="json-str">"Java"</span>, <span class="json-str">"Node.js"</span>, <span class="json-str">"SQL"</span>],
+      <span class="json-key">"skill_missing"</span>: [<span class="json-str">"Docker"</span>],
+      <span class="json-key">"salary_range"</span>: <span class="json-str">"40,000–62,000"</span>
+    },
+    <span style="color:#64748b">... (อีก 9 งาน)</span>
+  ]
+}</div>
+
+        <div style="margin-top:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:#1a3a2a">🖥️ ที่ UI จะแสดง:</div>
+          <div id="learner-results">
+            <div class="result-card fade-in">
+              <div class="result-rank gold">1</div>
+              <div class="result-info">
+                <h4>Web Developer — Grab Thailand</h4>
+                <p>Full-time · Hybrid · กรุงเทพมหานคร · 40,000–62,000 บาท</p>
+                <div class="skill-tags">
+                  <span class="skill-tag match">Java ✓</span>
+                  <span class="skill-tag match">Node.js ✓</span>
+                  <span class="skill-tag match">SQL ✓</span>
+                  <span class="skill-tag missing">Docker ↗</span>
+                </div>
+              </div>
+              <div>
+                <div class="match-score high">87%</div>
+                <div style="font-size:11px;color:#64748b;text-align:center">Match</div>
+              </div>
+            </div>
+            <div class="result-card fade-in" style="animation-delay:.1s">
+              <div class="result-rank silver">2</div>
+              <div class="result-info">
+                <h4>Backend Developer — SCG</h4>
+                <p>Full-time · On-site · นนทบุรี · 35,000–55,000 บาท</p>
+                <div class="skill-tags">
+                  <span class="skill-tag match">Java ✓</span>
+                  <span class="skill-tag match">SQL ✓</span>
+                  <span class="skill-tag missing">React ↗</span>
+                  <span class="skill-tag missing">Docker ↗</span>
+                </div>
+              </div>
+              <div>
+                <div class="match-score high">74%</div>
+                <div style="font-size:11px;color:#64748b;text-align:center">Match</div>
+              </div>
+            </div>
+            <div class="result-card fade-in" style="animation-delay:.2s">
+              <div class="result-rank bronze">3</div>
+              <div class="result-info">
+                <h4>Software Developer — Bangkok Bank</h4>
+                <p>Full-time · On-site · กรุงเทพมหานคร · 30,000–50,000 บาท</p>
+                <div class="skill-tags">
+                  <span class="skill-tag match">SQL ✓</span>
+                  <span class="skill-tag missing">React ↗</span>
+                  <span class="skill-tag missing">TypeScript ↗</span>
+                </div>
+              </div>
+              <div>
+                <div class="match-score mid">61%</div>
+                <div style="font-size:11px;color:#64748b;text-align:center">Match</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION 3: EMPLOYER FLOW ===== -->
+<div id="flow2" class="section">
+  <div class="section-title">🏢 Flow ที่ 2 — บริษัทหาผู้สมัคร (AI Recommend)</div>
+  <div class="section-desc">บริษัทกด "แนะนำด้วย AI" → ระบบหาผู้สมัครที่เหมาะสมที่สุดจากฐานข้อมูลทั้งหมด</div>
+
+  <div class="flow-container">
+    <div>
+      <div class="flow-panel" style="margin-bottom:16px">
+        <h3>📋 ขั้นตอนการทำงาน</h3>
+        <div class="flow-step">
+          <div class="step-num" style="background:#dbeafe;color:#1d4ed8">1</div>
+          <div class="step-content">
+            <h4>บริษัทกด "แนะนำด้วย AI"</h4>
+            <p>UI ส่ง job_post_id ไปที่ API</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#ede9fe;color:#6d28d9">2</div>
+          <div class="step-content">
+            <h4>API ดึงรายละเอียดงาน</h4>
+            <p>ดึง job_detail + job_skills จาก DB</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#fef3c7;color:#92400e">3</div>
+          <div class="step-content">
+            <h4>BERT ค้นหาผู้เรียนทั้งหมด</h4>
+            <p>เปรียบเทียบ Job กับ Learner ทั้ง 10,000 คน</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#dcfce7;color:#15803d">4</div>
+          <div class="step-content">
+            <h4>เรียงตาม % Match</h4>
+            <p>ส่งกลับ Top Candidates พร้อม Skill Breakdown</p>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="simulateEmployer()">▶ จำลองการทำงาน</button>
+      </div>
+      <div class="flow-panel">
+        <h3>📤 JSON ที่ UI ส่งมา</h3>
+        <div class="json-label"><span class="badge-in">INPUT</span> POST /api/match_candidates</div>
+        <div class="json-block">{
+  <span class="json-key">"job_post_id"</span>: <span class="json-str">"JOB-202600001"</span>,
+  <span class="json-key">"limit"</span>: <span class="json-num">20</span>
+}</div>
+      </div>
+    </div>
+    <div>
+      <div class="flow-panel">
+        <h3>📥 ผลลัพธ์จาก API <span id="employer-loading" class="hidden"><span class="spinner"></span></span></h3>
+        <div class="json-label"><span class="badge-out">OUTPUT</span> Response JSON (ตัวอย่าง)</div>
+        <div class="json-block">{
+  <span class="json-key">"job_id"</span>: <span class="json-str">"JOB-202600001"</span>,
+  <span class="json-key">"job_title"</span>: <span class="json-str">"Cybersecurity Analyst"</span>,
+  <span class="json-key">"candidates"</span>: [
+    {
+      <span class="json-key">"learner_id"</span>: <span class="json-str">"LNR-202603421"</span>,
+      <span class="json-key">"name"</span>: <span class="json-str">"Somchai T."</span>,
+      <span class="json-key">"match_score"</span>: <span class="json-num">92</span>,
+      <span class="json-key">"exp_years"</span>: <span class="json-num">5</span>,
+      <span class="json-key">"skill_matched"</span>: [<span class="json-str">"JavaScript"</span>, <span class="json-str">"Git"</span>, <span class="json-str">"Docker"</span>],
+      <span class="json-key">"skill_missing"</span>: [<span class="json-str">"Java"</span>]
+    },
+    <span style="color:#64748b">... (อีก 19 คน)</span>
+  ]
+}</div>
+        <div style="margin-top:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:#1a3a2a">🖥️ ที่ UI จะแสดง:</div>
+          <div class="result-card fade-in">
+            <div class="result-rank gold">1</div>
+            <div class="result-info">
+              <h4>Somchai T. — Cybersecurity Engineer</h4>
+              <p>ประสบการณ์ 5 ปี · กรุงเทพมหานคร</p>
+              <div class="skill-tags">
+                <span class="skill-tag match">JavaScript ✓</span>
+                <span class="skill-tag match">Git ✓</span>
+                <span class="skill-tag match">Docker ✓</span>
+                <span class="skill-tag missing">Java ↗</span>
+              </div>
+            </div>
+            <div><div class="match-score high">92%</div><div style="font-size:11px;color:#64748b;text-align:center">Match</div></div>
+          </div>
+          <div class="result-card fade-in" style="animation-delay:.1s">
+            <div class="result-rank silver">2</div>
+            <div class="result-info">
+              <h4>Pranee K. — IT Security Specialist</h4>
+              <p>ประสบการณ์ 3 ปี · นนทบุรี</p>
+              <div class="skill-tags">
+                <span class="skill-tag match">JavaScript ✓</span>
+                <span class="skill-tag match">Java ✓</span>
+                <span class="skill-tag missing">Docker ↗</span>
+              </div>
+            </div>
+            <div><div class="match-score high">78%</div><div style="font-size:11px;color:#64748b;text-align:center">Match</div></div>
+          </div>
+          <div class="result-card fade-in" style="animation-delay:.2s">
+            <div class="result-rank bronze">3</div>
+            <div class="result-info">
+              <h4>Wanchai P. — Network Engineer</h4>
+              <p>ประสบการณ์ 2 ปี · ชลบุรี</p>
+              <div class="skill-tags">
+                <span class="skill-tag match">Git ✓</span>
+                <span class="skill-tag missing">JavaScript ↗</span>
+                <span class="skill-tag missing">Docker ↗</span>
+              </div>
+            </div>
+            <div><div class="match-score mid">65%</div><div style="font-size:11px;color:#64748b;text-align:center">Match</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION 4: POOL ANALYSIS ===== -->
+<div id="flow3" class="section">
+  <div class="section-title">🔍 Flow ที่ 3 — วิเคราะห์ผู้สมัครใน Pool</div>
+  <div class="section-desc">ผู้สมัครใน Pool มาจาก 3 แหล่ง — ทุกคนจะถูกวิเคราะห์ % Match โดย AI</div>
+
+  <!-- Sources Explanation -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:4px solid #6d28d9">
+      <div style="font-size:24px;margin-bottom:8px">🤖</div>
+      <div style="font-weight:700;margin-bottom:4px">AI แนะนำ</div>
+      <div style="font-size:13px;color:#64748b">มาจาก /api/match_candidates ที่ AI เลือกมาให้ → source: "recommendation"</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:4px solid #2563eb">
+      <div style="font-size:24px;margin-bottom:8px">📝</div>
+      <div style="font-weight:700;margin-bottom:4px">สมัครเอง</div>
+      <div style="font-size:13px;color:#64748b">ผู้เรียนเห็นประกาศงานแล้วกดสมัครด้วยตัวเอง → source: "direct_apply"</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:4px solid #d97706">
+      <div style="font-size:24px;margin-bottom:8px">👆</div>
+      <div style="font-weight:700;margin-bottom:4px">บริษัทเพิ่มเอง</div>
+      <div style="font-size:13px;color:#64748b">HR เพิ่มผู้สมัครเข้า Pool โดยตรง → source: "pool" (manual)</div>
+    </div>
+  </div>
+
+  <div class="flow-container">
+    <div>
+      <div class="flow-panel" style="margin-bottom:16px">
+        <h3>📋 ขั้นตอนการทำงาน</h3>
+        <div class="flow-step">
+          <div class="step-num" style="background:#dbeafe;color:#1d4ed8">1</div>
+          <div class="step-content"><h4>บริษัทเปิดดู Pool</h4><p>UI ส่ง job_id + รายชื่อคนใน Pool</p></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#ede9fe;color:#6d28d9">2</div>
+          <div class="step-content"><h4>API วิเคราะห์ทุกคน</h4><p>ไม่ว่าจะมาจากแหล่งไหน → ทุกคนผ่าน AI เท่ากัน</p></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#dcfce7;color:#15803d">3</div>
+          <div class="step-content"><h4>ส่งกลับ % Match ทุกคน</h4><p>เรียงจากมากไปน้อย พร้อม Skill Breakdown</p></div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;background:#7c3aed;margin-top:8px" onclick="simulatePool()">▶ จำลองการวิเคราะห์ Pool</button>
+      </div>
+      <div class="flow-panel">
+        <h3>📤 JSON ที่ UI ส่งมา</h3>
+        <div class="json-label"><span class="badge-in">INPUT</span> POST /api/analyze_pool</div>
+        <div class="json-block">{
+  <span class="json-key">"job_post_id"</span>: <span class="json-str">"JOB-202600001"</span>,
+  <span class="json-key">"candidate_ids"</span>: [
+    <span class="json-str">"LNR-202606039"</span>,
+    <span class="json-str">"LNR-202601840"</span>,
+    <span class="json-str">"LNR-202600925"</span>
+  ]
+}</div>
+      </div>
+    </div>
+    <div>
+      <div class="flow-panel">
+        <h3>📊 Pool Analysis Result <span id="pool-loading" class="hidden"><span class="spinner"></span></span></h3>
+        <table class="pool-table" id="pool-table">
+          <thead>
+            <tr>
+              <th>อันดับ</th>
+              <th>ผู้สมัคร</th>
+              <th>แหล่งที่มา</th>
+              <th>% Match</th>
+              <th>Skill</th>
+              <th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody id="pool-body">
+            <tr>
+              <td><strong>1</strong></td>
+              <td><strong>LNR-202600925</strong><br><span style="font-size:11px;color:#64748b">IT Security Specialist</span></td>
+              <td><span class="source-badge src-ai">🤖 AI</span></td>
+              <td>
+                <div class="progress-bar"><div class="progress-fill" style="width:88%;background:#16a34a"></div></div>
+                <strong style="color:#16a34a">88%</strong>
+              </td>
+              <td><span class="skill-tag match" style="font-size:10px">JS ✓</span> <span class="skill-tag match" style="font-size:10px">Git ✓</span> <span class="skill-tag missing" style="font-size:10px">Java ↗</span></td>
+              <td><span class="status-dot" style="background:#f59e0b"></span>interview</td>
+            </tr>
+            <tr>
+              <td><strong>2</strong></td>
+              <td><strong>LNR-202606039</strong><br><span style="font-size:11px;color:#64748b">Cybersecurity Engineer</span></td>
+              <td><span class="source-badge src-direct">📝 สมัครเอง</span></td>
+              <td>
+                <div class="progress-bar"><div class="progress-fill" style="width:75%;background:#16a34a"></div></div>
+                <strong style="color:#16a34a">75%</strong>
+              </td>
+              <td><span class="skill-tag match" style="font-size:10px">Docker ✓</span> <span class="skill-tag missing" style="font-size:10px">JS ↗</span></td>
+              <td><span class="status-dot" style="background:#16a34a"></span>hired</td>
+            </tr>
+            <tr>
+              <td><strong>3</strong></td>
+              <td><strong>LNR-202601840</strong><br><span style="font-size:11px;color:#64748b">Network Admin</span></td>
+              <td><span class="source-badge src-manual">👆 HR เพิ่ม</span></td>
+              <td>
+                <div class="progress-bar"><div class="progress-fill" style="width:42%;background:#d97706"></div></div>
+                <strong style="color:#d97706">42%</strong>
+              </td>
+              <td><span class="skill-tag missing" style="font-size:10px">JS ↗</span> <span class="skill-tag missing" style="font-size:10px">Docker ↗</span></td>
+              <td><span class="status-dot" style="background:#dc2626"></span>rejected</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:16px;padding:16px;background:#f0fdf4;border-radius:10px;font-size:13px;border-left:4px solid #16a34a">
+          <strong>💡 ข้อสังเกต:</strong> คนที่ AI แนะนำมา (88%) และคนที่สมัครเอง (75%) ได้คะแนนสูงกว่า คนที่ HR เพิ่มเอง (42%) ซึ่งช่วยให้ HR ตัดสินใจได้ดีขึ้น
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION 5: TRAINING ===== -->
+<div id="training" class="section">
+  <div class="section-title">🧠 การเทรนโมเดล</div>
+  <div class="section-desc">ขั้นตอนการสร้างโมเดล AI ที่ใช้ในระบบทั้งหมด</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div class="flow-panel">
+      <h3>📊 ข้อมูลที่ใช้เทรน</h3>
+      <div style="margin-top:12px">
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:10px">
+          <div style="font-weight:700;font-size:14px;color:#16a34a;margin-bottom:6px">✅ Positive Pairs (คู่ที่ดี)</div>
+          <div style="font-size:13px;color:#475569">job_candidate ที่ status = <strong>"hired"</strong></div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:4px">มี 872 คู่ → หมายความว่า "Learner คนนี้ Match กับงานนี้จริงๆ"</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:10px">
+          <div style="font-weight:700;font-size:14px;color:#dc2626;margin-bottom:6px">❌ Negative Pairs (คู่ที่ไม่ดี)</div>
+          <div style="font-size:13px;color:#475569">job_candidate ที่ status = <strong>"rejected"</strong></div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:4px">มี 794 คู่ → หมายความว่า "ไม่เหมาะสม"</div>
+        </div>
+        <div style="background:#fef3c7;border-radius:10px;padding:14px">
+          <div style="font-weight:700;font-size:14px;color:#92400e;margin-bottom:6px">⚠️ ทำไมไม่ใช้ Mock JSON เดิม?</div>
+          <div style="font-size:13px;color:#475569">Mock JSON ใช้แค่ "title ตรงกัน" เป็น label → ไม่ใช่ ground truth จริง → ผลลัพธ์ accuracy 100% ที่ไม่น่าเชื่อถือ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-panel">
+      <h3>🔄 Training Pipeline</h3>
+      <div style="margin-top:12px">
+        <div class="flow-step">
+          <div class="step-num" style="background:#dbeafe;color:#1d4ed8;font-size:11px">1</div>
+          <div class="step-content">
+            <h4>Load CSV</h4>
+            <p>โหลด TBL_LEARNER + SKILL + EXPERINCE + job_post + job_candidate</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#ede9fe;color:#6d28d9;font-size:11px">2</div>
+          <div class="step-content">
+            <h4>สร้าง Profile Text</h4>
+            <p>รวม about_me + skills + experience → text เดียว</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#fef3c7;color:#92400e;font-size:11px">3</div>
+          <div class="step-content">
+            <h4>สร้าง Training Pairs</h4>
+            <p>hired → (learner_text, job_text, label=1.0) | rejected → label=0.0</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#dcfce7;color:#15803d;font-size:11px">4</div>
+          <div class="step-content">
+            <h4>Fine-tune BERT</h4>
+            <p>paraphrase-multilingual-MiniLM-L12-v2 + CosineSimilarityLoss</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#fce7f3;color:#9d174d;font-size:11px">5</div>
+          <div class="step-content">
+            <h4>บันทึก + วัดผล</h4>
+            <p>save models/fine_tuned_bert → วัด Hit Rate@5, Precision@K</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-panel" style="grid-column:1/-1">
+      <h3>📐 สูตร % Match ที่แสดงใน UI</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px">
+        <div style="background:#f0fdf4;border-radius:10px;padding:16px;text-align:center">
+          <div style="font-size:13px;color:#64748b;margin-bottom:8px">Learner Profile Vector</div>
+          <div style="font-size:28px;font-weight:800;color:#16a34a">A</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:4px">"Backend, 3ปี, สนใจ IT"</div>
+        </div>
+        <div style="background:#eff6ff;border-radius:10px;padding:16px;text-align:center">
+          <div style="font-size:13px;color:#64748b;margin-bottom:8px">Job Description Vector</div>
+          <div style="font-size:28px;font-weight:800;color:#2563eb">B</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:4px">"Software Dev, Backend, Docker"</div>
+        </div>
+        <div style="background:#fdf4ff;border-radius:10px;padding:16px;text-align:center">
+          <div style="font-size:13px;color:#64748b;margin-bottom:8px">% Match Score</div>
+          <div style="font-size:22px;font-weight:800;color:#7c3aed">cos(A,B) × 100</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:4px">= 80%</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:#f8fafc;border-radius:10px;font-size:13px;color:#475569">
+        <strong>หมายเหตุ:</strong> Skill Breakdown (✅/↗) ไม่ได้ใช้ AI — ใช้การเปรียบเทียบ List ธรรมดา เช็คว่า skill_name ตรงกันไหม เร็วกว่าและแม่นกว่าสำหรับงานนี้
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function simulateLearner() {
+  const loading = document.getElementById('learner-loading');
+  loading.classList.remove('hidden');
+  setTimeout(() => { loading.classList.add('hidden'); }, 1200);
+}
+
+function simulateEmployer() {
+  const loading = document.getElementById('employer-loading');
+  loading.classList.remove('hidden');
+  setTimeout(() => { loading.classList.add('hidden'); }, 1200);
+}
+
+function simulatePool() {
+  const loading = document.getElementById('pool-loading');
+  loading.classList.remove('hidden');
+  const rows = document.querySelectorAll('#pool-body tr');
+  rows.forEach(r => r.style.opacity = '0.3');
+  setTimeout(() => {
+    loading.classList.add('hidden');
+    rows.forEach((r, i) => {
+      setTimeout(() => { r.style.opacity = '1'; r.style.transition = 'opacity .3s'; }, i * 200);
+    });
+  }, 1500);
+}
+</script>
+</body>
+</html>

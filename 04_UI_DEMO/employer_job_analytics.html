@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>L2E | สถิติงาน</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { font-family: 'Sarabun', sans-serif; }
+        body { background: #f0f4f8; min-height: 100vh; }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, #0f1f3d, #16a34a);
+            padding: 0 20px; height: 56px;
+            display: flex; align-items: center;
+        }
+        .nav-logo { font-weight: 800; font-size: 1.2rem; color: #fff; text-decoration: none; }
+        .nav-link-c {
+            color: rgba(255,255,255,.8); font-weight: 600; font-size: .88rem;
+            padding: 8px 14px; border-radius: 8px; text-decoration: none; transition: .15s;
+        }
+        .nav-link-c:hover, .nav-link-c.active {
+            background: rgba(255,255,255,.15); color: #fff;
+        }
+        .main-container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+        .stat-card {
+            background: #fff; border-radius: 16px; padding: 22px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.06);
+            border-left: 4px solid transparent;
+        }
+        .stat-card.green  { border-color: #16a34a; }
+        .stat-card.blue   { border-color: #10b981; }
+        .stat-card.amber  { border-color: #f59e0b; }
+        .stat-card.purple { border-color: #8b5cf6; }
+        .stat-val   { font-size: 2rem; font-weight: 800; line-height: 1; color: #0f1f3d; }
+        .stat-label { font-size: .82rem; color: #64748b; font-weight: 600; margin-top: 4px; }
+        .stat-icon  { font-size: 2rem; opacity: .15; }
+
+        .section-card {
+            background: #fff; border-radius: 16px; padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 1.05rem; font-weight: 800; color: #0f1f3d;
+            margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .time-filter button {
+            border: 1.5px solid #e2e8f0; background: #fff; color: #64748b;
+            font-size: .82rem; font-weight: 600; padding: 5px 14px;
+            border-radius: 8px; cursor: pointer; transition: .15s;
+        }
+        .time-filter button.active {
+            background: #16a34a; color: #fff; border-color: #16a34a;
+        }
+
+        .job-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+        }
+        .job-row:last-child { border-bottom: none; }
+        .job-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; color: #16a34a; flex-shrink: 0;
+        }
+        .job-name { font-weight: 700; font-size: .9rem; color: #0f1f3d; }
+        .job-meta { font-size: .78rem; color: #64748b; margin-top: 2px; }
+
+        .progress-bar-custom {
+            height: 8px; border-radius: 4px;
+            background: linear-gradient(90deg, #16a34a, #10b981);
+        }
+        .progress-bg { background: #f1f5f9; border-radius: 4px; height: 8px; }
+
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px;
+        }
+        .dot-green  { background: #16a34a; }
+        .dot-amber  { background: #f59e0b; }
+        .dot-red    { background: #ef4444; }
+        .dot-blue   { background: #3b82f6; }
+
+        .funnel-step {
+            background: #f8fafc; border-radius: 12px; padding: 14px 18px;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 14px;
+        }
+        .funnel-num { font-size: 1.4rem; font-weight: 800; color: #0f1f3d; min-width: 60px; }
+        .funnel-label { font-size: .88rem; font-weight: 600; color: #374151; }
+        .funnel-pct { font-size: .78rem; color: #64748b; margin-top: 2px; }
+
+        .skill-tag {
+            display: inline-block; background: #f0fdf4; color: #16a34a;
+            border: 1px solid #bbf7d0; border-radius: 20px;
+            padding: 3px 12px; font-size: .78rem; font-weight: 600; margin: 3px;
+        }
+
+        .trend-up   { color: #16a34a; font-size: .8rem; font-weight: 700; }
+        .trend-down { color: #ef4444; font-size: .8rem; font-weight: 700; }
+
+        .btn-primary-g {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #fff; border: none; padding: 8px 20px;
+            border-radius: 10px; font-weight: 700; font-size: .88rem;
+            transition: .2s; cursor: pointer;
+        }
+        .btn-primary-g:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(22,163,74,.35);
+        }
+        .btn-outline-g {
+            background: transparent; color: #16a34a;
+            border: 1.5px solid #16a34a; padding: 6px 16px;
+            border-radius: 10px; font-weight: 700; font-size: .82rem;
+            cursor: pointer; transition: .15s;
+        }
+        .btn-outline-g:hover { background: #f0fdf4; }
+
+        .select-custom {
+            border: 1.5px solid #e2e8f0; border-radius: 8px;
+            padding: 6px 12px; font-size: .85rem; font-weight: 600;
+            color: #374151; background: #fff; cursor: pointer;
+        }
+    </style>
+<script src="config.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar-custom">
+    <a href="employer_dashboard.html" class="nav-logo me-4">ค้นหาผู้สมัคร</a>
+    <div class="d-flex gap-1 flex-grow-1">
+        <a href="employer_dashboard.html" class="nav-link-c"><i class="fas fa-tachometer-alt me-1"></i>ภาพรวม</a>
+        <a href="employer_candidates.html" class="nav-link-c"><i class="fas fa-users me-1"></i>ค้นหาผู้สมัคร</a>
+        <a href="employer_job_analytics.html" class="nav-link-c active"><i class="fas fa-chart-bar me-1"></i>สถิติงาน</a>
+        <a href="employer_dashboard.html" class="nav-link-c"><i class="fas fa-users-cog me-1"></i>จัดการทีม</a>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="text-white fw-bold small" id="navCompany">ไลน์ (ประเทศไทย)</span>
+        <a href="index.html" class="nav-link-c ms-2"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+</nav>
+
+<!-- Main -->
+<div class="main-container">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h5 style="font-weight:800;color:#0f1f3d;margin:0;">สถิติงานและการสมัคร</h5>
+            <p style="color:#64748b;font-size:.85rem;margin:4px 0 0;">ภาพรวมประสิทธิภาพการรับสมัครงาน</p>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="time-filter d-flex gap-1">
+                <button onclick="setFilter(this,'7d')">7 วัน</button>
+                <button onclick="setFilter(this,'30d')" class="active">30 วัน</button>
+                <button onclick="setFilter(this,'90d')">90 วัน</button>
+            </div>
+            <button class="btn-primary-g"><i class="fa fa-download me-1"></i>Export</button>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card green">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="stat-val" id="kpi-applicants">248</div>
+                        <div class="stat-label">ผู้สมัครทั้งหมด</div>
+                        <div class="trend-up mt-1"><i class="fa fa-arrow-up"></i> +12% จากเดือนก่อน</div>
+                    </div>
+                    <div class="stat-icon text-success"><i class="fa fa-users"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card blue">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="stat-val" id="kpi-matched">67</div>
+                        <div class="stat-label">ผ่านเกณฑ์ Match ≥70%</div>
+                        <div class="trend-up mt-1"><i class="fa fa-arrow-up"></i> +5% จากเดือนก่อน</div>
+                    </div>
+                    <div class="stat-icon" style="color:#10b981;"><i class="fa fa-check-circle"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card amber">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="stat-val" id="kpi-interview">23</div>
+                        <div class="stat-label">เรียกสัมภาษณ์</div>
+                        <div class="trend-down mt-1"><i class="fa fa-arrow-down"></i> -2% จากเดือนก่อน</div>
+                    </div>
+                    <div class="stat-icon text-warning"><i class="fa fa-calendar-check"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card purple">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="stat-val" id="kpi-hired">8</div>
+                        <div class="stat-label">รับเข้าทำงาน</div>
+                        <div class="trend-up mt-1"><i class="fa fa-arrow-up"></i> +3 จากเดือนก่อน</div>
+                    </div>
+                    <div class="stat-icon" style="color:#8b5cf6;"><i class="fa fa-user-check"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+
+        <!-- Chart: ผู้สมัครรายวัน -->
+        <div class="col-lg-8">
+            <div class="section-card">
+                <div class="section-title">
+                    <span><i class="fa fa-chart-line me-2 text-success"></i>ผู้สมัครรายวัน</span>
+                    <select class="select-custom" onchange="updateChart(this.value)">
+                        <option value="all">ทุกตำแหน่ง</option>
+                        <option value="de">Data Engineer</option>
+                        <option value="ds">Data Scientist</option>
+                        <option value="dev">Developer</option>
+                    </select>
+                </div>
+                <canvas id="applicantChart" height="120"></canvas>
+            </div>
+        </div>
+
+        <!-- Funnel -->
+        <div class="col-lg-4">
+            <div class="section-card">
+                <div class="section-title">
+                    <span><i class="fa fa-filter me-2 text-success"></i>Recruitment Funnel</span>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-num">248</div>
+                    <div>
+                        <div class="funnel-label"><span class="status-dot dot-blue"></span>สมัครเข้ามา</div>
+                        <div class="funnel-pct">100%</div>
+                    </div>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-num">67</div>
+                    <div>
+                        <div class="funnel-label"><span class="status-dot dot-green"></span>Match ≥ 70%</div>
+                        <div class="funnel-pct">27% ของผู้สมัครทั้งหมด</div>
+                    </div>
+                </div>
+                <div class="funnel-step">
+                    <div class="funnel-num">23</div>
+                    <div>
+                        <div class="funnel-label"><span class="status-dot dot-amber"></span>เรียกสัมภาษณ์</div>
+                        <div class="funnel-pct">34% ของที่ผ่านเกณฑ์</div>
+                    </div>
+                </div>
+                <div class="funnel-step" style="background:#f0fdf4;">
+                    <div class="funnel-num" style="color:#16a34a;">8</div>
+                    <div>
+                        <div class="funnel-label"><span class="status-dot dot-green"></span>รับเข้าทำงาน</div>
+                        <div class="funnel-pct">35% ของที่สัมภาษณ์</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ประสิทธิภาพแต่ละตำแหน่ง -->
+        <div class="col-lg-6">
+            <div class="section-card">
+                <div class="section-title">
+                    <span><i class="fa fa-briefcase me-2 text-success"></i>ประสิทธิภาพแต่ละตำแหน่ง</span>
+                </div>
+                <div id="job-perf-list">
+                    <!-- จะ render จาก JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ทักษะที่หายากที่สุด -->
+        <div class="col-lg-6">
+            <div class="section-card">
+                <div class="section-title">
+                    <span><i class="fa fa-exclamation-triangle me-2 text-warning"></i>ทักษะที่ผู้สมัครขาดมากที่สุด</span>
+                </div>
+                <canvas id="skillGapChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Match Score Distribution -->
+        <div class="col-lg-6">
+            <div class="section-card">
+                <div class="section-title">
+                    <span><i class="fa fa-chart-pie me-2 text-success"></i>การกระจาย Match Score</span>
+                </div>
+                <canvas id="scoreDistChart" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- เงินเดือนที่ผู้สมัครขอ vs งบบริษัท -->
+        <div class="col-lg-6">
+            <div class="section-card">
+                <div class="section-title">
+                    <span><i class="fa fa-money-bill-wave me-2 text-success"></i>เงินเดือนที่ขอ vs งบบริษัท</span>
+                </div>
+                <canvas id="salaryChart" height="180"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:5001/api';
+
+// ── Time filter ──────────────────────────────────────────────────────────
+function setFilter(btn, period) {
+    document.querySelectorAll('.time-filter button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadStats(period);
+}
+
+// ── Mock data (ใช้จนกว่าจะเชื่อม API) ───────────────────────────────────
+const MOCK = {
+    dailyApplicants: {
+        labels: ['20/2','21/2','22/2','23/2','24/2','25/2','26/2','27/2','28/2','1/3','2/3','3/3','4/3','5/3'],
+        data:   [5,8,12,7,15,18,10,14,20,9,16,22,11,13]
+    },
+    jobPerf: [
+        { title: 'Data Engineer',     applicants: 89, matched: 28, hired: 4, avgScore: 71 },
+        { title: 'Data Scientist',    applicants: 74, matched: 21, hired: 2, avgScore: 68 },
+        { title: 'Frontend Developer',applicants: 55, matched: 12, hired: 1, avgScore: 62 },
+        { title: 'DevOps Engineer',   applicants: 30, matched:  6, hired: 1, avgScore: 58 },
+    ],
+    skillGap: {
+        labels: ['Spark','Airflow','Kubernetes','BigQuery','dbt','Terraform','Kafka'],
+        data:   [65, 58, 52, 47, 43, 38, 31]
+    },
+    scoreDist: {
+        labels: ['< 40%','40–54%','55–69%','70–84%','≥ 85%'],
+        data:   [42, 68, 71, 45, 22]
+    },
+    salary: {
+        labels: ['Data Engineer','Data Scientist','Frontend Dev','DevOps'],
+        budget:    [75000, 80000, 60000, 85000],
+        requested: [82000, 88000, 65000, 90000],
+    }
+};
+
+// ── Charts ───────────────────────────────────────────────────────────────
+let chartApplicant, chartSkillGap, chartScoreDist, chartSalary;
+
+function initCharts() {
+    // 1. Daily applicants
+    chartApplicant = new Chart(document.getElementById('applicantChart'), {
+        type: 'line',
+        data: {
+            labels: MOCK.dailyApplicants.labels,
+            datasets: [{
+                label: 'ผู้สมัคร',
+                data: MOCK.dailyApplicants.data,
+                borderColor: '#16a34a',
+                backgroundColor: 'rgba(22,163,74,.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#16a34a',
+                pointRadius: 4,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Skill gap bar
+    chartSkillGap = new Chart(document.getElementById('skillGapChart'), {
+        type: 'bar',
+        data: {
+            labels: MOCK.skillGap.labels,
+            datasets: [{
+                label: '% ที่ขาด',
+                data: MOCK.skillGap.data,
+                backgroundColor: 'rgba(245,158,11,.7)',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { max: 100, grid: { color: '#f1f5f9' } },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 3. Score distribution
+    chartScoreDist = new Chart(document.getElementById('scoreDistChart'), {
+        type: 'bar',
+        data: {
+            labels: MOCK.scoreDist.labels,
+            datasets: [{
+                label: 'จำนวนผู้สมัคร',
+                data: MOCK.scoreDist.data,
+                backgroundColor: [
+                    'rgba(239,68,68,.6)', 'rgba(245,158,11,.6)',
+                    'rgba(59,130,246,.6)', 'rgba(16,185,129,.6)', 'rgba(22,163,74,.8)'
+                ],
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 4. Salary comparison
+    chartSalary = new Chart(document.getElementById('salaryChart'), {
+        type: 'bar',
+        data: {
+            labels: MOCK.salary.labels,
+            datasets: [
+                {
+                    label: 'งบบริษัท',
+                    data: MOCK.salary.budget,
+                    backgroundColor: 'rgba(22,163,74,.7)',
+                    borderRadius: 6
+                },
+                {
+                    label: 'เงินเดือนที่ขอ (avg)',
+                    data: MOCK.salary.requested,
+                    backgroundColor: 'rgba(239,68,68,.6)',
+                    borderRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ฿${ctx.raw.toLocaleString()}`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { callback: v => '฿' + (v/1000).toFixed(0) + 'k' },
+                    grid: { color: '#f1f5f9' }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+// ── Job performance list ─────────────────────────────────────────────────
+function renderJobPerf() {
+    const el = document.getElementById('job-perf-list');
+    el.innerHTML = MOCK.jobPerf.map(j => `
+        <div class="job-row">
+            <div class="job-icon"><i class="fa fa-briefcase"></i></div>
+            <div class="flex-grow-1">
+                <div class="job-name">${j.title}</div>
+                <div class="job-meta">${j.applicants} สมัคร · ${j.matched} ผ่านเกณฑ์ · ${j.hired} รับ</div>
+                <div class="progress-bg mt-2">
+                    <div class="progress-bar-custom" style="width:${j.avgScore}%"></div>
+                </div>
+            </div>
+            <div class="text-end" style="min-width:60px;">
+                <div style="font-weight:800;font-size:1rem;color:#16a34a;">${j.avgScore}%</div>
+                <div style="font-size:.75rem;color:#64748b;">avg score</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ── Load stats from API ──────────────────────────────────────────────────
+async function loadStats(period = '30d') {
+    try {
+        const res = await fetch(`${API}/market_stats`);
+        if (!res.ok) return;
+        const d = await res.json();
+        if (d.total_users)  document.getElementById('kpi-applicants').textContent = d.total_users;
+        if (d.total_jobs)   document.getElementById('kpi-matched').textContent    = d.open_jobs || '–';
+    } catch(e) {
+        // ใช้ mock data ต่อไป
+    }
+}
+
+function updateChart(pos) {
+    // TODO: filter by position เมื่อเชื่อม API จริง
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    initCharts();
+    renderJobPerf();
+    loadStats();
+});
+</script>
+</body>
+</html>

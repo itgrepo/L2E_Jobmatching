@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L2E V3 — จำลองการรับส่งข้อมูลจริง</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a202c; }
+
+.nav { background: #1a3a2a; color: white; padding: 14px 28px; display: flex; align-items: center; gap: 16px; }
+.nav-logo { font-size: 20px; font-weight: 800; color: #4ade80; }
+.nav-sub { font-size: 12px; color: #86efac; }
+.nav-tabs { display: flex; gap: 6px; margin-left: auto; }
+.nav-tab { padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; color: #aaa; border: 1.5px solid transparent; }
+.nav-tab.active { background: #4ade80; color: #1a3a2a; font-weight: 700; }
+.nav-tab:hover:not(.active) { border-color: #4ade80; color: #fff; }
+
+/* DATA SOURCE TOGGLE */
+.ds-toggle { display: flex; align-items: center; gap: 8px; background: white; border-radius: 12px; padding: 10px 16px; margin: 20px 28px 0; box-shadow: 0 2px 8px rgba(0,0,0,.06); font-size: 13px; }
+.ds-label { font-weight: 600; color: #475569; }
+.toggle-group { display: flex; background: #f1f5f9; border-radius: 8px; padding: 3px; gap: 2px; }
+.toggle-opt { padding: 5px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #94a3b8; transition: all .2s; }
+.toggle-opt.active { background: white; color: #1a3a2a; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+.ds-desc { font-size: 12px; color: #64748b; margin-left: 8px; }
+.ds-csv { color: #16a34a; }
+.ds-db { color: #2563eb; }
+
+.main { padding: 20px 28px 40px; max-width: 1400px; margin: 0 auto; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* FLOW LAYOUT */
+.flow-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+
+/* LEFT PANEL */
+.left-panel { display: flex; flex-direction: column; gap: 14px; }
+.panel { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+.panel h3 { font-size: 14px; font-weight: 700; color: #1a3a2a; margin-bottom: 12px; }
+
+/* FORM INPUTS */
+.form-group { margin-bottom: 10px; }
+.form-label { font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; display: block; }
+.form-select, .form-input { width: 100%; padding: 7px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 12px; color: #1a202c; background: white; }
+.form-select:focus, .form-input:focus { outline: none; border-color: #4ade80; }
+.btn { width: 100%; padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-size: 13px; font-weight: 700; transition: all .2s; }
+.btn-green { background: #1a3a2a; color: white; }
+.btn-green:hover { background: #16a34a; }
+.btn-purple { background: #7c3aed; color: white; }
+.btn-purple:hover { background: #6d28d9; }
+.btn-blue { background: #2563eb; color: white; }
+.btn-blue:hover { background: #1d4ed8; }
+
+/* RIGHT PANEL */
+.right-panel { display: flex; flex-direction: column; gap: 14px; }
+.flow-steps { display: flex; align-items: center; gap: 0; margin-bottom: 4px; }
+.flow-step-item { display: flex; align-items: center; gap: 6px; }
+.fsi-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; }
+.fsi-label { font-size: 11px; color: #94a3b8; font-weight: 500; white-space: nowrap; }
+.fsi-label.active { color: #1a3a2a; font-weight: 700; }
+.fsi-arrow { color: #cbd5e1; font-size: 14px; margin: 0 4px; }
+
+/* JSON PANELS */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.json-panel { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+.json-panel h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+.badge-in { background: #dbeafe; color: #1d4ed8; }
+.badge-out { background: #dcfce7; color: #15803d; }
+.badge-db { background: #fef3c7; color: #92400e; }
+.json-block { background: #0f172a; border-radius: 10px; padding: 14px; font-family: 'Courier New', monospace; font-size: 11.5px; line-height: 1.8; color: #e2e8f0; overflow-x: auto; min-height: 80px; position: relative; }
+.jk { color: #93c5fd; }
+.js { color: #86efac; }
+.jn { color: #fbbf24; }
+.jc { color: #64748b; font-style: italic; }
+
+/* RESULTS */
+.results-panel { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+.results-panel h4 { font-size: 14px; font-weight: 700; margin-bottom: 14px; color: #1a3a2a; display: flex; align-items: center; gap: 8px; }
+.result-row { display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 10px; border: 1.5px solid #f1f5f9; margin-bottom: 8px; transition: all .2s; }
+.result-row:hover { border-color: #4ade80; background: #f0fdf4; }
+.rank-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.rank-1 { background: #fef3c7; color: #92400e; }
+.rank-2 { background: #f1f5f9; color: #374151; }
+.rank-3 { background: #fed7aa; color: #92400e; }
+.rank-n { background: #f1f5f9; color: #94a3b8; font-size: 10px; }
+.result-info { flex: 1; min-width: 0; }
+.result-info h5 { font-size: 13px; font-weight: 700; }
+.result-info p { font-size: 11px; color: #64748b; margin-top: 2px; }
+.skill-row { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; }
+.stag { font-size: 10px; padding: 1px 7px; border-radius: 20px; }
+.stag-m { background: #dcfce7; color: #15803d; }
+.stag-x { background: #fee2e2; color: #dc2626; }
+.score-box { text-align: center; flex-shrink: 0; }
+.score-num { font-size: 22px; font-weight: 800; line-height: 1; }
+.score-high { color: #16a34a; }
+.score-mid { color: #d97706; }
+.score-low { color: #dc2626; }
+.score-lbl { font-size: 10px; color: #94a3b8; }
+
+/* PIPELINE VISUAL */
+.pipeline-vis { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+.pipeline-vis h4 { font-size: 13px; font-weight: 700; margin-bottom: 14px; color: #1a3a2a; }
+.pipe-row { display: flex; align-items: stretch; gap: 0; overflow-x: auto; }
+.pipe-box { min-width: 140px; border-radius: 10px; padding: 12px; font-size: 11px; flex-shrink: 0; }
+.pipe-arrow { display: flex; align-items: center; color: #94a3b8; font-size: 18px; padding: 0 4px; flex-shrink: 0; }
+.pipe-title { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+.pipe-code { font-family: 'Courier New', monospace; font-size: 10px; color: #64748b; }
+
+/* POOL TABLE */
+.pool-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.pool-table th { background: #f8fafc; padding: 10px 12px; text-align: left; font-size: 11px; color: #64748b; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+.pool-table td { padding: 10px 12px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+.pool-table tr:hover td { background: #f8fffe; }
+.src-ai { background: #ede9fe; color: #6d28d9; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+.src-direct { background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+.src-manual { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+.bar-wrap { display: flex; align-items: center; gap: 6px; }
+.bar { height: 6px; border-radius: 3px; background: #e2e8f0; width: 70px; }
+.bar-fill { height: 100%; border-radius: 3px; }
+
+/* SPINNER / STATES */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #e2e8f0; border-top-color: #4ade80; border-radius: 50%; animation: spin .6s linear infinite; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.fade-up { animation: fadeUp .35s ease forwards; }
+.hidden { display: none !important; }
+
+/* DB LAYER NOTE */
+.db-note { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #1d4ed8; }
+.csv-note { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #15803d; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div>
+    <div class="nav-logo">L2E V3</div>
+    <div class="nav-sub">จำลองการรับส่งข้อมูลจริง — Data Flow Demo</div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showTab('f1', this)">👤 ผู้เรียนหางาน</div>
+    <div class="nav-tab" onclick="showTab('f2', this)">🏢 บริษัทหาผู้สมัคร</div>
+    <div class="nav-tab" onclick="showTab('f3', this)">🔍 วิเคราะห์ Pool</div>
+  </div>
+</nav>
+
+<!-- DATA SOURCE TOGGLE (global) -->
+<div class="ds-toggle">
+  <span class="ds-label">📦 แหล่งข้อมูล:</span>
+  <div class="toggle-group">
+    <div class="toggle-opt active" id="tog-csv" onclick="setDS('csv')">📄 CSV File</div>
+    <div class="toggle-opt" id="tog-db" onclick="setDS('db')">🗄️ Database</div>
+  </div>
+  <span class="ds-desc" id="ds-desc">
+    <span class="ds-csv">กำลังใช้ข้อมูลจาก CSV files ใน DATA SET/ (Development)</span>
+  </span>
+  <span style="margin-left:auto;font-size:11px;color:#94a3b8">โมเดล AI เหมือนกัน 100% — แค่เปลี่ยนแหล่งข้อมูล</span>
+</div>
+
+<div class="main">
+
+<!-- ========== FLOW 1: LEARNER ========== -->
+<div id="f1" class="section active">
+  <div class="flow-layout">
+
+    <!-- LEFT -->
+    <div class="left-panel">
+      <div class="panel">
+        <h3>👤 ผู้เรียนกด "หางาน"</h3>
+        <div class="form-group">
+          <label class="form-label">เลือก Learner ID (จาก CSV จริง)</label>
+          <select class="form-select" id="l1-learner">
+            <option value="LNR-202600002">LNR-202600002 — Piywdi (Programmer)</option>
+            <option value="LNR-202600003">LNR-202600003 — Suthinanth (UX/UI Designer)</option>
+            <option value="LNR-202600005">LNR-202600005 — Phiphiththn (DevOps Engineer)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">จำนวนงานที่ต้องการ</label>
+          <select class="form-select" id="l1-limit">
+            <option value="5">5 งานแรก</option>
+            <option value="10" selected>10 งานแรก</option>
+            <option value="20">20 งานแรก</option>
+          </select>
+        </div>
+        <button class="btn btn-green" onclick="runFlow1()">▶ ส่งคำขอหา API</button>
+      </div>
+
+      <div class="panel">
+        <h3>📤 JSON ที่ UI ส่งไป</h3>
+        <div style="font-size:11px;color:#64748b;margin-bottom:6px">POST /api/match_jobs</div>
+        <div class="json-block" id="l1-req">
+<span class="jk">"learner_id"</span>: <span class="js">"LNR-202600002"</span>,
+<span class="jk">"limit"</span>: <span class="jn">10</span>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:#94a3b8">
+          ✅ UI ส่งแค่ ID — API จะไปดึงข้อมูลทั้งหมดเอง
+        </div>
+      </div>
+
+      <div class="panel" id="l1-dblayer">
+        <h3>🗄️ API ดึงข้อมูลจาก</h3>
+        <div id="l1-csvnote" class="csv-note">
+          <strong>📄 CSV (ตอนนี้)</strong><br>
+          <code style="font-size:10px">DATA SET/TBL_LEARNER.csv</code><br>
+          <code style="font-size:10px">DATA SET/TBL_LEARNER_SKILL.csv</code><br>
+          <code style="font-size:10px">DATA SET/TBL_LEARNER_EXPERINCE.csv</code><br>
+          <code style="font-size:10px">DATA SET/job_post.csv</code>
+        </div>
+        <div id="l1-dbnote" class="db-note hidden">
+          <strong>🗄️ Database (Production)</strong><br>
+          <code style="font-size:10px">SELECT * FROM TBL_LEARNER WHERE LEARNER_ID=?</code><br>
+          <code style="font-size:10px">SELECT * FROM TBL_LEARNER_SKILL WHERE LEARNER_ID=?</code><br>
+          <code style="font-size:10px">SELECT * FROM job_post WHERE is_active=1</code><br>
+          <span style="color:#64748b">→ โมเดล AI คำนวณเหมือนกันทุกอย่าง</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-panel">
+
+      <!-- PIPELINE VISUAL -->
+      <div class="pipeline-vis">
+        <h4>🔄 Data Flow ทีละขั้น</h4>
+        <div class="pipe-row">
+          <div class="pipe-box" style="background:#dbeafe" id="p1-s1">
+            <div class="pipe-title" style="color:#1d4ed8">① UI ส่ง JSON</div>
+            <div class="pipe-code">learner_id → API</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#f0fdf4" id="p1-s2">
+            <div class="pipe-title" style="color:#15803d">② API ดึงข้อมูล</div>
+            <div class="pipe-code" id="p1-s2-code">จาก CSV/DB</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#fdf4ff" id="p1-s3">
+            <div class="pipe-title" style="color:#7c3aed">③ สร้าง Profile Text</div>
+            <div class="pipe-code">"Job Title + Skills + Exp"</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#fef9c3" id="p1-s4">
+            <div class="pipe-title" style="color:#92400e">④ BERT คำนวณ</div>
+            <div class="pipe-code">Cosine Similarity × 100 = %</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#dcfce7" id="p1-s5">
+            <div class="pipe-title" style="color:#15803d">⑤ Skill Gap</div>
+            <div class="pipe-code">learner_skill vs job_skill</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#fff1f2" id="p1-s6">
+            <div class="pipe-title" style="color:#dc2626">⑥ ส่งกลับ UI</div>
+            <div class="pipe-code">Top Jobs + % + Skill</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OUTPUT JSON + RESULTS -->
+      <div class="two-col">
+        <div class="json-panel">
+          <h4>📥 JSON ที่ API ส่งกลับ <span id="l1-spin" class="hidden"><span class="spinner"></span></span></h4>
+          <span class="badge badge-out">OUTPUT</span>
+          <div class="json-block" id="l1-res" style="margin-top:8px;max-height:300px;overflow-y:auto">
+<span class="jk">"learner_id"</span>: <span class="js">"LNR-202600002"</span>,
+<span class="jk">"name"</span>: <span class="js">"Piywdi"</span>,
+<span class="jk">"job_title"</span>: <span class="js">"Programmer"</span>,
+<span class="jk">"skills"</span>: [<span class="js">"Python"</span>,<span class="js">"Java"</span>,<span class="js">"JavaScript"</span>],
+<span class="jk">"jobs"</span>: [
+  {
+    <span class="jk">"job_id"</span>: <span class="js">"JOB-202600002"</span>,
+    <span class="jk">"title"</span>: <span class="js">"DevOps Engineer"</span>,
+    <span class="jk">"match_score"</span>: <span class="jn">84</span>,
+    <span class="jk">"skill_matched"</span>: [<span class="js">"Docker"</span>,<span class="js">"CI/CD"</span>],
+    <span class="jk">"skill_missing"</span>: [<span class="js">"Kubernetes"</span>]
+  },
+  <span class="jc">// ... อีก 9 งาน</span>
+]
+          </div>
+        </div>
+
+        <div class="json-panel">
+          <h4>🖥️ UI แสดงผล</h4>
+          <div id="l1-cards">
+            <div class="result-row fade-up">
+              <div class="rank-badge rank-1">1</div>
+              <div class="result-info">
+                <h5>DevOps Engineer — PTT Digital</h5>
+                <p>Full-time · On-site · 40,000–62,000 บาท</p>
+                <div class="skill-row">
+                  <span class="stag stag-m">Docker ✓</span>
+                  <span class="stag stag-m">CI/CD ✓</span>
+                  <span class="stag stag-m">Linux ✓</span>
+                  <span class="stag stag-x">Kubernetes ↗</span>
+                </div>
+              </div>
+              <div class="score-box"><div class="score-num score-high">84%</div><div class="score-lbl">Match</div></div>
+            </div>
+            <div class="result-row fade-up" style="animation-delay:.08s">
+              <div class="rank-badge rank-2">2</div>
+              <div class="result-info">
+                <h5>Web Developer — Grab Thailand</h5>
+                <p>Full-time · Hybrid · 38,000–55,000 บาท</p>
+                <div class="skill-row">
+                  <span class="stag stag-m">JavaScript ✓</span>
+                  <span class="stag stag-m">Java ✓</span>
+                  <span class="stag stag-x">React ↗</span>
+                </div>
+              </div>
+              <div class="score-box"><div class="score-num score-high">76%</div><div class="score-lbl">Match</div></div>
+            </div>
+            <div class="result-row fade-up" style="animation-delay:.16s">
+              <div class="rank-badge rank-3">3</div>
+              <div class="result-info">
+                <h5>Data Analyst — SCG</h5>
+                <p>Full-time · On-site · 45,000–70,000 บาท</p>
+                <div class="skill-row">
+                  <span class="stag stag-m">Python ✓</span>
+                  <span class="stag stag-x">SQL ↗</span>
+                  <span class="stag stag-x">Tableau ↗</span>
+                </div>
+              </div>
+              <div class="score-box"><div class="score-num score-mid">61%</div><div class="score-lbl">Match</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== FLOW 2: EMPLOYER ========== -->
+<div id="f2" class="section">
+  <div class="flow-layout">
+    <div class="left-panel">
+      <div class="panel">
+        <h3>🏢 บริษัทกด "แนะนำด้วย AI"</h3>
+        <div class="form-group">
+          <label class="form-label">เลือก Job Post (จาก CSV จริง)</label>
+          <select class="form-select" id="f2-job">
+            <option value="JOB-202600001">JOB-202600001 — Cybersecurity Analyst (65k–102k)</option>
+            <option value="JOB-202600002">JOB-202600002 — DevOps Engineer (40k–62k)</option>
+            <option value="JOB-202600003">JOB-202600003 — Data Scientist (55k–86k)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">จำนวนผู้สมัครที่ต้องการ</label>
+          <select class="form-select" id="f2-limit">
+            <option value="10" selected>Top 10 คน</option>
+            <option value="20">Top 20 คน</option>
+          </select>
+        </div>
+        <button class="btn btn-blue" onclick="runFlow2()">▶ ค้นหาด้วย AI</button>
+      </div>
+
+      <div class="panel">
+        <h3>📤 JSON ที่ UI ส่งไป</h3>
+        <div style="font-size:11px;color:#64748b;margin-bottom:6px">POST /api/match_candidates</div>
+        <div class="json-block" id="f2-req">
+<span class="jk">"job_post_id"</span>: <span class="js">"JOB-202600001"</span>,
+<span class="jk">"limit"</span>: <span class="jn">10</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>🗄️ API ดึงข้อมูลจาก</h3>
+        <div id="f2-csvnote" class="csv-note">
+          <strong>📄 CSV</strong><br>
+          <code style="font-size:10px">job_post.csv → รายละเอียดงาน</code><br>
+          <code style="font-size:10px">job_post_skill.csv → ทักษะที่ต้องการ</code><br>
+          <code style="font-size:10px">TBL_LEARNER.csv → ผู้เรียนทั้งหมด 10,000 คน</code>
+        </div>
+        <div id="f2-dbnote" class="db-note hidden">
+          <strong>🗄️ Database</strong><br>
+          <code style="font-size:10px">SELECT * FROM job_post WHERE job_post_id=?</code><br>
+          <code style="font-size:10px">SELECT skill_id FROM job_post_skill WHERE Job_post_id=?</code><br>
+          <code style="font-size:10px">SELECT * FROM TBL_LEARNER WHERE status='active'</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="pipeline-vis">
+        <h4>🔄 Data Flow — ฝั่งบริษัท</h4>
+        <div class="pipe-row">
+          <div class="pipe-box" style="background:#dbeafe">
+            <div class="pipe-title" style="color:#1d4ed8">① UI ส่ง JSON</div>
+            <div class="pipe-code">job_post_id → API</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#f0fdf4">
+            <div class="pipe-title" style="color:#15803d">② ดึงรายละเอียดงาน</div>
+            <div class="pipe-code" id="f2-s2-code">จาก CSV/DB</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#fdf4ff">
+            <div class="pipe-title" style="color:#7c3aed">③ BERT เปรียบเทียบ</div>
+            <div class="pipe-code">Job vs Learner 10,000 คน</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#fef9c3">
+            <div class="pipe-title" style="color:#92400e">④ เรียง % Match</div>
+            <div class="pipe-code">Top K candidates</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#dcfce7">
+            <div class="pipe-title" style="color:#15803d">⑤ ส่งกลับ</div>
+            <div class="pipe-code">Candidates + % + Skill</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="json-panel">
+          <h4>📥 JSON กลับ <span id="f2-spin" class="hidden"><span class="spinner"></span></span></h4>
+          <span class="badge badge-out">OUTPUT</span>
+          <div class="json-block" id="f2-res" style="margin-top:8px;max-height:300px;overflow-y:auto">
+<span class="jk">"job_id"</span>: <span class="js">"JOB-202600001"</span>,
+<span class="jk">"job_title"</span>: <span class="js">"Cybersecurity Analyst"</span>,
+<span class="jk">"required_skills"</span>: [<span class="js">"JavaScript"</span>,<span class="js">"Git"</span>,<span class="js">"Java"</span>,<span class="js">"Docker"</span>],
+<span class="jk">"candidates"</span>: [
+  {
+    <span class="jk">"learner_id"</span>: <span class="js">"LNR-202600002"</span>,
+    <span class="jk">"name"</span>: <span class="js">"Piywdi"</span>,
+    <span class="jk">"match_score"</span>: <span class="jn">82</span>,
+    <span class="jk">"skill_matched"</span>: [<span class="js">"JavaScript"</span>,<span class="js">"Git"</span>,<span class="js">"Java"</span>],
+    <span class="jk">"skill_missing"</span>: [<span class="js">"Docker"</span>]
+  },
+  <span class="jc">// ... อีก 9 คน</span>
+]
+          </div>
+        </div>
+
+        <div class="json-panel">
+          <h4>🖥️ UI แสดงผล</h4>
+          <div id="f2-cards">
+            <div class="result-row fade-up">
+              <div class="rank-badge rank-1">1</div>
+              <div class="result-info">
+                <h5>Piywdi — Programmer</h5>
+                <p>LNR-202600002 · ประสบการณ์ 3 ปี</p>
+                <div class="skill-row">
+                  <span class="stag stag-m">JavaScript ✓</span>
+                  <span class="stag stag-m">Git ✓</span>
+                  <span class="stag stag-m">Java ✓</span>
+                  <span class="stag stag-x">Docker ↗</span>
+                </div>
+              </div>
+              <div class="score-box"><div class="score-num score-high">82%</div><div class="score-lbl">Match</div></div>
+            </div>
+            <div class="result-row fade-up" style="animation-delay:.08s">
+              <div class="rank-badge rank-2">2</div>
+              <div class="result-info">
+                <h5>Phiphiththn — DevOps Engineer</h5>
+                <p>LNR-202600005 · ประสบการณ์ 5 ปี</p>
+                <div class="skill-row">
+                  <span class="stag stag-m">Docker ✓</span>
+                  <span class="stag stag-x">JavaScript ↗</span>
+                  <span class="stag stag-x">Java ↗</span>
+                </div>
+              </div>
+              <div class="score-box"><div class="score-num score-mid">68%</div><div class="score-lbl">Match</div></div>
+            </div>
+            <div class="result-row fade-up" style="animation-delay:.16s">
+              <div class="rank-badge rank-3">3</div>
+              <div class="result-info">
+                <h5>Suthinanth — UX/UI Designer</h5>
+                <p>LNR-202600003 · ประสบการณ์ 2 ปี</p>
+                <div class="skill-row">
+                  <span class="stag stag-x">JavaScript ↗</span>
+                  <span class="stag stag-x">Git ↗</span>
+                  <span class="stag stag-x">Docker ↗</span>
+                </div>
+              </div>
+              <div class="score-box"><div class="score-num score-low">31%</div><div class="score-lbl">Match</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FLOW 3: POOL ========== -->
+<div id="f3" class="section">
+  <div class="flow-layout">
+    <div class="left-panel">
+      <div class="panel">
+        <h3>🔍 วิเคราะห์ Pool</h3>
+        <div class="form-group">
+          <label class="form-label">Job Post</label>
+          <select class="form-select" id="f3-job">
+            <option value="JOB-202601570">JOB-202601570 — Data Analyst (45k–70k)</option>
+          </select>
+        </div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px">Pool มี 6 คน (ข้อมูลจริงจาก CSV)</div>
+        <div style="font-size:11px;background:#f8fafc;border-radius:8px;padding:10px;margin-bottom:10px;line-height:1.8">
+          <div>🤖 <span class="src-ai">AI</span> LNR-202603720 — recommendation</div>
+          <div>📝 <span class="src-direct">สมัครเอง</span> LNR-202601894, LNR-202605649, LNR-202604978, LNR-202609177</div>
+          <div>👆 <span class="src-manual">HR เพิ่ม</span> LNR-202605199</div>
+        </div>
+        <button class="btn btn-purple" onclick="runFlow3()">▶ วิเคราะห์ทุกคนด้วย AI</button>
+      </div>
+
+      <div class="panel">
+        <h3>📤 JSON ที่ UI ส่งไป</h3>
+        <div style="font-size:11px;color:#64748b;margin-bottom:6px">POST /api/analyze_pool</div>
+        <div class="json-block">
+<span class="jk">"job_post_id"</span>: <span class="js">"JOB-202601570"</span>,
+<span class="jk">"candidate_ids"</span>: [
+  <span class="js">"LNR-202601894"</span>,
+  <span class="js">"LNR-202605649"</span>,
+  <span class="js">"LNR-202603720"</span>,
+  <span class="js">"LNR-202605199"</span>,
+  <span class="js">"LNR-202604978"</span>,
+  <span class="js">"LNR-202609177"</span>
+]
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>🗄️ API ดึงข้อมูลจาก</h3>
+        <div id="f3-csvnote" class="csv-note">
+          <strong>📄 CSV</strong><br>
+          <code style="font-size:10px">job_candidate.csv → รายชื่อ + แหล่งที่มา</code><br>
+          <code style="font-size:10px">TBL_LEARNER.csv + SKILL → โปรไฟล์ทุกคน</code><br>
+          <code style="font-size:10px">job_post_skill.csv → ทักษะที่งานต้องการ</code>
+        </div>
+        <div id="f3-dbnote" class="db-note hidden">
+          <strong>🗄️ Database</strong><br>
+          <code style="font-size:10px">SELECT * FROM job_candidate WHERE job_post_id=?</code><br>
+          <code style="font-size:10px">SELECT l.*, s.SKILL_NAME FROM TBL_LEARNER l JOIN TBL_LEARNER_SKILL s</code><br>
+          <code style="font-size:10px">WHERE l.LEARNER_ID IN (candidate_ids)</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="pipeline-vis">
+        <h4>🔄 Pool Analysis Flow — ทุกคนผ่าน AI เท่ากัน ไม่ว่าจะมาจากแหล่งไหน</h4>
+        <div class="pipe-row">
+          <div class="pipe-box" style="background:#ede9fe">
+            <div class="pipe-title" style="color:#6d28d9">🤖 AI Recommend</div>
+            <div class="pipe-code">recommendation</div>
+          </div>
+          <div class="pipe-arrow" style="flex-direction:column;gap:2px">↘<br>→<br>↗</div>
+          <div class="pipe-box" style="background:#dbeafe">
+            <div class="pipe-title" style="color:#1d4ed8">📝 สมัครเอง</div>
+            <div class="pipe-code">direct_apply</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#fef9c3">
+            <div class="pipe-title" style="color:#92400e">🧠 BERT AI</div>
+            <div class="pipe-code">คำนวณ % ทุกคน</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-box" style="background:#dcfce7">
+            <div class="pipe-title" style="color:#15803d">📊 เรียงอันดับ</div>
+            <div class="pipe-code">High → Low</div>
+          </div>
+          <div class="pipe-arrow" style="flex-direction:column;gap:2px">↗<br>→<br>↘</div>
+          <div class="pipe-box" style="background:#fef3c7">
+            <div class="pipe-title" style="color:#92400e">👆 HR เพิ่ม</div>
+            <div class="pipe-code">manual/pool</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-panel">
+        <h4>📊 ผล Pool Analysis <span id="f3-spin" class="hidden"><span class="spinner"></span></span></h4>
+        <table class="pool-table" id="f3-table">
+          <thead>
+            <tr>
+              <th>อันดับ</th>
+              <th>ผู้สมัคร</th>
+              <th>ตำแหน่ง</th>
+              <th>แหล่งที่มา</th>
+              <th>% Match</th>
+              <th>Skill ที่ตรง</th>
+              <th>Skill ที่ขาด</th>
+              <th>สถานะใน Pool</th>
+            </tr>
+          </thead>
+          <tbody id="f3-body">
+            <tr class="fade-up">
+              <td><strong style="color:#16a34a">1</strong></td>
+              <td><strong>LNR-202604978</strong><br><small style="color:#64748b">Oaaeoesaa</small></td>
+              <td>Data Scientist</td>
+              <td><span class="src-direct">📝 สมัครเอง</span></td>
+              <td>
+                <div class="bar-wrap">
+                  <div class="bar"><div class="bar-fill" style="width:91%;background:#16a34a"></div></div>
+                  <strong style="color:#16a34a">91%</strong>
+                </div>
+              </td>
+              <td><span class="stag stag-m" style="font-size:10px">Python ✓</span> <span class="stag stag-m" style="font-size:10px">ML ✓</span> <span class="stag stag-m" style="font-size:10px">SQL ✓</span></td>
+              <td><span class="stag stag-x" style="font-size:10px">Tableau ↗</span></td>
+              <td><span style="color:#16a34a;font-size:11px">● hired</span></td>
+            </tr>
+            <tr class="fade-up" style="animation-delay:.08s">
+              <td><strong style="color:#2563eb">2</strong></td>
+              <td><strong>LNR-202605199</strong><br><small style="color:#64748b">Phrebyya</small></td>
+              <td>Programmer</td>
+              <td><span class="src-manual">👆 HR เพิ่ม</span></td>
+              <td>
+                <div class="bar-wrap">
+                  <div class="bar"><div class="bar-fill" style="width:73%;background:#16a34a"></div></div>
+                  <strong style="color:#16a34a">73%</strong>
+                </div>
+              </td>
+              <td><span class="stag stag-m" style="font-size:10px">Python ✓</span> <span class="stag stag-m" style="font-size:10px">Java ✓</span></td>
+              <td><span class="stag stag-x" style="font-size:10px">SQL ↗</span> <span class="stag stag-x" style="font-size:10px">ML ↗</span></td>
+              <td><span style="color:#d97706;font-size:11px">● offer</span></td>
+            </tr>
+            <tr class="fade-up" style="animation-delay:.16s">
+              <td><strong>3</strong></td>
+              <td><strong>LNR-202603720</strong><br><small style="color:#64748b">Oophas</small></td>
+              <td>Civil Engineer</td>
+              <td><span class="src-ai">🤖 AI</span></td>
+              <td>
+                <div class="bar-wrap">
+                  <div class="bar"><div class="bar-fill" style="width:38%;background:#d97706"></div></div>
+                  <strong style="color:#d97706">38%</strong>
+                </div>
+              </td>
+              <td><span class="stag stag-m" style="font-size:10px">Communication ✓</span></td>
+              <td><span class="stag stag-x" style="font-size:10px">Python ↗</span> <span class="stag stag-x" style="font-size:10px">SQL ↗</span></td>
+              <td><span style="color:#94a3b8;font-size:11px">● applied</span></td>
+            </tr>
+            <tr class="fade-up" style="animation-delay:.24s">
+              <td><strong>4</strong></td>
+              <td><strong>LNR-202601894</strong><br><small style="color:#64748b">Thara</small></td>
+              <td>UX/UI Designer</td>
+              <td><span class="src-direct">📝 สมัครเอง</span></td>
+              <td>
+                <div class="bar-wrap">
+                  <div class="bar"><div class="bar-fill" style="width:25%;background:#dc2626"></div></div>
+                  <strong style="color:#dc2626">25%</strong>
+                </div>
+              </td>
+              <td><span class="stag stag-x" style="font-size:10px">ไม่มี ↗</span></td>
+              <td><span class="stag stag-x" style="font-size:10px">Python ↗</span> <span class="stag stag-x" style="font-size:10px">SQL ↗</span> <span class="stag stag-x" style="font-size:10px">ML ↗</span></td>
+              <td><span style="color:#94a3b8;font-size:11px">● applied</span></td>
+            </tr>
+            <tr class="fade-up" style="animation-delay:.32s">
+              <td><strong>5</strong></td>
+              <td><strong>LNR-202605649</strong><br><small style="color:#64748b">Suprani</small></td>
+              <td>Digital Marketer</td>
+              <td><span class="src-direct">📝 สมัครเอง</span></td>
+              <td>
+                <div class="bar-wrap">
+                  <div class="bar"><div class="bar-fill" style="width:18%;background:#dc2626"></div></div>
+                  <strong style="color:#dc2626">18%</strong>
+                </div>
+              </td>
+              <td><span class="stag stag-x" style="font-size:10px">ไม่มี ↗</span></td>
+              <td><span class="stag stag-x" style="font-size:10px">Python ↗</span> <span class="stag stag-x" style="font-size:10px">SQL ↗</span></td>
+              <td><span style="color:#94a3b8;font-size:11px">● screening</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px;padding:12px;background:#f0fdf4;border-radius:10px;font-size:12px;border-left:4px solid #16a34a">
+          <strong>💡 Insight:</strong> คนที่ "hired" จริง (LNR-202604978) ได้คะแนน AI สูงที่สุด 91% ✅ แสดงว่าโมเดลทำนายถูกต้อง · HR ที่เพิ่มมาเอง (73%) ก็อยู่ในระดับดี · AI ที่แนะนำมา (38%) กลับคะแนนต่ำ — แสดงให้เห็นว่าโมเดลยังต้องเทรนเพิ่ม
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<script>
+let currentDS = 'csv';
+
+function showTab(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+
+function setDS(mode) {
+  currentDS = mode;
+  document.getElementById('tog-csv').classList.toggle('active', mode==='csv');
+  document.getElementById('tog-db').classList.toggle('active', mode==='db');
+
+  const desc = document.getElementById('ds-desc');
+  if (mode === 'csv') {
+    desc.innerHTML = '<span class="ds-csv">กำลังใช้ข้อมูลจาก CSV files ใน DATA SET/ (Development)</span>';
+  } else {
+    desc.innerHTML = '<span class="ds-db">กำลังใช้ข้อมูลจาก Database จริง (Production)</span>';
+  }
+
+  // Toggle notes in all flows
+  ['l1','f2','f3'].forEach(prefix => {
+    const csv = document.getElementById(prefix+'-csvnote');
+    const db = document.getElementById(prefix+'-dbnote');
+    if (csv) csv.classList.toggle('hidden', mode==='db');
+    if (db) db.classList.toggle('hidden', mode==='csv');
+  });
+
+  // Update pipe step 2 labels
+  const s2label = mode === 'csv' ? 'จาก CSV files' : 'จาก Database';
+  ['p1-s2-code','f2-s2-code'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = s2label;
+  });
+}
+
+function runFlow1() {
+  const lid = document.getElementById('l1-learner').value;
+  const limit = document.getElementById('l1-limit').value;
+  const spin = document.getElementById('l1-spin');
+  const reqBox = document.getElementById('l1-req');
+
+  reqBox.innerHTML = `<span class="jk">"learner_id"</span>: <span class="js">"${lid}"</span>,\n<span class="jk">"limit"</span>: <span class="jn">${limit}</span>`;
+
+  spin.classList.remove('hidden');
+  document.getElementById('l1-cards').style.opacity = '0.3';
+
+  setTimeout(() => {
+    spin.classList.add('hidden');
+    document.getElementById('l1-cards').style.opacity = '1';
+    document.getElementById('l1-cards').style.transition = 'opacity .3s';
+    updateL1Result(lid);
+  }, 1200);
+}
+
+function updateL1Result(lid) {
+  const profiles = {
+    'LNR-202600002': { name:'Piywdi', title:'Programmer', jobs:[
+      {r:1,t:'DevOps Engineer',c:'PTT Digital',s:'84%',cls:'score-high',m:['Docker ✓','CI/CD ✓','Linux ✓'],x:['Kubernetes ↗']},
+      {r:2,t:'Web Developer',c:'Grab Thailand',s:'76%',cls:'score-high',m:['JavaScript ✓','Java ✓'],x:['React ↗']},
+      {r:3,t:'Data Analyst',c:'SCG',s:'61%',cls:'score-mid',m:['Python ✓'],x:['SQL ↗','Tableau ↗']}
+    ]},
+    'LNR-202600003': { name:'Suthinanth', title:'UX/UI Designer', jobs:[
+      {r:1,t:'UX/UI Designer',c:'Sansiri',s:'92%',cls:'score-high',m:['Figma ✓','UX Design ✓','Wireframing ✓'],x:[]},
+      {r:2,t:'Product Designer',c:'LINE Thailand',s:'85%',cls:'score-high',m:['Figma ✓','Prototyping ✓'],x:['User Research ↗']},
+      {r:3,t:'Web Developer',c:'Bangkok Bank',s:'42%',cls:'score-mid',m:[],x:['JavaScript ↗','React ↗']}
+    ]},
+    'LNR-202600005': { name:'Phiphiththn', title:'DevOps Engineer', jobs:[
+      {r:1,t:'DevOps Engineer',c:'PTT Digital',s:'96%',cls:'score-high',m:['Docker ✓','Kubernetes ✓','CI/CD ✓','AWS ✓'],x:[]},
+      {r:2,t:'Cloud Engineer',c:'SCG',s:'88%',cls:'score-high',m:['Docker ✓','AWS ✓'],x:['Terraform ↗']},
+      {r:3,t:'Cybersecurity Analyst',c:'Bangkok Bank',s:'54%',cls:'score-mid',m:['Linux ✓'],x:['JavaScript ↗','Java ↗']}
+    ]}
+  };
+  const p = profiles[lid];
+  document.getElementById('l1-res').innerHTML = `<span class="jk">"learner_id"</span>: <span class="js">"${lid}"</span>,\n<span class="jk">"name"</span>: <span class="js">"${p.name}"</span>,\n<span class="jk">"job_title"</span>: <span class="js">"${p.title}"</span>,\n<span class="jk">"jobs"</span>: [\n${p.jobs.map(j=>`  { <span class="jk">"title"</span>: <span class="js">"${j.t}"</span>, <span class="jk">"match_score"</span>: <span class="jn">${j.s}</span> }`).join(',\n')}\n]`;
+  const ranks = ['rank-1','rank-2','rank-3'];
+  document.getElementById('l1-cards').innerHTML = p.jobs.map((j,i)=>`
+    <div class="result-row fade-up" style="animation-delay:${i*.08}s">
+      <div class="rank-badge ${ranks[i]}">${j.r}</div>
+      <div class="result-info">
+        <h5>${j.t} — ${j.c}</h5>
+        <p>Full-time · On-site</p>
+        <div class="skill-row">
+          ${j.m.map(s=>`<span class="stag stag-m">${s}</span>`).join('')}
+          ${j.x.map(s=>`<span class="stag stag-x">${s}</span>`).join('')}
+        </div>
+      </div>
+      <div class="score-box"><div class="score-num ${j.cls}">${j.s}</div><div class="score-lbl">Match</div></div>
+    </div>`).join('');
+}
+
+function runFlow2() {
+  const jid = document.getElementById('f2-job').value;
+  const spin = document.getElementById('f2-spin');
+  document.getElementById('f2-req').innerHTML = `<span class="jk">"job_post_id"</span>: <span class="js">"${jid}"</span>,\n<span class="jk">"limit"</span>: <span class="jn">10</span>`;
+  spin.classList.remove('hidden');
+  document.getElementById('f2-cards').style.opacity = '0.3';
+  setTimeout(() => {
+    spin.classList.add('hidden');
+    document.getElementById('f2-cards').style.opacity = '1';
+    document.getElementById('f2-cards').style.transition = 'opacity .3s';
+  }, 1200);
+}
+
+function runFlow3() {
+  const spin = document.getElementById('f3-spin');
+  spin.classList.remove('hidden');
+  const rows = document.querySelectorAll('#f3-body tr');
+  rows.forEach(r => r.style.opacity = '0.2');
+  setTimeout(() => {
+    spin.classList.add('hidden');
+    rows.forEach((r,i) => setTimeout(() => { r.style.opacity='1'; r.style.transition='opacity .3s'; }, i*150));
+  }, 1500);
+}
+</script>
+</body>
+</html>

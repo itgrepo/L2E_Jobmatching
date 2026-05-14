@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+*.env
+
+# Jupyter / Anaconda
+.ipynb_checkpoints/
+anaconda_projects/
+*.ipynb
+
+# Model files (large binaries — store on HF Hub instead)
+03_MODEL_TRAINING/models/
+03_MODEL_TRAINING/MODEL_TRIN/models/
+03_MODEL_TRAINING/output/
+05_OCI_DEPLOYMENT/JobMatchingModel/
+05_OCI_DEPLOYMENT/JobMatchingModel.zip
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+
+# Embedding cache (regenerated at startup)
+.cache_embeddings/
+*.pkl
+*.pickle
+
+# Secrets
+.env
+.env.*
+wallet/
+*.wallet
+*.key
+*.pem
+*.p12
+*.jks
+tnsnames.ora
+sqlnet.ora
+cwallet.sso
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDEs
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+
+# Logs
+*.log
+*.txt
+logs/
+
+# Backup data files
+*_BACKUP.csv
+*_backup*.csv
+*_backup2.csv
+
+# Temporary
+*.tmp
+*.bak
+*.swp
+
+# ZIP archives (large)
+04_UI_DEMO/*.zip
+
+# Non-essential folders (documents, OCI deployment, references, scripts)
+01_DOCUMENTS/
+03_MODEL_TRAINING/
+05_OCI_DEPLOYMENT/
+05_TOR_REFERENCE/
+06_SCRIPTS/
+anaconda_projects/
+
+# Office documents
+*.docx
+*.xlsx
+*.pptx
+*.pdf

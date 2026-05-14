@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labor Market Demand Forecast</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            /* ... existing variables ... */
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+
+            /* Modern Palette */
+            --primary: #10b981;
+            /* Indigo */
+            --secondary: #10B981;
+            /* Emerald */
+            --accent: #F59E0B;
+            /* Amber */
+            --danger: #EF4444;
+            /* Red */
+            --info: #3B82F6;
+            /* Blue */
+            --purple: #8B5CF6;
+            /* Purple for Line Chart */
+
+            --nav-bg: #FFFFFF;
+            --border-radius: 12px;
+            --font-family: "Sarabun", sans-serif;
+            --transition: 0.2s ease-in-out;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-main);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            /* Increased width from 260px */
+            gap: 24px;
+        }
+
+        /* Sidebar & Logo */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .logo-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 140px;
+        }
+
+        .logo-card img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Sidebar Filters */
+        .filters-container {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            height: 710px;
+        }
+
+        .filters-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .filter-group select {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: var(--font-family);
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .filter-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: var(--transition);
+        }
+
+        .filter-btn:hover {
+            background-color: #4338ca;
+        }
+
+        /* Content Area */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* KPI Cards (3 Columns) */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .kpi-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 140px;
+        }
+
+        .kpi-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .kpi-trend {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .trend-up {
+            color: var(--secondary);
+        }
+
+        /* Charts Grid (2x2) */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .chart-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            height: 340px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Center title like mockup */
+        .chart-wrapper {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            min-height: 0;
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+            }
+
+            .kpi-container {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <style>
+        /* Bootstrap Primary Override to Emerald Green */
+        :root {
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+        }
+
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        /* Extra fix for gradient inputs and focus rings */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div class="dashboard-container">
+        <div class="header-title">รายงานการคาดการณ์ความต้องการของตลาดแรงงานในอนาคต</div>
+
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Logo Card -->
+                <div class="logo-card">
+                    <img
+                        src="/Users/thanaponchueaboonmee/Library/CloudStorage/OneDrive-IntelligistPublicCompanyLimited/L2E_V3/LOGO_L2E.png" />
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-container">
+                    <div class="filters-title">ตัวกรองข้อมูล</div>
+                    <div class="filter-group"><label>ปี (Year)</label><select>
+                            <option>2026</option>
+                        </select></div>
+                    <div class="filter-group"><label>กลุ่มงาน</label><select>
+                            <option>ทั้งหมด</option>
+                        </select></div>
+                    <div class="filter-group"><label>ชื่ออาชีพ</label><select>
+                            <option>ทั้งหมด</option>
+                        </select></div>
+                    <div class="filter-group"><label>จังหวัด</label><select>
+                            <option>ทั้งหมด</option>
+                        </select></div>
+                    <div class="filter-group"><label>ประสบการณ์</label><select>
+                            <option>ทั้งหมด</option>
+                        </select></div>
+                    <div class="filter-group"><label>รูปแบบการจ้างงาน</label><select>
+                            <option>ทั้งหมด</option>
+                        </select></div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="content-area">
+                <!-- KPIs -->
+                <div class="kpi-container">
+                    <div class="kpi-card">
+                        <div class="kpi-title">จำนวนงานที่เปิดรับสมัคร</div>
+                        <div class="kpi-value">10,000 งาน</div>
+                        <div class="kpi-trend trend-up">↑ + 5%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-title">จำนวนคนว่างงาน</div>
+                        <div class="kpi-value">10,000 งาน</div>
+                        <div class="kpi-trend trend-up">↑ + 5%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-title">อัตราการว่างงาน</div>
+                        <div class="kpi-value">0.98 %</div>
+                        <div class="kpi-trend" style="color: #EF4444;">↑ + 5%</div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="charts-grid">
+                    <!-- 1. Top 10 Jobs (Horizontal Bar) -->
+                    <div class="chart-card">
+                        <div class="chart-title">10 อาชีพที่เป็นที่ต้องการสูงสุด</div>
+                        <div class="chart-wrapper"><canvas id="topJobsChart"></canvas></div>
+                    </div>
+
+                    <!-- 2. Demand Forecast (Line Chart) -->
+                    <div class="chart-card">
+                        <div class="chart-title">แนวโน้มการจ้างงาน เปรียบเทียบ กับแนวโน้มการว่างงาน</div>
+                        <div class="chart-wrapper"><canvas id="forecastChart"></canvas></div>
+                    </div>
+
+                    <!-- 3. Industry (Donut) -->
+                    <div class="chart-card">
+                        <div class="chart-title">สัดส่วนการจ้างงานตามประเภทธุรกิจ</div>
+                        <div class="chart-wrapper"><canvas id="industryChart"></canvas></div>
+                    </div>
+
+                    <!-- 4. Regional (Vertical Bar) -->
+                    <div class="chart-card">
+                        <div class="chart-title">พื้นที่ที่มีความต้องการงาน</div>
+                        <div class="chart-wrapper"><canvas id="regionalChart"></canvas></div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        Chart.register(ChartDataLabels, window['chartjs-plugin-annotation']);
+
+        const colors = {
+            blue: '#8EB0F4', /* Light Blue from Mockup */
+            accentBlue: '#10b981',
+            orange: '#F59E0B',
+            green: '#10B981',
+            purple: '#A78BFA',
+            text: '#1F2937',
+            danger: '#EF4444'
+        };
+
+        Chart.defaults.font.family = '"Sarabun", sans-serif';
+        Chart.defaults.color = colors.text;
+
+        // 1. Top 10 Jobs (Horizontal Bar) - Match Mockup Labels & Color
+        new Chart(document.getElementById('topJobsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['นักวิเคราะห์ข้อมูล', 'นักพัฒนาซอฟต์แวร์', 'กราฟิกดีไซน์', 'นักพัฒนาเว็บไซต์', 'นักการตลาดออนไลน์', 'UX/UI', 'Project Manager', 'Full Stack', 'บัญชี', 'Human Resource'],
+                datasets: [{
+                    data: [4500, 3800, 3500, 3200, 3000, 2800, 2500, 2200, 1800, 1500],
+                    backgroundColor: colors.blue,
+                    borderRadius: 4,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', offset: 4, formatter: (val) => val } },
+                scales: { x: { display: false }, y: { grid: { display: false } } },
+                layout: { padding: { right: 40 } }
+            }
+        });
+
+        // 2. Forecast (Line Chart)
+        const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+        new Chart(forecastCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                    {
+                        label: 'แนวโน้มการจ้างงาน',
+                        data: [120, 135, 140, 155, 170, 185, 200, 215, 230, 245, 260, 280],
+                        borderColor: colors.purple,
+                        backgroundColor: (context) => {
+                            const ctx = context.chart.ctx;
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+                            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                            return gradient;
+                        },
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: colors.purple,
+                        pointRadius: 3,
+                        segment: {
+                            borderDash: ctx => ctx.p0DataIndex >= 9 ? [6, 6] : undefined,
+                        }
+                    },
+                    {
+                        label: 'แนวโน้มการว่างงาน',
+                        data: [110, 125, 130, 135, 145, 150, 155, 160, 165, 170, 175, 180],
+                        borderColor: '#F59E0B',
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: false,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#F59E0B',
+                        pointRadius: 3,
+                        segment: {
+                            borderDash: ctx => ctx.p0DataIndex >= 9 ? [6, 6] : undefined,
+                        }
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8
+                        }
+                    },
+                    datalabels: { display: false },
+                    annotation: {
+                        annotations: {
+                            line1: {
+                                type: 'line',
+                                xMin: 9.5,
+                                xMax: 9.5,
+                                borderColor: 'rgba(0,0,0,0.2)',
+                                borderWidth: 1,
+                                borderDash: [4, 4],
+                                label: { display: false }
+                            }
+                        }
+                    }
+                },
+                scales: { y: { grid: { color: '#F3F4F6' } }, x: { grid: { color: '#F3F4F6' } } }
+            }
+        });
+
+        // 3. Industry (Donut) - Thai Labels
+        new Chart(document.getElementById('industryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['เทคโนโลยี', 'อุตสาหกรรม/EV', 'สุขภาพ', 'การบริการ/ท่องเที่ยว', 'อื่นๆ'],
+                datasets: [{
+                    data: [35, 25, 15, 15, 10],
+                    backgroundColor: [colors.accentBlue, colors.orange, colors.green, colors.blue, '#9CA3AF'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                cutout: '55%',
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 12, usePointStyle: true } },
+                    datalabels: { color: '#fff', formatter: (val) => val + '%' }
+                }
+            }
+        });
+
+        // 4. Regional (Vertical Bar) - Light Blue color
+        new Chart(document.getElementById('regionalChart'), {
+            type: 'bar',
+            data: {
+                labels: ['กรุงเทพ', 'ชลบุรี', 'ระยอง', 'เชียงใหม่', 'ภูเก็ต'],
+                datasets: [{
+                    data: [65000, 25000, 18000, 12000, 8000],
+                    backgroundColor: colors.blue,
+                    borderRadius: 4,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', formatter: (val) => val } },
+                scales: { y: { display: false, grid: { display: false } }, x: { grid: { display: false } } },
+                layout: { padding: { top: 20 } }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

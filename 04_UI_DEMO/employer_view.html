@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Employer Workspace - L2E</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --bg-gray: #f3f2ef;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            font-family: 'Sarabun', sans-serif;
+            padding-top: 70px;
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .pulse-logo {
+            font-size: 3rem;
+            color: var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+        }
+
+        .layout-center {
+            max-width: 900px;
+            margin: 0 auto;
+            transition: 0.35s;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            padding: 28px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 14px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 6px;
+        }
+
+        /* Candidate Card */
+        .candidate-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            overflow: hidden;
+        }
+
+        .candidate-card:hover {
+            border-color: var(--success);
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .candidate-card-header {
+            padding: 14px 16px 10px;
+            position: relative;
+        }
+
+        .candidate-card-footer {
+            background: #f8f9fb;
+            border-top: 1px solid #f0f0f0;
+            padding: 10px 16px;
+        }
+
+        /* Fitness Badge */
+        .fitness-badge {
+            font-weight: 800;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.95rem;
+        }
+
+        .badge-excellent {
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: white;
+        }
+
+        .badge-good {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .badge-fair {
+            background: linear-gradient(135deg, #3b82f6, #059669);
+            color: white;
+        }
+
+        .badge-low {
+            background: linear-gradient(135deg, #f87171, #dc2626);
+            color: white;
+        }
+
+        /* Mini Bars */
+        .mini-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+        }
+
+        .mini-bar-bg {
+            background: #e5e7eb;
+            height: 5px;
+            border-radius: 3px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .mini-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        /* Cert Pills */
+        .cert-pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        /* Tag pill */
+        .tag-pill {
+            background: #f3f2ef;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: #555;
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .cert-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .cert-match {
+            background: #dcfce7;
+            color: #16a34a;
+            border: 1px solid #86efac;
+        }
+
+        .cert-required {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        .cert-neutral {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #7dd3fc;
+        }
+
+        /* Score circle for modal */
+        .score-circle-wrap {
+            position: relative;
+            width: 86px;
+            height: 86px;
+        }
+
+        .score-circle-svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-circle-number {
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-circle-label {
+            font-size: 0.58rem;
+            font-weight: 600;
+            color: #888;
+            text-align: center;
+        }
+
+        /* Match bar */
+        .match-bar-bg {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .match-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.8s ease;
+        }
+    </style>
+
+    <style>
+        /* Bootstrap Primary Override to Emerald Green */
+        :root {
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+        }
+
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        /* Extra fix for gradient inputs and focus rings */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+    <script src="config.js"></script>
+</head>
+
+
+<body>
+    <div id="loadingOverlay" class="d-none">
+        <div class="pulse-logo"><i class="fas fa-search-dollar"></i></div>
+        <h4 class="mt-3 fw-bold text-dark">AI กำลังเฟ้นหาผู้สมัครที่ "คุ้มค่า" ที่สุด...</h4>
+        <p class="text-muted">กำลังคำนวณด้วย BERT & Genetic Algorithm + Cert Matching</p>
+        <div class="progress mt-3" style="width:280px; height:6px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width:100%"></div>
+        </div>
+    </div>
+
+    <style>
+      .navbar-emp {
+        background: linear-gradient(135deg,#0f1f3d,#16a34a);
+        padding: 0 20px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+      .nav-logo-emp {
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: #fff;
+        text-decoration: none;
+        margin-right: 1rem;
+      }
+      .nav-lnk {
+        color: rgba(255,255,255,.8);
+        font-weight: 600;
+        font-size: .88rem;
+        padding: 8px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: .15s;
+      }
+      .nav-lnk:hover { background: rgba(255,255,255,.15); color: #fff; }
+    </style>
+
+    <nav class="navbar-emp">
+        <a href="employer_dashboard.html" class="nav-logo-emp">ค้นหาผู้สมัคร</a>
+        <div class="d-flex gap-1 me-auto">
+            <a href="employer_dashboard.html" class="nav-lnk"><i class="fas fa-tachometer-alt me-1"></i>ภาพรวม</a>
+            <a href="employer_candidates.html" class="nav-lnk"><i class="fas fa-users me-1"></i>ค้นหาผู้สมัคร</a>
+            <a href="employer_job_analytics.html" class="nav-lnk"><i class="fas fa-chart-bar me-1"></i>สถิติงาน</a>
+            <a href="employer_dashboard.html" class="nav-lnk"><i class="fas fa-users-cog me-1"></i>จัดการทีม</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span id="navName" class="nav-lnk">HR Manager</span>
+            <a href="index.html" class="nav-lnk"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-3">
+        <div class="row" id="mainRow">
+            <div id="formCol" class="col-12 layout-center">
+                <div class="form-card">
+                    <h3 class="fw-bold text-success mb-4 text-center"><i class="fas fa-bullhorn"></i> สร้างประกาศงาน
+                        (JOB POSTING)</h3>
+
+                    <div class="section-header"><i class="fas fa-info-circle"></i> ข้อมูลงานพื้นฐาน (Basic Info)</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6"><label class="small fw-bold">Job ID</label><input type="text" id="jobId"
+                                class="form-control" readonly></div>
+                        <div class="col-md-6"><label class="small fw-bold">ชื่อตำแหน่ง (Job Title)</label><input
+                                type="text" id="jobTitle" class="form-control fw-bold text-primary"></div>
+                        <div class="col-md-6"><label class="small fw-bold">บริษัท</label><input type="text" id="company"
+                                class="form-control"></div>
+                        <div class="col-md-6"><label class="small fw-bold">สถานที่ทำงาน</label><input type="text"
+                                id="location" class="form-control"></div>
+                        <div class="col-md-4">
+                            <label class="small fw-bold">รูปแบบงาน</label>
+                            <select id="type" class="form-select">
+                                <option value="Full-time">Full-time</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Part-time">Part-time</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4"><label class="small fw-bold">งบประมาณเงินเดือน (Max Budget)</label><input
+                                type="number" id="budget" class="form-control fw-bold text-success"></div>
+                        <div class="col-md-4"><label class="small fw-bold">ประสบการณ์ขั้นต่ำ (ปี)</label><input
+                                type="number" id="minExp" class="form-control"></div>
+                    </div>
+
+                    <div class="section-header"><i class="fas fa-graduation-cap"></i> ข้อมูลการศึกษา (Education
+                        Requirements)</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="small fw-bold">ระดับการศึกษาขั้นต่ำ</label>
+                            <select id="eduLevel" class="form-select">
+                                <option value="Bachelor's Degree">Bachelor's Degree</option>
+                                <option value="Master's Degree">Master's Degree</option>
+                                <option value="Doctorate">Doctorate</option>
+                                <option value="High School / Diploma">High School / Diploma</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold">สาขาวิชาที่ต้องการ (Majors)</label>
+                            <input type="text" id="majors" class="form-control"
+                                placeholder="Computer Science, Information Technology, etc.">
+                        </div>
+                    </div>
+
+                    <!-- Certification Requirements -->
+                    <div class="section-header"><i class="fas fa-certificate"></i> ใบรับรองที่ต้องการ (Required
+                        Certifications)</div>
+                    <div class="mb-4">
+                        <label class="small fw-bold text-muted mb-1 d-block">
+                            ระบุ certifications ที่ต้องการ (คั่นด้วย comma) — ผู้สมัครที่มี cert ตรงกันจะได้ <span
+                                class="text-success fw-bold">+5% bonus score</span> ต่อ cert (สูงสุด +15%)
+                        </label>
+                        <textarea id="requiredCerts" class="form-control" rows="2"
+                            placeholder="Oracle Database Administrator, AWS Solutions Architect, Google Data Analytics..."></textarea>
+                        <div id="certRequiredPills" class="cert-pill-container mt-2"></div>
+                        <small class="text-muted mt-1 d-block">
+                            <i class="fas fa-lightbulb text-warning"></i>
+                            ตัวอย่าง: Oracle Certified Professional, AWS SAA-C03, GCP Professional Data Engineer, PMP,
+                            CFA
+                        </small>
+                    </div>
+
+                    <div class="section-header"><i class="fas fa-align-left"></i> รายละเอียดงาน (JOB DESCRIPTION &
+                        SKILLS)
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">รายละเอียดหน้าที่ความรับผิดชอบ (JOB DESCRIPTION)</label>
+                        <textarea id="desc" class="form-control" rows="5"
+                            placeholder="อธิบายเนื้องานให้ละเอียด..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">ทักษะที่ต้องการ (Required Skills — คั่นด้วย comma)</label>
+                        <textarea id="skills" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">สวัสดิการ (Benefits)</label>
+                        <textarea id="benefits" class="form-control" rows="2"
+                            placeholder="ประกันสังคม, โบนัส, WFH..."></textarea>
+                    </div>
+
+                    <button onclick="runMatch()" class="btn btn-success w-100 btn-lg fw-bold mt-4 shadow-sm py-3">
+                        <i class="fas fa-users-viewfinder"></i> บันทึก & ค้นหาผู้สมัคร (Run AI Match)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Column -->
+            <div id="resultCol" class="col-md-8 d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold m-0">ผู้สมัครที่แนะนำ (Top Matches)</h5>
+                        <small class="text-muted" id="resultCount"></small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="showForm()">
+                        <i class="fas fa-edit"></i> แก้ไขประกาศงาน
+                    </button>
+                </div>
+
+                <!-- Legend -->
+                <div class="d-flex gap-3 mb-3 flex-wrap">
+                    <small class="text-muted d-flex align-items-center gap-1"><span
+                            class="fitness-badge badge-excellent px-2 py-0"
+                            style="font-size:.7rem;font-weight:700;">90%+</span> Excellent</small>
+                    <small class="text-muted d-flex align-items-center gap-1"><span
+                            class="fitness-badge badge-good px-2 py-0"
+                            style="font-size:.7rem;font-weight:700;">75%+</span> Good</small>
+                    <small class="text-muted d-flex align-items-center gap-1"><span
+                            class="fitness-badge badge-fair px-2 py-0"
+                            style="font-size:.7rem;font-weight:700;">60%+</span> Fair</small>
+                    <small class="text-muted d-flex align-items-center gap-1"><span
+                            class="fitness-badge badge-low px-2 py-0"
+                            style="font-size:.7rem;font-weight:700;">&lt;60%</span> Low</small>
+                </div>
+
+                <div id="candidateList"></div>
+
+                <div class="text-center mt-4 mb-5">
+                    <button id="loadMoreBtn" class="btn btn-outline-success rounded-pill px-4"
+                        onclick="loadMoreCandidates()">
+                        โหลดผู้สมัครเพิ่มเติม <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Detail Modal -->
+    <div class="modal fade" id="candidateModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <!-- Modal Header -->
+                    <div class="d-flex align-items-center mb-4">
+                        <img id="cAvatar" src="" class="rounded-circle me-3 border" width="70" height="70">
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold mb-0 text-success" id="cName">Candidate Name</h4>
+                            <div class="text-secondary fw-bold"><i class="fas fa-crosshairs"></i> <span
+                                    id="cRole">Target Role</span></div>
+                            <small class="text-muted"><i class="fas fa-map-marker-alt"></i> <span
+                                    id="cLocation">—</span></small>
+                        </div>
+                        <!-- Fitness Score Circle -->
+                        <div class="text-center ms-3">
+                            <div class="score-circle-wrap">
+                                <svg class="score-circle-svg" width="86" height="86" viewBox="0 0 86 86">
+                                    <circle cx="43" cy="43" r="36" fill="none" stroke="#e5e7eb" stroke-width="9" />
+                                    <circle id="fitnessArc" cx="43" cy="43" r="36" fill="none" stroke="#16a34a"
+                                        stroke-width="9" stroke-dasharray="226" stroke-dashoffset="226"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <div class="score-circle-text">
+                                    <div class="score-circle-number text-success" id="cFitness">0</div>
+                                    <div class="score-circle-label">FITNESS</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Row -->
+                    <div class="row g-3 mb-4 text-center">
+                        <div class="col-3 border-end">
+                            <small class="text-muted fw-bold">MATCH</small>
+                            <div class="h5 fw-bold text-primary mb-0" id="cMatch">0%</div>
+                        </div>
+                        <div class="col-3 border-end">
+                            <small class="text-muted fw-bold">EXP. SALARY</small>
+                            <div class="h5 fw-bold text-dark mb-0" id="cSalary">—</div>
+                        </div>
+                        <div class="col-3 border-end">
+                            <small class="text-muted fw-bold">EXPERIENCE</small>
+                            <div class="h5 fw-bold text-dark mb-0" id="cExpTotal">—</div>
+                        </div>
+                        <div class="col-3">
+                            <small class="text-muted fw-bold">WORK STYLE</small>
+                            <div class="h5 fw-bold text-dark mb-0" id="cWorkStyle">—</div>
+                        </div>
+                    </div>
+
+                    <!-- คะแนนความเหมาะสม (SCORE BREAKDOWN) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-4">
+                            <small class="fw-bold text-muted">SEMANTIC MATCH</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold small" id="scSemantic">0%</span>
+                                <div class="match-bar-bg flex-grow-1">
+                                    <div id="barSemantic" class="match-bar-fill bg-primary" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <small class="fw-bold text-muted">BUDGET FIT</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold small" id="scBudget">0%</span>
+                                <div class="match-bar-bg flex-grow-1">
+                                    <div id="barBudget" class="match-bar-fill bg-success" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <small class="fw-bold text-muted">CERT MATCH</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold small" id="scCert">0%</span>
+                                <div class="match-bar-bg flex-grow-1">
+                                    <div id="barCert" class="match-bar-fill bg-warning" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- About -->
+                    <h6 class="fw-bold border-bottom pb-2">เกี่ยวกับผู้สมัคร (ABOUT CANDIDATE)</h6>
+                    <p id="cAbout" class="text-secondary small" style="white-space:pre-line;"></p>
+
+                    <!-- Certifications -->
+                    <div id="cCertSection" class="mb-4 mt-4">
+                        <h6 class="fw-bold border-bottom pb-2"><i class="fas fa-certificate text-warning"></i>
+                            ใบรับรองที่ต้องการ (REQUIRED CERTIFICATIONS)</h6>
+                        <div id="cCertList"></div>
+                    </div>
+
+                    <!-- Skills -->
+                    <h6 class="fw-bold border-bottom pb-2 mt-3">ทักษะที่ต้องการ (REQUIRED SKILLS)</h6>
+                    <div id="cSkills" class="mb-3"></div>
+
+                    <!-- Education -->
+                    <h6 class="fw-bold border-bottom pb-2 mt-4">Education History</h6>
+                    <div id="cEduList" class="mb-3"></div>
+
+                    <!-- Experience -->
+                    <h6 class="fw-bold border-bottom pb-2 mt-4">Experience Highlights</h6>
+                    <div id="cExpList" class="text-secondary small mb-3"></div>
+
+                    <!-- Action Footer -->
+                    <div class="mt-4 p-3 bg-light rounded border d-flex justify-content-between align-items-center">
+                        <div class="small text-muted"><i class="fas fa-info-circle"></i> ผู้สมัครนี้ผ่านการคัดกรองโดย AI
+                        </div>
+                        <button class="btn btn-success fw-bold"><i class="fas fa-envelope"></i> ติดต่อสัมภาษณ์</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allCandidates = [];
+        let displayCount = 0;
+        const PAGE_SIZE = 10;
+        let currentRequiredCerts = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const j = JSON.parse(localStorage.getItem('currentUser'));
+            // Support both old (job_id) and new (job_post_id) field names
+            if (j && (j.job_id || j.job_post_id)) {
+                document.getElementById('navName').innerText = j.company_name || 'HR Manager';
+                document.getElementById('jobId').value = j.job_post_id || j.job_id || '';
+                document.getElementById('jobTitle').value = j.title || '';
+                document.getElementById('company').value = j.company_name || '';
+                document.getElementById('location').value = j.location || '';
+                // job_type from new dataset is 'IT' or 'Business', map to employment type
+                const workStyle = j.work_style || j.job_type || 'Full-time';
+                const typeEl = document.getElementById('type');
+                const validOpts = ['Full-time', 'Contract', 'Part-time'];
+                typeEl.value = validOpts.includes(workStyle) ? workStyle : 'Full-time';
+                // Budget: use salary_max or income_max
+                document.getElementById('budget').value = j.salary_max || j.max_salary || j.income_max || 50000;
+                document.getElementById('minExp').value = j.min_exp || 0;
+                document.getElementById('eduLevel').value = j.education_level || "Bachelor's Degree";
+                document.getElementById('majors').value = Array.isArray(j.preferred_majors) ? j.preferred_majors.join(', ') : (j.preferred_majors || '');
+                document.getElementById('desc').value = j.description || j.summary || '';
+                document.getElementById('skills').value = (j.required_skills || []).join(', ');
+                document.getElementById('benefits').value = Array.isArray(j.benefits) ? j.benefits.join(', ') : (j.benefits || '');
+
+                // Pre-fill required certs
+                const reqCerts = j.required_certs || [];
+                document.getElementById('requiredCerts').value = reqCerts.join(', ');
+                updateCertPills(reqCerts);
+            }
+
+            // Live cert pills update
+            document.getElementById('requiredCerts').addEventListener('input', function () {
+                const certs = this.value.split(',').map(s => s.trim()).filter(Boolean);
+                updateCertPills(certs);
+            });
+        });
+
+        function updateCertPills(certs) {
+            const container = document.getElementById('certRequiredPills');
+            container.innerHTML = certs.map(c => `
+                <span class="badge border" style="background:#f0fdf4; color:#16a34a; font-size:0.8rem; font-weight:600; padding:5px 10px;">
+                    <i class="fas fa-certificate me-1"></i>${c}
+                </span>`).join('');
+        }
+
+        function getFitnessBadgeClass(score) {
+            if (score >= 85) return 'badge-excellent';
+            if (score >= 70) return 'badge-good';
+            if (score >= 55) return 'badge-fair';
+            return 'badge-low';
+        }
+
+        async function runMatch() {
+            document.getElementById('loadingOverlay').classList.remove('d-none');
+
+            const certsRaw = document.getElementById('requiredCerts').value;
+            currentRequiredCerts = certsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+            const payload = {
+                jd_text: document.getElementById('desc').value + ' ' + document.getElementById('skills').value,
+                budget: document.getElementById('budget').value,
+                education_level: document.getElementById('eduLevel').value,
+                preferred_majors: document.getElementById('majors').value,
+                required_certs: currentRequiredCerts
+            };
+
+            try {
+                const res = await fetch('http://127.0.0.1:5001/api/match_candidates', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                });
+                allCandidates = await res.json();
+
+                document.getElementById('resultCount').innerText = `พบผู้สมัครที่ตรงกับตำแหน่ง ${allCandidates.length} คน`;
+                displayCount = 0;
+                document.getElementById('candidateList').innerHTML = '';
+                loadMoreCandidates();
+
+                document.getElementById('formCol').classList.remove('layout-center', 'col-12');
+                document.getElementById('formCol').classList.add('col-md-4');
+                document.getElementById('resultCol').classList.remove('d-none');
+
+            } catch (e) {
+                console.error(e);
+                alert('ไม่สามารถเชื่อมต่อ API Server ได้ กรุณาตรวจสอบว่า api_server.py กำลังทำงานอยู่');
+            } finally {
+                document.getElementById('loadingOverlay').classList.add('d-none');
+            }
+        }
+
+        function loadMoreCandidates() {
+            const container = document.getElementById('candidateList');
+            const nextBatch = allCandidates.slice(displayCount, displayCount + PAGE_SIZE);
+
+            nextBatch.forEach((c, idx) => {
+                const globalIdx = displayCount + idx;
+                const badgeClass = getFitnessBadgeClass(c.fitness);
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff`;
+                const sb = c.score_breakdown || {};
+                const semanticPct = Math.round(sb.semantic || c.match_score || 0);
+                const budgetPct = Math.round(sb.budget_fit || 0);
+                const certPct = Math.round(sb.cert || 0);
+                const hasCerts = c.certificates && c.certificates.length > 0;
+                const certMatchCount = (c.cert_matched || []).length;
+
+                const certInfo = hasCerts
+                    ? `<i class="fas fa-certificate text-warning me-1"></i>${c.certificates.length} cert${certMatchCount > 0 ? ` (${certMatchCount} match)` : ''}`
+                    : '';
+
+                container.innerHTML += `
+                <div class="candidate-card" onclick="openModal(${globalIdx})">
+                    <div class="candidate-card-header d-flex align-items-center">
+                        <img src="${avatarUrl}" class="rounded-circle me-3 border" width="50" height="50">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h6 class="fw-bold text-primary mb-0">${c.name}</h6>
+                                <span class="fitness-badge ${badgeClass} ms-2">${c.fitness}%</span>
+                            </div>
+                            <div class="small fw-bold text-dark"><i class="fas fa-crosshairs me-1"></i>${c.title}</div>
+                            <div class="small text-muted">
+                                ฿${c.expected_salary.toLocaleString()} • Match: ${c.match_score}%
+                                ${certInfo ? ' • ' + certInfo : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="candidate-card-footer">
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="mini-bar-wrap">
+                                    <span class="text-muted" style="min-width:50px;">Semantic</span>
+                                    <div class="mini-bar-bg"><div class="mini-bar-fill bg-primary" style="width:${semanticPct}%"></div></div>
+                                    <span class="fw-bold">${semanticPct}%</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mini-bar-wrap">
+                                    <span class="text-muted" style="min-width:50px;">Budget</span>
+                                    <div class="mini-bar-bg"><div class="mini-bar-fill bg-success" style="width:${budgetPct}%"></div></div>
+                                    <span class="fw-bold">${budgetPct}%</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mini-bar-wrap">
+                                    <span class="text-muted" style="min-width:50px;">Cert</span>
+                                    <div class="mini-bar-bg"><div class="mini-bar-fill bg-warning" style="width:${certPct}%"></div></div>
+                                    <span class="fw-bold">${currentRequiredCerts.length > 0 ? certPct + '%' : 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            displayCount += nextBatch.length;
+            document.getElementById('loadMoreBtn').style.display = displayCount >= allCandidates.length ? 'none' : 'inline-block';
+        }
+
+        function openModal(idx) {
+            const c = allCandidates[idx];
+
+            document.getElementById('cName').innerText = c.name;
+            document.getElementById('cRole').innerText = c.title;
+            document.getElementById('cLocation').innerText = c.location || c.work_style_pref || '—';
+            document.getElementById('cSalary').innerText = '฿' + c.expected_salary.toLocaleString();
+            document.getElementById('cExpTotal').innerText = c.exp_years_total > 0 ? c.exp_years_total + ' ปี' : (c.experience ? c.experience.length + ' Jobs' : '—');
+            document.getElementById('cWorkStyle').innerText = c.work_style_pref || '—';
+            document.getElementById('cMatch').innerText = c.match_score + '%';
+            document.getElementById('cAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff&size=128`;
+
+            // Fitness Circle Animation
+            const fitness = c.fitness;
+            document.getElementById('cFitness').innerText = fitness + '%';
+            const circ = 2 * Math.PI * 36;
+            const offset = circ - (fitness / 100) * circ;
+            const arc = document.getElementById('fitnessArc');
+            arc.style.strokeDashoffset = circ;
+            arc.style.transition = 'none';
+            const color = fitness >= 85 ? '#f59e0b' : fitness >= 70 ? '#16a34a' : fitness >= 55 ? '#3b82f6' : '#dc2626';
+            setTimeout(() => {
+                arc.style.transition = 'stroke-dashoffset 1s ease';
+                arc.style.strokeDashoffset = offset;
+                arc.setAttribute('stroke', color);
+                document.getElementById('cFitness').style.color = color;
+            }, 100);
+
+            // Score Breakdown Bars
+            const sb = c.score_breakdown || {};
+            const semanticPct = Math.round(sb.semantic || c.match_score || 0);
+            const budgetPct = Math.round(sb.budget_fit || 0);
+            const certPct = Math.round(sb.cert || 0);
+
+            document.getElementById('scSemantic').innerText = semanticPct + '%';
+            document.getElementById('barSemantic').style.width = semanticPct + '%';
+            document.getElementById('scBudget').innerText = budgetPct + '%';
+            document.getElementById('barBudget').style.width = budgetPct + '%';
+            document.getElementById('scCert').innerText = certPct + '%';
+            document.getElementById('barCert').style.width = certPct + '%';
+
+            // About
+            document.getElementById('cAbout').innerText = c.about_me || 'ผู้สมัครไม่ได้ระบุข้อมูลแนะนำตัวเพิ่มเติม';
+
+            // Certifications
+            const certs = c.certificates || [];
+            const certMatched = c.cert_matched || [];
+            const certSec = document.getElementById('cCertSection');
+            if (certs.length > 0 || currentRequiredCerts.length > 0) {
+                certSec.classList.remove('d-none');
+                const certDiv = document.getElementById('cCertList');
+                if (certs.length > 0) {
+                    certDiv.innerHTML = certs.map(cert => {
+                        const isMatch = certMatched.some(mc =>
+                            mc.toLowerCase().includes(cert.toLowerCase()) || cert.toLowerCase().includes(mc.toLowerCase())
+                        );
+                        return isMatch
+                            ? `<span class="cert-badge cert-match"><i class="fas fa-check-circle me-1"></i>${cert}</span>`
+                            : `<span class="cert-badge cert-neutral"><i class="fas fa-certificate me-1"></i>${cert}</span>`;
+                    }).join('');
+                } else {
+                    certDiv.innerHTML = '<span class="text-muted small">ไม่มีข้อมูล certification</span>';
+                }
+
+                // Show required certs not matched
+                if (currentRequiredCerts.length > 0) {
+                    const missing = currentRequiredCerts.filter(rc =>
+                        !certMatched.some(mc => mc.toLowerCase().includes(rc.toLowerCase()) || rc.toLowerCase().includes(mc.toLowerCase()))
+                    );
+                    if (missing.length > 0) {
+                        certDiv.innerHTML += '<div class="mt-2 small fw-bold text-muted">ยังขาด:</div>';
+                        certDiv.innerHTML += missing.map(m => `<span class="cert-badge cert-required"><i class="fas fa-times-circle me-1"></i>${m}</span>`).join('');
+                    }
+                }
+            } else {
+                certSec.classList.add('d-none');
+            }
+
+            // Skills
+            const skills = c.skills || [];
+            document.getElementById('cSkills').innerHTML = skills.map(s => `<span class="tag-pill">${s}</span>`).join('') || '<span class="text-muted small">—</span>';
+
+            // Education
+            const eduDiv = document.getElementById('cEduList');
+            const eduList = c.education || [];
+            if (eduList.length > 0) {
+                eduDiv.innerHTML = eduList.map(e => `
+                    <div class="mb-3 border-bottom pb-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold text-dark">${e.degree || '—'} in ${e.major || '—'}</span>
+                            <span class="badge bg-light text-dark border">Grad: ${e.grad_year || '—'}</span>
+                        </div>
+                        <div class="text-primary small fw-bold">${e.university || '—'}</div>
+                        ${e.gpa ? `<div class="text-muted small">GPA: ${typeof e.gpa === 'number' ? e.gpa.toFixed(2) : e.gpa}</div>` : ''}
+                    </div>`).join('');
+            } else {
+                eduDiv.innerHTML = '<span class="text-muted small">— ไม่มีข้อมูลการศึกษา —</span>';
+            }
+
+            // Experience
+            const expDiv = document.getElementById('cExpList');
+            const expList = c.experience || [];
+            if (expList.length > 0) {
+                expDiv.innerHTML = expList.map(e => `
+                    <div class="mb-2 border-bottom pb-2">
+                        <div class="fw-bold text-dark">${e.position || e.role || '—'} @ ${e.company || '—'}</div>
+                        <div class="text-muted small">${e.start_date || ''} ${e.years ? '(' + e.years + ' ปี)' : e.end_date ? '- ' + e.end_date : ''}</div>
+                        <div class="text-secondary small fst-italic">${e.description || ''}</div>
+                    </div>`).join('');
+            } else {
+                expDiv.innerHTML = '<span class="text-muted small">— ไม่มีข้อมูลประสบการณ์ —</span>';
+            }
+
+            new bootstrap.Modal(document.getElementById('candidateModal')).show();
+        }
+
+        function showForm() {
+            document.getElementById('resultCol').classList.add('d-none');
+            document.getElementById('formCol').classList.remove('col-md-4');
+            document.getElementById('formCol').classList.add('col-12', 'layout-center');
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

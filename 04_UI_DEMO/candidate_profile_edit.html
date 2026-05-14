@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>L2E | แก้ไขโปรไฟล์</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --success: #16a34a;
+        }
+
+        * {
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background: #f0f4f8;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, #0f1f3d, #10b981);
+            padding: 0 20px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-link-custom {
+            color: rgba(255, 255, 255, .8);
+            font-weight: 600;
+            font-size: .88rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: .15s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background: rgba(255, 255, 255, .15);
+            color: #fff;
+        }
+
+        .main-container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        .section-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(10, 102, 194, .08);
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0f1f3d;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8f0fe;
+            margin-bottom: 20px;
+        }
+
+        .completeness-bar {
+            height: 10px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            overflow: hidden;
+            margin: 6px 0;
+        }
+
+        .completeness-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #10b981, #16a34a);
+            transition: width .5s;
+        }
+
+        .tag-pill {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: .82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 2px;
+        }
+
+        .tag-pill.skill-p {
+            background: #e8f0fe;
+            border-color: #c7d2fe;
+            color: #059669;
+        }
+
+        .tag-pill.cert-p {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #15803d;
+        }
+
+        .tag-pill .rm {
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: .85rem;
+        }
+
+        .tag-pill .rm:hover {
+            color: #ef4444;
+        }
+
+        .exp-card {
+            background: #f8faff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border-color: #e2e8f0;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(10, 102, 194, .12);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: #fff;
+            padding: 12px 36px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            transition: .2s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(10, 102, 194, .35);
+            color: #fff;
+        }
+
+        .save-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #16a34a;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 4px 20px rgba(22, 163, 74, .4);
+        }
+    </style>
+
+    <style>
+        /* Bootstrap Primary Override to Emerald Green */
+        :root {
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+        }
+
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        /* Extra fix for gradient inputs and focus rings */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+    <script src="config.js"></script>
+</head>
+
+
+<body>
+    <nav class="navbar-custom sticky-top z-3">
+        <a href="candidate_dashboard.html" class="nav-logo me-4">ค้นหางาน</a>
+        <div class="d-flex gap-1 me-auto">
+            <a href="candidate_dashboard.html" class="nav-link-custom"><i class="fas fa-briefcase me-1"></i>งาน</a>
+            <a href="candidate_profile.html" class="nav-link-custom active"><i class="fas fa-user me-1"></i>โปรไฟล์</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-white fw-bold small" id="navName"></span>
+            <a href="index.html" class="nav-link-custom ms-2"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Completeness -->
+        <div class="section-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-bold" style="font-size:1rem;color:#0f1f3d;"><i
+                        class="fas fa-chart-pie text-primary me-2"></i>ความสมบูรณ์โปรไฟล์</div>
+                <span class="fw-bold" style="color:#10b981;" id="completePerc">0%</span>
+            </div>
+            <div class="completeness-bar">
+                <div class="completeness-fill" id="completeFill" style="width:0%;"></div>
+            </div>
+            <div class="small text-muted" id="completeHint"></div>
+        </div>
+
+        <!-- Basic Info -->
+        <div class="section-card">
+            <div class="section-title"><i class="fas fa-user-circle text-primary me-2"></i>ข้อมูลส่วนตัว</div>
+            <div class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-bold small">ชื่อ (ไทย)</label><input type="text"
+                        id="f_fname_th" class="form-control"></div>
+                <div class="col-md-6"><label class="form-label fw-bold small">นามสกุล (ไทย)</label><input type="text"
+                        id="f_lname_th" class="form-control"></div>
+                <div class="col-12"><label class="form-label fw-bold small">ตำแหน่งที่ต้องการ <span
+                            class="text-danger">*</span></label><input type="text" id="f_role" class="form-control"
+                        placeholder="Data Scientist, Software Engineer..."></div>
+                <div class="col-12"><label class="form-label fw-bold small">เกี่ยวกับฉัน (About Me)</label><textarea
+                        id="f_about" class="form-control" rows="3"></textarea></div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">เงินเดือนที่คาดหวัง (บาท) <span
+                            class="text-danger">*</span></label>
+                    <input type="number" id="f_salary" class="form-control">
+                </div>
+                <div class="col-md-6"><label class="form-label fw-bold small">จังหวัดที่ต้องการทำงาน</label>
+                    <select id="f_province" class="form-select">
+                        <option value="">-- เลือกจังหวัด --</option>
+                        <option>กรุงเทพมหานคร</option>
+                        <option>นนทบุรี</option>
+                        <option>ปทุมธานี</option>
+                        <option>สมุทรปราการ</option>
+                        <option>ชลบุรี</option>
+                        <option>เชียงใหม่</option>
+                        <option>ขอนแก่น</option>
+                        <option>นครราชสีมา</option>
+                        <option>สงขลา</option>
+                        <option>ภูเก็ต</option>
+                    </select>
+                </div>
+                <div class="col-md-6"><label class="form-label fw-bold small">รูปแบบงาน</label>
+                    <select id="f_worktype" class="form-select">
+                        <option>Onsite (เข้าออฟฟิศ)</option>
+                        <option>Remote (ทำงานทางไกล)</option>
+                        <option>Hybrid (ผสม)</option>
+                        <option>Shift-based (กะ/ผลัด)</option>
+                        <option>Project-based (ตามโปรเจกต์)</option>
+                    </select>
+                </div>
+                <div class="col-md-6"><label class="form-label fw-bold small">ประเภทการจ้าง</label>
+                    <select id="f_jobtype" class="form-select">
+                        <option>Full-time (พนักงานประจำ)</option>
+                        <option>Part-time (พาร์ทไทม์)</option>
+                        <option>Contract / Fixed-term (สัญญาจ้าง)</option>
+                        <option>Temporary (ชั่วคราว)</option>
+                        <option>Freelance / Self-employed (ฟรีแลนซ์)</option>
+                        <option>Intern / Coop (ฝึกงาน/สหกิจ)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Education -->
+        <div class="section-card">
+            <div class="section-title"><i class="fas fa-graduation-cap text-primary me-2"></i>การศึกษา</div>
+            <div class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-bold small">ระดับปริญญา</label>
+                    <select id="f_degree" class="form-select">
+                        <option>ปริญญาตรี</option>
+                        <option>ปริญญาโท</option>
+                        <option>ปริญญาเอก</option>
+                        <option>อนุปริญญา</option>
+                    </select>
+                </div>
+                <div class="col-md-6"><label class="form-label fw-bold small">ปีที่จบ (พ.ศ.)</label><input type="number"
+                        id="f_gyear" class="form-control"></div>
+                <div class="col-12"><label class="form-label fw-bold small">มหาวิทยาลัย</label><input type="text"
+                        id="f_university" class="form-control"></div>
+                <div class="col-md-8"><label class="form-label fw-bold small">สาขาวิชา</label><input type="text"
+                        id="f_major" class="form-control"></div>
+                <div class="col-md-4"><label class="form-label fw-bold small">GPA</label><input type="number" id="f_gpa"
+                        class="form-control" step="0.01" min="0" max="4"></div>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="section-card">
+            <div class="section-title"><i class="fas fa-tools text-primary me-2"></i>ทักษะ <span
+                    class="text-danger">*</span></div>
+            <div class="input-group mb-2">
+                <input type="text" id="skillInput" class="form-control" placeholder="พิมพ์ทักษะ แล้วกด Enter">
+                <button class="btn btn-outline-primary" onclick="addSkill()"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="mySkillPills" class="d-flex flex-wrap gap-1 mb-3"></div>
+            <div class="small text-muted fw-bold mb-2">เลือกเร็ว:</div>
+            <div class="d-flex flex-wrap gap-1">
+                <span style="cursor:pointer;" class="tag-pill skill-p" onclick="quickAddSkill('Python')">Python</span>
+                <span style="cursor:pointer;" class="tag-pill skill-p" onclick="quickAddSkill('SQL')">SQL</span>
+                <span style="cursor:pointer;" class="tag-pill skill-p"
+                    onclick="quickAddSkill('Machine Learning')">Machine Learning</span>
+                <span style="cursor:pointer;" class="tag-pill skill-p" onclick="quickAddSkill('Data Engineering')">Data
+                    Engineering</span>
+                <span style="cursor:pointer;" class="tag-pill skill-p"
+                    onclick="quickAddSkill('Docker & Kubernetes')">Docker/K8s</span>
+                <span style="cursor:pointer;" class="tag-pill skill-p"
+                    onclick="quickAddSkill('Generative AI')">Generative AI</span>
+                <span style="cursor:pointer;" class="tag-pill skill-p"
+                    onclick="quickAddSkill('Security Architecture')">Security</span>
+                <span style="cursor:pointer;" class="tag-pill skill-p"
+                    onclick="quickAddSkill('Agile & Scrum')">Agile/Scrum</span>
+            </div>
+        </div>
+
+        <!-- Certs -->
+        <div class="section-card">
+            <div class="section-title"><i class="fas fa-certificate text-warning me-2"></i>Certificate</div>
+            <div class="input-group mb-2">
+                <input type="text" id="certInput" class="form-control" placeholder="ชื่อ Certification แล้วกด Enter">
+                <button class="btn btn-outline-success" onclick="addCert()"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="myCertPills" class="d-flex flex-wrap gap-1 mb-3"></div>
+            <div class="small text-muted fw-bold mb-2">Certs ยอดนิยม:</div>
+            <div class="d-flex flex-wrap gap-1">
+                <span style="cursor:pointer;" class="tag-pill cert-p"
+                    onclick="quickAddCert('AWS Solutions Architect')">AWS SAA</span>
+                <span style="cursor:pointer;" class="tag-pill cert-p"
+                    onclick="quickAddCert('Oracle Database Administrator Certified')">Oracle DBA</span>
+                <span style="cursor:pointer;" class="tag-pill cert-p"
+                    onclick="quickAddCert('GCP Professional Data Engineer')">GCP Data</span>
+                <span style="cursor:pointer;" class="tag-pill cert-p"
+                    onclick="quickAddCert('Docker & Kubernetes Essential')">Docker K8s</span>
+                <span style="cursor:pointer;" class="tag-pill cert-p"
+                    onclick="quickAddCert('Microsoft Azure Fundamentals')">Azure AZ-900</span>
+                <span style="cursor:pointer;" class="tag-pill cert-p"
+                    onclick="quickAddCert('Generative AI & LLM Ops')">GenAI LLM</span>
+            </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="section-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="section-title mb-0"><i class="fas fa-briefcase text-primary me-2"></i>ประสบการณ์ทำงาน
+                </div>
+                <button class="btn btn-sm btn-outline-primary rounded-pill" onclick="addExp()"><i
+                        class="fas fa-plus me-1"></i>เพิ่ม</button>
+            </div>
+            <div id="expContainer"></div>
+        </div>
+
+        <div class="section-card sticky-bottom bottom-0 z-3 p-3 shadow-lg" style="margin-bottom: 0;">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="candidate_profile.html" class="btn btn-outline-secondary rounded-pill px-4">ยกเลิก</a>
+                <div class="d-flex gap-3 align-items-center">
+                    <div id="saveStatus" class="text-success fw-bold" style="display:none;"><i
+                            class="fas fa-check-circle me-1"></i>บันทึกแล้ว!</div>
+                    <button class="btn-save btn" onclick="saveProfile()"><i
+                            class="fas fa-save me-2"></i>บันทึกและอัปเดตการ
+                        Match</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="save-toast" id="saveToast"><i class="fas fa-check-circle me-2"></i>บันทึกโปรไฟล์เรียบร้อยแล้ว!</div>
+    </div> <!-- Close main-container -->
+
+    <template id="expTpl">
+        <div class="exp-card position-relative mb-3 p-3 border rounded shadow-sm bg-white">
+            <button type="button" class="btn btn-sm btn-link text-danger position-absolute top-0 end-0 m-1"
+                onclick="this.closest('.exp-card').remove();calcCompleteness()"><i class="fas fa-times"></i></button>
+            <div class="row g-3 mt-1">
+                <div class="col-md-6"><label class="small fw-bold text-muted mb-1">บริษัท</label><input type="text"
+                        class="form-control form-control-sm exp-company" placeholder="ชื่อบริษัท"></div>
+                <div class="col-md-6"><label class="small fw-bold text-muted mb-1">ตำแหน่ง</label><input type="text"
+                        class="form-control form-control-sm exp-position" placeholder="ตำแหน่ง"></div>
+                <div class="col-md-3"><label class="small fw-bold text-muted mb-1">เริ่มงาน</label><input type="date"
+                        class="form-control form-control-sm exp-start"></div>
+                <div class="col-md-3"><label class="small fw-bold text-muted mb-1">สิ้นสุด</label><input type="date"
+                        class="form-control form-control-sm exp-end"></div>
+                <div class="col-md-6"><label class="small fw-bold text-muted mb-1">เทคโนโลยี/เครื่องมือ</label><input
+                        type="text" class="form-control form-control-sm exp-tools" placeholder="Python, AWS, Docker...">
+                </div>
+                <div class="col-12"><label class="small fw-bold text-muted mb-1">รายละเอียดงาน</label><textarea
+                        class="form-control form-control-sm exp-desc" rows="2"
+                        placeholder="อธิบายงานที่ทำพอสังเขป..."></textarea></div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        let selectedSkills = new Set();
+        let selectedCerts = new Set();
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser?.user_id) { window.location.href = 'index.html'; return; }
+
+            document.getElementById('navName').textContent = currentUser.name || '';
+            document.getElementById('f_fname_th').value = (currentUser.name || '').split(' ')[0] || '';
+            document.getElementById('f_lname_th').value = (currentUser.name || '').split(' ').slice(1).join(' ') || '';
+            document.getElementById('f_role').value = currentUser.current_role || '';
+            document.getElementById('f_about').value = currentUser.about_me || '';
+            document.getElementById('f_salary').value = currentUser.expected_salary || '';
+            document.getElementById('f_province').value = currentUser.location || '';
+            if (currentUser.work_style_pref) document.getElementById('f_worktype').value = currentUser.work_style_pref;
+            if (currentUser.job_type_pref) document.getElementById('f_jobtype').value = currentUser.job_type_pref;
+
+            const edu = currentUser.education?.[0];
+            if (edu) {
+                document.getElementById('f_degree').value = edu.degree || 'ปริญญาตรี';
+                document.getElementById('f_university').value = edu.university || '';
+                document.getElementById('f_major').value = edu.major || '';
+                document.getElementById('f_gpa').value = edu.gpa || '';
+                document.getElementById('f_gyear').value = edu.grad_year || '';
+            }
+
+            (currentUser.skills || []).forEach(s => selectedSkills.add(s));
+            renderSkills();
+            (currentUser.certificates || []).forEach(c => selectedCerts.add(c));
+            renderCerts();
+            (currentUser.experience || []).forEach(e => addExp(e));
+            calcCompleteness();
+
+            document.getElementById('skillInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } });
+            document.getElementById('certInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addCert(); } });
+            document.querySelectorAll('input,textarea,select').forEach(el => el.addEventListener('change', calcCompleteness));
+        });
+
+        function addSkill() { const v = document.getElementById('skillInput').value.trim(); if (v) { selectedSkills.add(v); document.getElementById('skillInput').value = ''; renderSkills(); calcCompleteness(); } }
+        function quickAddSkill(s) { selectedSkills.add(s); renderSkills(); calcCompleteness(); }
+        function addCert() { const v = document.getElementById('certInput').value.trim(); if (v) { selectedCerts.add(v); document.getElementById('certInput').value = ''; renderCerts(); calcCompleteness(); } }
+        function quickAddCert(c) { selectedCerts.add(c); renderCerts(); calcCompleteness(); }
+        function renderSkills() { document.getElementById('mySkillPills').innerHTML = [...selectedSkills].map(s => `<span class="tag-pill skill-p"><i class="fas fa-check-circle me-1" style="font-size:.7rem;"></i>${s}<span class="rm" onclick="removeSkill('${s}')">&times;</span></span>`).join(''); }
+        function renderCerts() { document.getElementById('myCertPills').innerHTML = [...selectedCerts].map(c => `<span class="tag-pill cert-p"><i class="fas fa-certificate me-1" style="font-size:.7rem;"></i>${c}<span class="rm" onclick="removeCert('${c}')">&times;</span></span>`).join(''); }
+        function removeSkill(s) { selectedSkills.delete(s); renderSkills(); calcCompleteness(); }
+        function removeCert(c) { selectedCerts.delete(c); renderCerts(); calcCompleteness(); }
+
+        function addExp(data = null) {
+            const tpl = document.getElementById('expTpl').content.cloneNode(true);
+            if (data) { tpl.querySelector('.exp-company').value = data.company || ''; tpl.querySelector('.exp-position').value = data.position || ''; tpl.querySelector('.exp-start').value = data.start_date || ''; tpl.querySelector('.exp-end').value = data.end_date || ''; tpl.querySelector('.exp-tools').value = (data.tech_tools || []).join(', '); tpl.querySelector('.exp-desc').value = data.description || ''; }
+            document.getElementById('expContainer').appendChild(tpl); calcCompleteness();
+        }
+
+        function calcCompleteness() {
+            const role = document.getElementById('f_role').value;
+            const salary = document.getElementById('f_salary').value;
+            const uni = document.getElementById('f_university').value;
+            const expCount = document.querySelectorAll('.exp-card').length;
+            let score = 0;
+            if (role) score += 20; if (salary && salary > 0) score += 20; if (selectedSkills.size >= 2) score += 20;
+            if (uni) score += 15; if (selectedCerts.size > 0) score += 15; if (expCount > 0) score += 10;
+            document.getElementById('completePerc').textContent = score + '%';
+            document.getElementById('completeFill').style.width = score + '%';
+            const hints = [];
+            if (!role) hints.push('ใส่ตำแหน่งที่ต้องการ');
+            if (!salary) hints.push('ใส่เงินเดือนที่คาดหวัง');
+            if (selectedSkills.size < 2) hints.push('เพิ่มทักษะอย่างน้อย 2 อย่าง');
+            if (selectedCerts.size === 0) hints.push('เพิ่ม Certification เพื่อเพิ่ม score');
+            document.getElementById('completeHint').innerHTML = hints.length ? `<i class="fas fa-info-circle text-warning me-1"></i>เพิ่ม: ${hints.join(', ')}` : '<i class="fas fa-check-circle text-success me-1"></i>โปรไฟล์สมบูรณ์';
+        }
+
+        async function saveProfile() {
+            const expCards = [...document.querySelectorAll('.exp-card')].map(c => ({
+                company: c.querySelector('.exp-company').value, position: c.querySelector('.exp-position').value,
+                start_date: c.querySelector('.exp-start').value, end_date: c.querySelector('.exp-end').value,
+                tech_tools: c.querySelector('.exp-tools').value.split(',').map(s => s.trim()).filter(Boolean),
+                description: c.querySelector('.exp-desc').value
+            }));
+            const profileData = {
+                user_id: currentUser.user_id,
+                name: `${document.getElementById('f_fname_th').value} ${document.getElementById('f_lname_th').value}`.trim(),
+                current_role: document.getElementById('f_role').value,
+                about_me: document.getElementById('f_about').value,
+                expected_salary: parseInt(document.getElementById('f_salary').value) || 0,
+                location: document.getElementById('f_province').value,
+                work_style_pref: document.getElementById('f_worktype').value,
+                job_type_pref: document.getElementById('f_jobtype').value,
+                education: [{ degree: document.getElementById('f_degree').value, university: document.getElementById('f_university').value, major: document.getElementById('f_major').value, gpa: parseFloat(document.getElementById('f_gpa').value) || 0, grad_year: document.getElementById('f_gyear').value }],
+                skills: [...selectedSkills], certificates: [...selectedCerts], experience: expCards
+            };
+            try {
+                await fetch('http://127.0.0.1:5001/api/save_profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(profileData) });
+            } catch (e) { }
+            const merged = { ...currentUser, ...profileData, profile_completeness: parseInt(document.getElementById('completePerc').textContent) };
+            localStorage.setItem('currentUser', JSON.stringify(merged));
+            const toast = document.getElementById('saveToast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; window.location.href = 'candidate_profile.html'; }, 1500);
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

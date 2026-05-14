@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>L2E | โปรไฟล์ของฉัน</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --success: #16a34a;
+        }
+
+        body {
+            background: #f0f4f8;
+            font-family: 'Sarabun', sans-serif;
+            color: #374151;
+        }
+
+        /* Navbar Custom */
+        .navbar-custom {
+            background: linear-gradient(135deg, #0f1f3d, #10b981);
+            padding: 0 20px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-link-custom {
+            color: rgba(255, 255, 255, .8);
+            font-weight: 600;
+            font-size: .88rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: .15s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background: rgba(255, 255, 255, .15);
+            color: #fff;
+        }
+
+        /* Security Notice */
+        .security-notice {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 24px;
+            max-width: 900px;
+            margin: 0 auto;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #0f1f3d;
+        }
+
+        .security-icon {
+            color: #10b981;
+            font-size: 1.4rem;
+        }
+
+        /* Profile App Container */
+        .profile-wrapper {
+            max-width: 900px;
+            margin: 40px auto 60px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+
+
+        /* Sections */
+        .profile-section {
+            padding: 40px 48px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .profile-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #0f1f3d;
+            margin: 0;
+        }
+
+        .btn-edit {
+            background: none;
+            border: none;
+            color: #4b5563;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .btn-edit:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        /* Information Pills (Location, Email, etc.) */
+        .info-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .info-pill {
+            background: #f8faff;
+            border: 1px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Timeline Pattern */
+        .timeline {
+            margin-top: 20px;
+            margin-left: 8px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 32px;
+            padding-bottom: 32px;
+            border-left: 2px solid #10b981;
+        }
+
+        .timeline-item:last-child {
+            border-left-color: transparent;
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2.5px solid #0f1f3d;
+            z-index: 2;
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0f1f3d;
+            margin-bottom: 4px;
+        }
+
+        .timeline-subtitle {
+            font-size: 0.95rem;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .timeline-desc {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: #64748b;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .timeline-tech {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        /* Skills/Certs Chips */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .chip {
+            background: #f8faff;
+            border: 1px solid #e2e8f0;
+            color: #0f1f3d;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .chip:hover {
+            border-color: #10b981;
+            background: #ecfdf5;
+            color: #10b981;
+        }
+
+        .empty-state {
+            color: #9ca3af;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .role-highlight {
+            font-size: 1.1rem;
+            color: #10b981;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <style>
+        /* Bootstrap Primary Override to Emerald Green */
+        :root {
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+        }
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+        /* Extra fix for gradient inputs and focus rings */
+        .form-control:focus, .form-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+</head>
+
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar-custom">
+        <a href="candidate_dashboard.html" class="nav-logo me-4">ค้นหางาน</a>
+        <div class="d-flex gap-1 me-auto">
+            <a href="candidate_dashboard.html" class="nav-link-custom"><i class="fas fa-briefcase me-1"></i>งาน</a>
+            <a href="candidate_profile.html" class="nav-link-custom active"><i class="fas fa-user me-1"></i>โปรไฟล์</a>
+            <a href="market_dashboard.html" class="nav-link-custom"><i class="fas fa-chart-bar me-1"></i>ตลาดแรงงาน</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-white fw-bold small" id="navName"></span>
+            <a href="index.html" class="nav-link-custom ms-2"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </nav>
+
+    <!-- Security Header -->
+    <div class="security-notice">
+        <i class="fas fa-shield-alt security-icon"></i>
+        <span>Your profile data is kept private and secure. <i class="far fa-question-circle text-muted"
+                style="cursor:help;" title="ข้อมูลถูกจัดเก็บด้วยมาตรฐานความปลอดภัยระดับสูง"></i></span>
+    </div>
+
+    <!-- Main Profile App -->
+    <div class="profile-wrapper">
+
+        <!-- Header -->
+        <div class="pb-4" style="padding: 32px 48px 0 48px; border-bottom: 2px solid #f0f4f8;">
+            <h2 style="font-weight: 700; color: #0f1f3d; margin: 0; font-size: 1.6rem;">ประวัติของฉัน Profile</h2>
+        </div>
+
+        <!-- 1. Personal Info -->
+        <div id="personal" class="profile-section">
+            <div class="section-header align-items-start">
+                <div class="flex-grow-1">
+                    <h1 class="personal-name" id="viewName">Loading...</h1>
+                    <div class="role-highlight" id="viewRole"></div>
+                    <div class="text-muted mb-2 fw-bold" id="viewSalary"></div>
+
+                    <div class="info-pills">
+                        <span class="info-pill" id="viewLocation"><i class="fas fa-map-marker-alt text-muted"></i>
+                            —</span>
+                    </div>
+
+                    <div class="mt-4 timeline-subtitle" id="viewAbout" style="max-width: 800px;"></div>
+                </div>
+                <!-- Link to Edit Page -->
+                <a href="candidate_profile_edit.html" class="btn-edit" title="Edit Personal Info">
+                    <i class="fas fa-pen"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. Education -->
+        <div id="education" class="profile-section">
+            <div class="section-header">
+                <h2 class="section-title">Education</h2>
+                <a href="candidate_profile_edit.html" class="btn-edit" title="Edit Education">
+                    <i class="fas fa-pen"></i>
+                </a>
+            </div>
+            <div class="timeline" id="viewEduList">
+                <div class="empty-state">No education history recorded.</div>
+            </div>
+        </div>
+
+        <!-- 3. Work Experience -->
+        <div id="experience" class="profile-section">
+            <div class="section-header">
+                <h2 class="section-title">Work Experience</h2>
+                <a href="candidate_profile_edit.html" class="btn-edit" title="Edit Work Experience">
+                    <i class="fas fa-pen"></i>
+                </a>
+            </div>
+            <div class="timeline" id="viewExpList">
+                <div class="empty-state">No work experience recorded.</div>
+            </div>
+        </div>
+
+        <!-- 4. Skills & Certifications -->
+        <div id="skills" class="profile-section">
+            <div class="section-header">
+                <h2 class="section-title">Skills & Certifications</h2>
+                <a href="candidate_profile_edit.html" class="btn-edit" title="Edit Skills">
+                    <i class="fas fa-pen"></i>
+                </a>
+            </div>
+
+            <h6 class="fw-bold mb-3 mt-2 text-muted">TECHNICAL & SOFT SKILLS</h6>
+            <div class="chip-container mb-4" id="viewSkillList">
+                <div class="empty-state">No skills listed.</div>
+            </div>
+
+            <h6 class="fw-bold mb-3 text-muted border-top pt-4">CERTIFICATIONS</h6>
+            <div class="chip-container" id="viewCertList">
+                <div class="empty-state">No certifications listed.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!user.user_id) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Populate NavBar
+            document.getElementById('navName').textContent = user.name || 'Candidate';
+
+            // Populate Personal
+            document.getElementById('viewName').textContent = user.name || 'Not specified';
+
+            // Expected Salary & Role combined logic
+            const role = user.current_role || 'No specific role set';
+            document.getElementById('viewRole').textContent = role;
+
+            let prefsHtml = '';
+            if (user.expected_salary) {
+                prefsHtml += `<span class="badge rounded-pill bg-light text-dark border px-3 py-2" style="font-weight:600; font-size:0.9rem;"><i class="fas fa-money-bill-wave text-success me-2"></i>฿${parseInt(user.expected_salary).toLocaleString()} / month</span>`;
+            }
+            if (user.work_style_pref) {
+                prefsHtml += `<span class="badge rounded-pill bg-light text-dark border px-3 py-2" style="font-weight:600; font-size:0.9rem;"><i class="fas fa-building text-primary me-2"></i>${user.work_style_pref}</span>`;
+            }
+            if (user.job_type_pref) {
+                prefsHtml += `<span class="badge rounded-pill bg-light text-dark border px-3 py-2" style="font-weight:600; font-size:0.9rem;"><i class="fas fa-clock text-warning me-2"></i>${user.job_type_pref}</span>`;
+            }
+            const salaryEl = document.getElementById('viewSalary');
+            salaryEl.className = "d-flex flex-wrap gap-2 mb-3 mt-1";
+            salaryEl.innerHTML = prefsHtml;
+
+            // Pills (Location fallback using dummy data if none)
+            document.getElementById('viewLocation').innerHTML = `<i class="fas fa-map-marker-alt text-muted"></i> ${user.location || 'Location not specified'}`;
+
+            document.getElementById('viewAbout').innerHTML = (user.about_me || '').replace(/\n/g, '<br>') || '<span class="empty-state">No summary provided.</span>';
+
+            // Populate Education
+            if (user.education && user.education.length > 0) {
+                document.getElementById('viewEduList').innerHTML = user.education.map(edu => {
+                    const startYear = edu.grad_year ? (edu.grad_year - 4) : 'Unknown';
+                    const endYear = edu.grad_year || 'Present';
+                    return `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">${startYear} <i class="fas fa-arrow-right mx-1" style="font-size:0.7rem;color:#9ca3af;"></i> ${endYear}</div>
+                        <div class="timeline-title">${edu.university || 'Unknown University'}</div>
+                        <div class="timeline-subtitle">
+                            ${edu.degree || ''}${edu.major ? ` in ${edu.major}` : ''}<br>
+                            ${edu.gpa ? `GPA: ${edu.gpa}` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            // Populate Experience
+            if (user.experience && user.experience.length > 0) {
+                document.getElementById('viewExpList').innerHTML = user.experience.map(exp => {
+                    const s = exp.start_date ? exp.start_date.substring(0, 7) : 'Unknown';
+                    const e = exp.end_date ? exp.end_date.substring(0, 7) : 'Present';
+                    const tools = (exp.tech_tools && exp.tech_tools.length) ? `Tech stack: ${exp.tech_tools.join(', ')}` : '';
+                    return `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">${s} <i class="fas fa-arrow-right mx-1" style="font-size:0.7rem;color:#9ca3af;"></i> ${e}</div>
+                        <div class="timeline-title">${exp.company || 'Unknown Company'}</div>
+                        <div class="timeline-subtitle" style="font-weight:700; color:#0f1f3d;">${exp.position || 'Unknown Role'}</div>
+                        ${exp.description ? `<div class="timeline-desc">• ${exp.description.replace(/\n/g, '<br>• ')}</div>` : ''}
+                        ${tools ? `<div class="timeline-tech"><i class="fas fa-wrench me-1"></i> ${tools}</div>` : ''}
+                    </div>`;
+                }).join('');
+            }
+
+            // Populate Skills
+            if (user.skills && user.skills.length > 0) {
+                document.getElementById('viewSkillList').innerHTML = user.skills.map(skill => `
+                    <span class="chip">${skill}</span>
+                `).join('');
+            }
+
+            // Populate Certifications
+            if (user.certificates && user.certificates.length > 0) {
+                document.getElementById('viewCertList').innerHTML = user.certificates.map(cert => `
+                    <span class="chip" style="background:#f0fdf4; border-color:#bbf7d0; color:#15803d;">
+                        <i class="fas fa-certificate text-success me-1"></i> ${cert}
+                    </span>
+                `).join('');
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>

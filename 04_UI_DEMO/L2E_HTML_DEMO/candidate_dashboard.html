@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>L2E | งานที่ใช่สำหรับคุณ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background: #f0f4f8;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAVBAR */
+        .navbar-custom {
+            background: linear-gradient(135deg, #0f1f3d 0%, #10b981 100%);
+            padding: 0 20px;
+            height: 56px;
+            flex-shrink: 0;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .nav-link-custom {
+            color: rgba(255, 255, 255, .8);
+            font-weight: 600;
+            font-size: .88rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: .15s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background: rgba(255, 255, 255, .15);
+            color: #fff;
+        }
+
+        .nav-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: .9rem;
+            cursor: pointer;
+        }
+
+        /* LAYOUT */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1280px;
+            margin: 0 auto;
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 56px);
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
+        }
+
+        .sidebar-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(10, 102, 194, .08);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 20px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .user-avatar-lg {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 auto 10px;
+            border: 3px solid rgba(255, 255, 255, .5);
+        }
+
+        .sidebar-body {
+            padding: 16px;
+        }
+
+        .completeness-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            overflow: hidden;
+            margin: 4px 0 2px;
+        }
+
+        .completeness-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #16a34a);
+            border-radius: 3px;
+            transition: width .6s;
+        }
+
+        .skill-badge {
+            background: #e8f0fe;
+            color: var(--primary);
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .skill-badge.missing {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .cert-chip {
+            background: #f0fdf4;
+            color: var(--success);
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .sidebar-section {
+            padding: 14px 16px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .sidebar-section-title {
+            font-size: .78rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 10px;
+        }
+
+        .btn-edit-profile {
+            width: 100%;
+            background: #f8faff;
+            border: 1.5px solid #10b981;
+            color: #10b981;
+            border-radius: 10px;
+            padding: 9px;
+            font-weight: 700;
+            font-size: .9rem;
+            transition: .2s;
+        }
+
+        .btn-edit-profile:hover {
+            background: #10b981;
+            color: #fff;
+        }
+
+        /* MAIN CONTENT */
+        main {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .filter-bar {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 18px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+            margin-bottom: 18px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .filter-bar select,
+        .filter-bar input {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-size: .85rem;
+            font-family: 'Sarabun', sans-serif;
+            background: #f8faff;
+            color: #374151;
+            outline: none;
+            transition: .15s;
+        }
+
+        .filter-bar select:focus,
+        .filter-bar input:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .filter-label {
+            font-size: .8rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .result-info {
+            font-size: .85rem;
+            color: #64748b;
+        }
+
+        /* JOB CARD */
+        #jobList {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 20px;
+        }
+
+        .premium-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .05);
+            margin-bottom: 16px;
+            display: flex;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: .2s;
+            cursor: pointer;
+        }
+
+        .premium-card:hover {
+            box-shadow: 0 8px 25px rgba(10, 102, 194, .15);
+            transform: translateY(-2px);
+            border-color: #10b981;
+        }
+
+        .premium-card-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .match-pane {
+            width: 140px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            text-align: center;
+            border-left: 1px dashed #e2e8f0;
+            background: transparent;
+        }
+
+        /* SVG Circle Progress */
+        .score-circle-wrapper {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            margin-bottom: 12px;
+        }
+
+        .score-circle-svg {
+            transform: rotate(-90deg);
+            width: 70px;
+            height: 70px;
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: #f1f5f9;
+            stroke-width: 6;
+        }
+
+        .score-circle-progress {
+            fill: none;
+            stroke: #10b981;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #0f1f3d;
+        }
+
+        .match-label {
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+        .job-card {
+            /* kept for old classes if any, though replaced by premium-card */
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 1.5px solid transparent;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .job-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 6px 24px rgba(10, 102, 194, .15);
+            transform: translateY(-2px);
+        }
+
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: contain;
+            border: 1px solid #e2e8f0;
+            background: #f8faff;
+            padding: 4px;
+        }
+
+        .job-title {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #0f1f3d;
+            margin-bottom: 2px;
+        }
+
+        .job-company {
+            font-size: .85rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .job-meta span {
+            font-size: .8rem;
+            color: #64748b;
+            margin-right: 12px;
+        }
+
+        .match-score-badge {
+            font-weight: 800;
+            font-size: .9rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .score-gold {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .score-green {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+        }
+
+        .score-blue {
+            background: #e8f0fe;
+            color: #059669;
+        }
+
+        .score-gray {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .mini-bar-container {
+            margin-top: 10px;
+        }
+
+        .mini-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .mini-bar-label {
+            font-size: .72rem;
+            color: #94a3b8;
+            font-weight: 600;
+            min-width: 60px;
+        }
+
+        .mini-bar-track {
+            flex: 1;
+            height: 5px;
+            background: #f1f5f9;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .mini-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width .8s;
+        }
+
+        .mini-bar-val {
+            font-size: .72rem;
+            font-weight: 700;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .skill-match-inline .has {
+            color: var(--success);
+            font-size: .78rem;
+            font-weight: 600;
+        }
+
+        .skill-match-inline .miss {
+            color: #ef4444;
+            font-size: .78rem;
+            font-weight: 600;
+        }
+
+        .btn-view {
+            background: #e8f0fe;
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            padding: 7px 18px;
+            font-weight: 700;
+            font-size: .85rem;
+            transition: .2s;
+        }
+
+        .btn-view:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .new-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            font-size: .68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* MODAL */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+        }
+
+        .modal-header-custom {
+            background: linear-gradient(135deg, #0f1f3d, #10b981);
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+        }
+
+        .score-circle-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .score-circle-container svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .score-circle-num {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .score-circle-label {
+            font-size: .62rem;
+            color: rgba(255, 255, 255, .75);
+            font-weight: 600;
+        }
+
+        .modal-section-title {
+            font-size: .78rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin: 16px 0 8px;
+        }
+
+        .skill-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid #f8faff;
+        }
+
+        .skill-has {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: .8rem;
+            font-weight: 700;
+        }
+
+        .skill-miss {
+            background: #fef2f2;
+            color: #ef4444;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: .8rem;
+            font-weight: 700;
+        }
+
+        .cert-match-chip {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 12px;
+            padding: 4px 12px;
+            font-size: .8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin: 3px;
+        }
+
+        .cert-miss-chip {
+            background: #fef2f2;
+            color: #ef4444;
+            border-radius: 12px;
+            padding: 4px 12px;
+            font-size: .8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin: 3px;
+        }
+
+        .course-card {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .jd-text {
+            background: #f8faff;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: .87rem;
+            line-height: 1.7;
+            color: #374151;
+            white-space: pre-line;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .score-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .score-bar-label {
+            font-size: .8rem;
+            font-weight: 700;
+            color: #374151;
+            width: 260px;
+            flex-shrink: 0;
+        }
+
+        .score-bar-track {
+            flex: 1;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s;
+        }
+
+        .score-bar-val {
+            font-size: .8rem;
+            font-weight: 800;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .kpi-box {
+            background: #f8faff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .kpi-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #0f1f3d;
+        }
+
+        .kpi-label {
+            font-size: .72rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* LOADING */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .92);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .spinner-ring {
+            width: 56px;
+            height: 56px;
+            border: 5px solid #e2e8f0;
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        @media(max-width:900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+    </style>
+
+    <style>
+        /* Bootstrap Primary Override to Emerald Green */
+        :root {
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+        }
+
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        /* Extra fix for gradient inputs and focus rings */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar-custom d-flex align-items-center">
+        <a href="candidate_dashboard.html" class="nav-logo me-4">ค้นหางาน</a>
+        <div class="d-flex gap-1 me-auto">
+            <a href="candidate_dashboard.html" class="nav-link-custom active"><i
+                    class="fas fa-briefcase me-1"></i>งาน</a>
+            <a href="candidate_profile.html" class="nav-link-custom"><i class="fas fa-user me-1"></i>โปรไฟล์</a>
+            <a href="job_trend_analysis.html" class="nav-link-custom"><i
+                    class="fas fa-chart-bar me-1"></i>ตลาดแรงงาน</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <div class="nav-avatar" id="navAvatar" title="โปรไฟล์">?</div>
+            <span class="text-white fw-bold" id="navName" style="font-size:.88rem;"></span>
+            <a href="index.html" class="nav-link-custom ms-2"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </nav>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-ring mb-3"></div>
+        <h5 class="fw-bold text-dark">AI กำลังจับคู่งาน...</h5>
+        <p class="text-muted small">กำลังวิเคราะห์โปรไฟล์ของคุณกับ <span id="jobCount">500+</span> ตำแหน่งงาน</p>
+    </div>
+
+    <div class="main-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-header">
+                    <div class="user-avatar-lg" id="sideAvatar">?</div>
+                    <div class="fw-bold" id="sideName" style="font-size:1rem;">กำลังโหลด...</div>
+                    <div style="font-size:.82rem;opacity:.85;" id="sideRole">—</div>
+                </div>
+                <div class="sidebar-body">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small fw-bold text-muted">ความสมบูรณ์โปรไฟล์</span>
+                        <span class="fw-bold" style="color:#10b981;font-size:.85rem;" id="sideCompleteness">0%</span>
+                    </div>
+                    <div class="completeness-bar">
+                        <div class="completeness-fill" id="sideCompleteBar" style="width:0%"></div>
+                    </div>
+                    <div class="mt-2 small text-muted" id="completeHint"></div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-crosshairs me-1"></i>ตำแหน่งที่มุ่งหมาย</div>
+                    <div class="fw-bold" style="color:#0f1f3d;font-size:.9rem;" id="sideTarget">—</div>
+                    <div class="small text-muted mt-1" id="sideSalary">เงินเดือน: —</div>
+                    <div class="mt-2 p-2 rounded" style="background-color: #f0fdf4; border: 1px solid #bbf7d0;">
+                        <span class="small text-muted fw-bold d-block"><i
+                                class="fas fa-chart-line text-success me-1"></i> ช่วงเงินเดือนที่คุณควรได้รับ:</span>
+                        <span class="fw-bold text-success" style="font-size:.95rem;">฿45,000 - ฿60,000</span>
+                    </div>
+                    <div class="small text-muted" id="sideWorkPref">รูปแบบ: —</div>
+                    <div class="small text-muted" id="sideLocation">พื้นที่: —</div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-tools me-1"></i>ทักษะของฉัน (<span
+                            id="skillCount">0</span>)</div>
+                    <div id="sideSkills"></div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title"><i class="fas fa-certificate me-1"></i>Certifications (<span
+                            id="certCount">0</span>)</div>
+                    <div id="sideCerts"></div>
+                </div>
+                <div class="p-3">
+                    <button class="btn-edit-profile" onclick="location.href='candidate_profile.html'">
+                        <i class="fas fa-id-badge me-2"></i>ดูโปรไฟล์ของฉัน
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary w-100 mt-2"
+                        onclick="location.href='candidate_profile_edit.html'">
+                        <i class="fas fa-edit me-1"></i>อัปเดตข้อมูล
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main>
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div>
+                    <div class="filter-label mb-1">จังหวัด</div>
+                    <select id="filterProvince" onchange="applyFilters()">
+                        <option value="">ทุกจังหวัด</option>
+                        <option>กรุงเทพมหานคร</option>
+                        <option>นนทบุรี</option>
+                        <option>ปทุมธานี</option>
+                        <option>ชลบุรี</option>
+                        <option>เชียงใหม่</option>
+                        <option>ขอนแก่น</option>
+                        <option>สงขลา</option>
+                        <option>ภูเก็ต</option>
+                        <option>ระยอง</option>
+                    </select>
+                </div>
+                <div>
+                    <div class="filter-label mb-1">รูปแบบงาน</div>
+                    <select id="filterWorkType" onchange="applyFilters()">
+                        <option value="">ทั้งหมด</option>
+                        <option>Onsite (เข้าออฟฟิศ)</option>
+                        <option>Remote (ทำงานทางไกล)</option>
+                        <option>Hybrid (ผสม)</option>
+                        <option>Shift-based (กะ/ผลัด)</option>
+                        <option>Project-based (ตามโปรเจกต์)</option>
+                    </select>
+                </div>
+                <div>
+                    <div class="filter-label mb-1">เงินเดือน (บาท)</div>
+                    <select id="filterSalary" onchange="applyFilters()">
+                        <option value="">ทั้งหมด</option>
+                        <option value="20000">20,000+</option>
+                        <option value="40000">40,000+</option>
+                        <option value="60000">60,000+</option>
+                        <option value="80000">80,000+</option>
+                        <option value="100000">100,000+</option>
+                    </select>
+                </div>
+                <div class="ms-auto d-flex align-items-end">
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="reloadJobs()">
+                        <i class="fas fa-sync-alt me-1"></i>รีเฟรช
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="result-info" id="resultInfo">กำลังโหลด...</div>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" id="sortOrder" onchange="applyFilters()"
+                        style="width:auto;font-size:.82rem;">
+                        <option value="score">คะแนนความเหมาะสมสูงสุด</option>
+                        <option value="salary">เงินเดือนสูงสุด</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="jobList">
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <div class="fw-bold">กำลังโหลดงานที่ตรงกับคุณ...</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JOB DETAIL MODAL -->
+    <div class="modal fade" id="jobModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header-custom">
+                    <div class="d-flex align-items-center gap-4">
+                        <img id="mLogo" src="" width="56" height="56"
+                            style="border-radius:14px;object-fit:contain;background:#fff;padding:4px;">
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold text-white mb-1" id="mTitle">—</h4>
+                            <div class="text-white opacity-75 fw-bold" id="mCompany">—</div>
+                            <div class="d-flex gap-3 mt-1 flex-wrap">
+                                <span class="text-white opacity-75 small" id="mLocation"><i
+                                        class="fas fa-map-marker-alt me-1"></i>—</span>
+                                <span class="text-white opacity-75 small" id="mWorkType"><i
+                                        class="fas fa-laptop-house me-1"></i>—</span>
+                                <span class="text-white opacity-75 small" id="mSalary"><i
+                                        class="fas fa-baht-sign me-1"></i>—</span>
+                            </div>
+                        </div>
+                        <div class="score-circle-container flex-shrink-0">
+                            <svg width="100" height="100" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.2)"
+                                    stroke-width="8" />
+                                <circle id="mScoreCircle" cx="50" cy="50" r="45" fill="none" stroke="#fbbf24"
+                                    stroke-width="8" stroke-linecap="round" stroke-dasharray="283"
+                                    stroke-dashoffset="283" />
+                            </svg>
+                            <div class="score-circle-value">
+                                <span class="score-circle-num" id="mScoreNum">—</span>
+                                <span class="score-circle-label" id="mScoreLabel">MATCH</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" data-bs-dismiss="modal"
+                        class="position-absolute top-0 end-0 m-3 btn-close btn-close-white"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <!-- KPI -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-4">
+                                    <div class="kpi-box">
+                                        <div class="kpi-val" id="mKpiSalary">—</div>
+                                        <div class="kpi-label">เงินเดือน</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="kpi-box">
+                                        <div class="kpi-val" id="mKpiLocation">—</div>
+                                        <div class="kpi-label">จังหวัด</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="kpi-box">
+                                        <div class="kpi-val" id="mKpiWork">—</div>
+                                        <div class="kpi-label">รูปแบบงาน</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- JD -->
+                            <div class="modal-section-title"><i class="fas fa-align-left me-1"></i>รายละเอียดงาน (JOB
+                                DESCRIPTION)</div>
+                            <div class="jd-text" id="mJD">—</div>
+                            <!-- Score Breakdown -->
+                            <div class="modal-section-title mt-3"><i class="fas fa-chart-bar me-1"></i>คะแนนความเหมาะสม
+                                (SCORE BREAKDOWN)</div>
+                            <div id="mScoreBars"></div>
+                        </div>
+                        <div class="col-lg-5">
+                            <!-- Skills -->
+                            <div class="modal-section-title"><i class="fas fa-tools me-1"></i>ทักษะที่ต้องการ (REQUIRED
+                                SKILLS)</div>
+                            <div id="mSkillsList"></div>
+                            <!-- Certs -->
+                            <div id="mCertSection">
+                                <div class="modal-section-title"><i
+                                        class="fas fa-certificate me-1"></i>ใบรับรองที่ต้องการ (REQUIRED CERTIFICATIONS)
+                                </div>
+                                <div id="mCertsList"></div>
+                            </div>
+                            <!-- Missing skills courses -->
+                            <div id="mCourseSection">
+                                <div class="modal-section-title"><i class="fas fa-graduation-cap me-1"></i>แนะนำ Courses
+                                    สำหรับทักษะที่ขาด</div>
+                                <div id="mCoursesList"></div>
+                                <div class="text-center mt-3">
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-success rounded-pill px-4 fw-bold"
+                                        onclick="openCoursesModal()">
+                                        <i class="fas fa-book-open me-1"></i>ดูคอร์สเรียนทั้งหมด
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Company -->
+                            <div class="modal-section-title"><i class="fas fa-building me-1"></i>เกี่ยวกับบริษัท (ABOUT
+                                COMPANY)</div>
+                            <div id="mCompanyAbout" class="small text-muted"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-5 fw-bold">
+                        <i class="fas fa-paper-plane me-2"></i>สมัครงาน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COURSES MODAL -->
+    <div class="modal fade" id="coursesModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" style="color:#0f1f3d;">
+                        <i class="fas fa-book-reader text-success me-2"></i>คอร์สเรียนแนะนำเพื่ออัปสกิล (Skill Gap
+                        Recommended)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <div class="row g-4" id="allCoursesList">
+                        <!-- Populated dynamically or with placeholders -->
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allJobs = [];
+        let currentUser = null;
+        const API = 'http://127.0.0.1:5001';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser || !currentUser.user_id) {
+                window.location.href = 'index.html'; return;
+            }
+            loadSidebar();
+            await loadJobs();
+        });
+
+        function loadSidebar() {
+            const u = currentUser;
+            const initials = (u.name || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('navAvatar').textContent = initials;
+            document.getElementById('sideAvatar').textContent = initials;
+            document.getElementById('navName').textContent = u.name || '';
+            document.getElementById('sideName').textContent = u.name || u.user_id;
+            document.getElementById('sideRole').textContent = u.current_role || '—';
+            document.getElementById('sideTarget').textContent = u.current_role || '—';
+            document.getElementById('sideSalary').textContent = u.expected_salary ? `฿${parseInt(u.expected_salary).toLocaleString()}/เดือน` : 'ไม่ระบุ';
+            document.getElementById('sideWorkPref').textContent = u.work_style_pref ? `รูปแบบ: ${u.work_style_pref}` : 'ไม่ระบุ';
+            document.getElementById('sideLocation').textContent = u.location ? `พื้นที่: ${u.location}` : 'ไม่ระบุ';
+
+            const comp = u.profile_completeness || 60;
+            document.getElementById('sideCompleteness').textContent = comp + '%';
+            document.getElementById('sideCompleteBar').style.width = comp + '%';
+            if (comp < 80) document.getElementById('completeHint').innerHTML = `<i class="fas fa-info-circle text-warning me-1"></i><a href="candidate_profile_edit.html" style="font-size:.78rem;">เพิ่มข้อมูลเพื่อ Match ที่ดีขึ้น</a>`;
+
+            const skills = u.skills || [];
+            document.getElementById('skillCount').textContent = skills.length;
+            document.getElementById('sideSkills').innerHTML = skills.slice(0, 8).map(s => `<span class="skill-badge">${s}</span>`).join('') + (skills.length > 8 ? `<span class="skill-badge">+${skills.length - 8}</span>` : '');
+
+            const certs = u.certificates || [];
+            document.getElementById('certCount').textContent = certs.length;
+            document.getElementById('sideCerts').innerHTML = certs.slice(0, 4).map(c => `<span class="cert-chip"><i class="fas fa-certificate me-1"></i>${c}</span>`).join('') + (certs.length > 4 ? `<span class="cert-chip">+${certs.length - 4}</span>` : '');
+        }
+
+        async function loadJobs() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            try {
+                const res = await fetch(`${API}/api/match_jobs_instant`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUser.user_id, limit: 50 })
+                });
+                const data = await res.json();
+                allJobs = data.jobs || [];
+                applyFilters();
+            } catch (e) {
+                document.getElementById('jobList').innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-exclamation-triangle text-warning"></i>
+        <div class="fw-bold text-dark">ไม่สามารถเชื่อมต่อ API Server ได้</div>
+        <div class="small text-muted mt-2">กรุณา run: <code>python api_server.py</code></div>
+      </div>`;
+            } finally {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }
+        }
+
+        async function reloadJobs() {
+            await loadJobs();
+        }
+
+        function applyFilters() {
+            const province = document.getElementById('filterProvince').value.toLowerCase();
+            const worktype = document.getElementById('filterWorkType').value.toLowerCase();
+            const minSalary = parseInt(document.getElementById('filterSalary').value) || 0;
+            const sortBy = document.getElementById('sortOrder').value;
+
+            let filtered = allJobs.filter(j => {
+                if (province && !((j.location || '').toLowerCase().includes(province))) return false;
+                if (worktype && !((j.work_type || '').toLowerCase().includes(worktype))) return false;
+                if (minSalary && j.salary_min < minSalary) return false;
+                return true;
+            });
+
+            if (sortBy === 'salary') filtered.sort((a, b) => b.salary_max - a.salary_max);
+            else filtered.sort((a, b) => b.match_score - a.match_score);
+
+            document.getElementById('resultInfo').textContent = `พบ ${filtered.length} ตำแหน่งงานที่ตรงกับคุณ`;
+            renderJobs(filtered);
+        }
+
+        function renderJobs(jobs) {
+            if (!jobs.length) {
+                document.getElementById('jobList').innerHTML = '<div class="empty-state"><i class="fas fa-search-minus"></i><div class="fw-bold">ไม่พบงานที่ตรงกับเงื่อนไข</div></div>';
+                return;
+            }
+            document.getElementById('jobList').innerHTML = jobs.map((j, i) => renderJobCard(j, i)).join('');
+        }
+
+        function getScoreClass(s) {
+            if (s >= 85) return 'score-gold';
+            if (s >= 70) return 'score-green';
+            if (s >= 55) return 'score-blue';
+            return 'score-gray';
+        }
+        function getScoreIcon(s) {
+            if (s >= 85) return '🏆';
+            if (s >= 70) return '✨';
+            return '';
+        }
+
+        // Helper function for skill highlighting
+        function highlightSkills(requiredSkills, uSkills) {
+            if (!requiredSkills || requiredSkills.length === 0) return '';
+            const matched = requiredSkills.filter(s => uSkills.includes(s));
+            const missing = requiredSkills.filter(s => !uSkills.includes(s));
+
+            const preview = [
+                ...matched.slice(0, 3).map(s => `<span class="has">✓ ${s}</span>`),
+                ...missing.slice(0, 2).map(s => `<span class="miss">✗ ${s}</span>`)
+            ].join(' &nbsp;');
+            return preview;
+        }
+
+        function renderJobCard(j, i) {
+            const uSkills = (currentUser && currentUser.skills) ? currentUser.skills : [];
+            const uCerts = (currentUser && currentUser.certificates) ? currentUser.certificates : [];
+
+            const sb = j.score_breakdown || {};
+            const skillsPreview = highlightSkills(j.required_skills, uSkills);
+            const rCerts = j.required_certs || [];
+            const certMatched = rCerts.filter(c => uCerts.includes(c));
+            const certMissing = rCerts.filter(c => !uCerts.includes(c));
+            const isNew = Math.random() > 0.7;
+
+            const score = Math.round(j.match_score || 0);
+            const r = 30;
+            const circumference = 2 * Math.PI * r;
+            const offset = Math.max(0, circumference - (score / 100) * circumference);
+
+            let matchLabel = 'เหมาะสมระดับปานกลาง';
+            let strokeColor = '#f59e0b'; // orange
+            if (score >= 90) {
+                matchLabel = 'เหมาะสมมาก';
+                strokeColor = '#15803d'; // dark green
+            } else if (score >= 50) {
+                matchLabel = 'เหมาะสมดี';
+                strokeColor = '#10b981'; // light green
+            }
+
+            return `
+  <div class="premium-card" onclick="openModal(${i})">
+    <div class="premium-card-body">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div class="d-flex gap-3 align-items-center">
+            <img src="${j.logo_url}" class="company-logo flex-shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(j.company || '?')}&size=50&background=0a66c2&color=fff'">
+            <div>
+              <div class="job-title">${j.title} ${isNew ? '<span class="new-badge">ใหม่</span>' : ''}</div>
+              <div class="job-company"><i class="fas fa-building me-1"></i>${j.company || '—'}</div>
+            </div>
+        </div>
+        <button class="btn btn-light btn-sm rounded-circle" style="width: 36px; height: 36px; color:#64748b; background: #f8faff; border: 1px solid #e2e8f0;" onclick="event.stopPropagation()"><i class="fas fa-ellipsis-h"></i></button>
+      </div>
+
+      <div class="d-flex flex-wrap gap-4 mt-1" style="font-size: .85rem; color: #475569; font-weight: 600;">
+        <span><i class="fas fa-map-marker-alt me-1"></i>${j.location || '—'}</span>
+        <span><i class="fas fa-laptop-house me-1"></i>${j.work_type || '—'}</span>
+        <span><i class="fas fa-baht-sign me-1"></i>${j.salary_text || 'Negotiable'}</span>
+      </div>
+      
+      <div class="skill-match-inline mt-1">${skillsPreview || '<span class="text-muted small">ยังไม่มีข้อมูลทักษะ</span>'}</div>
+        ${certMatched.length || certMissing.length ? `
+        <div class="mt-1" style="font-size:.77rem;">
+          ${certMatched.map(c => `<span style="color:#16a34a; font-weight:600;"><i class="fas fa-check-circle me-1"></i>${c}</span>`).join(' ')}
+          ${certMissing.map(c => `<span style="color:#ef4444; font-weight:600;"><i class="fas fa-times-circle me-1"></i>${c}</span>`).join(' ')}
+        </div>` : ''}
+    </div>
+    
+    <div class="match-pane">
+        <div class="score-circle-wrapper">
+            <svg class="score-circle-svg" viewBox="0 0 70 70">
+                <circle class="score-circle-bg" cx="35" cy="35" r="30"></circle>
+                <circle class="score-circle-progress" cx="35" cy="35" r="30" style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${offset}; stroke: ${strokeColor};"></circle>
+            </svg>
+            <div class="score-text">${score}<span style="font-size: .7rem;">%</span></div>
+        </div>
+        <div class="match-label" style="color: ${strokeColor};">${matchLabel}</div>
+    </div>
+  </div>`;
+        }
+
+        function openModal(idx) {
+            const filtered = getFilteredJobs();
+            const j = filtered[idx];
+            if (!j) return;
+
+            document.getElementById('mLogo').src = j.logo_url;
+            document.getElementById('mTitle').textContent = j.title;
+            document.getElementById('mCompany').textContent = j.company;
+            document.getElementById('mLocation').innerHTML = `<i class="fas fa-map-marker-alt me-1"></i>${j.location}`;
+            document.getElementById('mWorkType').innerHTML = `<i class="fas fa-laptop-house me-1"></i>${j.work_type}`;
+            document.getElementById('mSalary').innerHTML = `<i class="fas fa-baht-sign me-1"></i>${j.salary_text}`;
+            document.getElementById('mKpiSalary').textContent = j.salary_text;
+            document.getElementById('mKpiLocation').textContent = j.location;
+            document.getElementById('mKpiWork').textContent = j.work_type;
+
+            // Score circle
+            const score = j.match_score;
+            document.getElementById('mScoreNum').innerHTML = score + '<span style="font-size: .8rem; font-weight: 700;">%</span>';
+            document.getElementById('mScoreLabel').textContent = 'เหมาะสม';
+            const offset = 283 - (283 * score / 100);
+            const circle = document.getElementById('mScoreCircle');
+            circle.setAttribute('stroke-dashoffset', 283); // Changed from 264 to 283
+            const color = score >= 85 ? '#fbbf24' : score >= 70 ? '#4ade80' : '#60a5fa';
+            circle.setAttribute('stroke', color);
+            setTimeout(() => circle.setAttribute('stroke-dashoffset', offset), 100);
+
+            // JD
+            document.getElementById('mJD').textContent = j.description || j.summary || 'ไม่มีรายละเอียด';
+
+            // Score bars
+            const sb = j.score_breakdown || {};
+            document.getElementById('mScoreBars').innerHTML = [
+                { label: 'ความสอดคล้องของตำแหน่ง (Title Match)', val: sb.title || 0, color: '#10b981' },
+                { label: 'ความสามารถตามคุณสมบัติ (Semantic Match)', val: sb.semantic || 0, color: '#10b981' },
+                { label: 'ทักษะตรงกัน (Skill Tag)', val: sb.skill || 0, color: '#16a34a' },
+                { label: 'ค่าตอบแทน (Salary)', val: sb.budget_fit || 0, color: '#16a34a' },
+                { label: 'ใบรับรอง (Certificate)', val: sb.cert || 0, color: '#f59e0b' }
+            ].map(b => `
+    <div class="score-bar-row">
+      <span class="score-bar-label">${b.label}</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${b.val}%;background:${b.color};"></div></div>
+      <span class="score-bar-val" style="color:${b.color};">${b.raw || Math.round(b.val) + '%'}</span>
+    </div>`).join('');
+
+            // Skills
+            const reqSkills = j.required_skills || [];
+            const matchedSkills = j.matched_skills || [];
+            const missingSkills = j.missing_skills || [];
+            const explanations = j.skill_explanations || {};
+
+            if (reqSkills.length > 0) {
+                document.getElementById('mSkillsList').innerHTML = reqSkills.map(s => {
+                    const has = matchedSkills.includes(s);
+                    const exp = explanations[s] || '';
+                    if (has) {
+                        return `
+                        <div class="skill-row flex-column align-items-start gap-1">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <span class="skill-has"><i class="fas fa-check-circle me-1"></i>${s}</span>
+                                <span class="text-muted small ms-auto">มีตรงกัน</span>
+                            </div>
+                        </div>`;
+                    } else {
+                        return `
+                        <div class="skill-row flex-column align-items-start gap-1">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <span class="skill-miss"><i class="fas fa-times-circle me-1"></i>${s}</span>
+                                <span class="text-muted small ms-auto text-danger">ยังขาด</span>
+                            </div>
+                            <div class="small text-muted" style="font-size: 0.75rem; border-left: 2px solid #e5e7eb; padding-left: 8px; margin-left: 4px;">
+                                ${exp}
+                            </div>
+                        </div>`;
+                    }
+                }).join('');
+            } else {
+                document.getElementById('mSkillsList').innerHTML = '<div class="text-muted small">ไม่ระบุทักษะที่ต้องการ</div>';
+            }
+
+            // Certs
+            const reqCerts = j.required_certs || [];
+            const certMatchedArr = j.cert_matched || [];
+            const certMissingArr = j.cert_missing || [];
+            if (reqCerts.length > 0) {
+                document.getElementById('mCertSection').style.display = '';
+                document.getElementById('mCertsList').innerHTML =
+                    certMatchedArr.map(c => `<span class="cert-match-chip"><i class="fas fa-check-circle me-1"></i>${c}</span>`).join('') +
+                    certMissingArr.map(c => `<span class="cert-miss-chip"><i class="fas fa-times-circle me-1"></i>${c}</span>`).join('');
+            } else {
+                document.getElementById('mCertSection').style.display = 'none';
+            }
+
+            // Courses
+            const courses = j.rec_courses || [];
+            if (missingSkills.length > 0 && courses.length > 0) {
+                document.getElementById('mCourseSection').style.display = '';
+                document.getElementById('mCoursesList').innerHTML = courses.map(c => `
+      <div class="course-card">
+        <i class="fas fa-graduation-cap text-warning fa-lg flex-shrink-0"></i>
+        <div>
+          <div class="fw-bold small text-dark">${c.course_name}</div>
+          <div style="font-size:.74rem;color:#92400e;">ช่วยเติม: <strong>${c.skill}</strong> • ${c.platform}</div>
+        </div>
+      </div>`).join('');
+            } else {
+                document.getElementById('mCourseSection').style.display = 'none';
+            }
+
+            // Company
+            document.getElementById('mCompanyAbout').textContent = j.company_about || '—';
+
+            new bootstrap.Modal(document.getElementById('jobModal')).show();
+        }
+
+        function getFilteredJobs() {
+            const province = document.getElementById('filterProvince').value.toLowerCase();
+            const worktype = document.getElementById('filterWorkType').value.toLowerCase();
+            const minSalary = parseInt(document.getElementById('filterSalary').value) || 0;
+            const sortBy = document.getElementById('sortOrder').value;
+            let filtered = allJobs.filter(j => {
+                if (province && !((j.location || '').toLowerCase().includes(province))) return false;
+                if (worktype && !((j.work_type || '').toLowerCase().includes(worktype))) return false;
+                if (minSalary && j.salary_min < minSalary) return false;
+                return true;
+            });
+            if (sortBy === 'salary') filtered.sort((a, b) => b.salary_max - a.salary_max);
+            else filtered.sort((a, b) => b.match_score - a.match_score);
+            return filtered;
+        }
+
+        // Add CSS for course grid cards
+        const courseStyle = document.createElement('style');
+        courseStyle.innerHTML = `
+            .course-grid-card {
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                overflow: hidden;
+                background: #fff;
+                transition: 0.2s;
+            }
+            .course-grid-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            }
+            .course-img {
+                width: 100%;
+                height: 160px;
+                object-fit: cover;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            .course-body {
+                padding: 16px;
+            }
+            .course-pill {
+                display: inline-block;
+                padding: 4px 10px;
+                background: #f0fdf4;
+                color: #16a34a;
+                border: 1px solid #bbf7d0;
+                border-radius: 6px;
+                font-size: 0.75rem;
+                font-weight: 700;
+            }
+        `;
+        document.head.appendChild(courseStyle);
+
+        function openCoursesModal() {
+            // Get currently active job from modal context or regenerate dummy courses
+            const dummyCourses = [
+                {
+                    name: "Advanced Python for Data Science",
+                    platform: "DataCamp",
+                    skill: "Python",
+                    price: "฿ 1,200",
+                    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80"
+                },
+                {
+                    name: "AWS Cloud Architecture Foundation",
+                    platform: "Coursera",
+                    skill: "AWS",
+                    price: "ฟรี",
+                    img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80"
+                },
+                {
+                    name: "SQL for Data Analysis Masterclass",
+                    platform: "Udemy",
+                    skill: "SQL",
+                    price: "฿ 490",
+                    img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80"
+                },
+                {
+                    name: "React - The Complete Guide",
+                    platform: "Udemy",
+                    skill: "React",
+                    price: "฿ 590",
+                    img: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=600&q=80"
+                }
+            ];
+
+            document.getElementById('allCoursesList').innerHTML = dummyCourses.map(c => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="course-grid-card">
+                        <img src="${c.img}" class="course-img" alt="Course Image">
+                        <div class="course-body">
+                            <h6 class="fw-bold text-dark mb-1" style="height:40px; overflow:hidden;">${c.name}</h6>
+                            <div class="small text-muted mb-3"><i class="fas fa-building me-1"></i>${c.platform}</div>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="course-pill">เติมเต็ม: ${c.skill}</span>
+                                <span class="fw-bold ${c.price === 'ฟรี' ? 'text-primary' : 'text-dark'}">${c.price}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Hide job modal to show course modal nicely, or just layer it
+            const courseModal = new bootstrap.Modal(document.getElementById('coursesModal'));
+            courseModal.show();
+        }
+    </script>
+</body>
+
+</html>

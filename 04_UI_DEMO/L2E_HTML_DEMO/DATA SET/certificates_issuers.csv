@@ -1,0 +1,11 @@
+﻿Issuer_id,Issuer_name,Signer_full_name,Signer_signature_url,Signer_signature_name,Signer_signature_size_mb,Issuer_logo_url,Issure_logo_name,Issure_logo_size_mb,CREATE_BY,CREATE_DATE,UPDATE_BY,UPDATE_DATE
+ISS-0001,AWS,วิทูลย์ แน่นดุจป้อม,https://cdn.cert.io/sig/1.png,sig_1.png,0.39,https://cdn.cert.io/logo/aws.png,aws_logo.png,0.42,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0002,Google Cloud,ชนิศา มนทอง,https://cdn.cert.io/sig/2.png,sig_2.png,0.69,https://cdn.cert.io/logo/google cloud.png,google cloud_logo.png,0.31,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0003,Microsoft,ทิพรดา นิลเสนา,https://cdn.cert.io/sig/3.png,sig_3.png,0.54,https://cdn.cert.io/logo/microsoft.png,microsoft_logo.png,0.05,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0004,Coursera,นิรันดร์ เตชะกำพุ,https://cdn.cert.io/sig/4.png,sig_4.png,0.37,https://cdn.cert.io/logo/coursera.png,coursera_logo.png,0.22,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0005,Udemy,ตอฮา ดุษฎีวนิช,https://cdn.cert.io/sig/5.png,sig_5.png,0.61,https://cdn.cert.io/logo/udemy.png,udemy_logo.png,0.44,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0006,Oracle,ราชัน พรมอ่อน,https://cdn.cert.io/sig/6.png,sig_6.png,0.95,https://cdn.cert.io/logo/oracle.png,oracle_logo.png,0.37,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0007,Cisco,ศิริญา บุนยะศัพท์,https://cdn.cert.io/sig/7.png,sig_7.png,0.61,https://cdn.cert.io/logo/cisco.png,cisco_logo.png,0.1,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0008,CompTIA,ภูวฤณ ธูปหอม,https://cdn.cert.io/sig/8.png,sig_8.png,0.69,https://cdn.cert.io/logo/comptia.png,comptia_logo.png,0.49,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0009,PMI,นาทภูวพัฒน์ ธรรมสถิตไพศาล,https://cdn.cert.io/sig/9.png,sig_9.png,0.41,https://cdn.cert.io/logo/pmi.png,pmi_logo.png,0.21,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+ISS-0010,Meta,ดารุนี ไทไชโย,https://cdn.cert.io/sig/10.png,sig_10.png,0.13,https://cdn.cert.io/logo/meta.png,meta_logo.png,0.15,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38

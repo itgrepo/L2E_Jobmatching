@@ -1,0 +1,6 @@
+﻿candidate_pool_id,candidate_pool_title,Candicate_Pool_descript,is_pinned,is_archved,created_by,created_at,updated_by,updated_at
+POOL-0001,The Master Branch,กลุ่ม 'พร้อมใช้งานทันที' (Production Ready),False,False,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+POOL-0002,Neural Nexus,กลุ่ม 'เทพ Data & AI' (Data Wizards),False,False,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+POOL-0003,Velocity Squad,กลุ่ม 'สายลุยงานไว' (Agile & Fast Movers),True,False,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+POOL-0004,Zero-Trust Zone,กลุ่ม 'สาย Security & Infra' (Guardians),False,False,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38
+POOL-0005,Future Syntax,กลุ่ม 'ดาวรุ่งพุ่งแรง' (Rising Stars / New Grads),False,False,SYSTEM_ADMIN,2026-02-20 16:25:38,SYSTEM_ADMIN,2026-02-20 16:25:38

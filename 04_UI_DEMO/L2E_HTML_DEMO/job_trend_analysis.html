@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Trend Analysis</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #10b981;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-color: #f0f4f8;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+            --border-radius: 12px;
+            --font-family: "Sarabun", sans-serif;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+            --primary-dark: #059669;
+            --secondary: #34d399;
+            --accent: #f59e0b;
+        }
+
+        * {
+            font-family: var(--font-family);
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar-custom {
+            background: linear-gradient(135deg, #0f1f3d 0%, #10b981 100%);
+            padding: 0 20px;
+            height: 56px;
+            flex-shrink: 0;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .nav-link-custom {
+            color: rgba(255, 255, 255, .8);
+            font-weight: 600;
+            font-size: .88rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: .15s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background: rgba(255, 255, 255, .15);
+            color: #fff;
+        }
+
+        .nav-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: .9rem;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title i {
+            color: var(--primary);
+        }
+
+        .chart-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            margin-bottom: 24px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .chart-card:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 12px;
+        }
+
+        .chart-wrapper {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            min-height: 0;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--primary);
+        }
+    </style>
+
+    <style>
+        /* Bootstrap Primary Override to Emerald Green */
+        :root {
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+        }
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+        /* Extra fix for gradient inputs and focus rings */
+        .form-control:focus, .form-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar-custom d-flex align-items-center">
+        <a href="candidate_dashboard.html" class="nav-logo me-4">ค้นหางาน</a>
+        <div class="d-flex gap-1 me-auto">
+            <a href="candidate_dashboard.html" class="nav-link-custom"><i class="fas fa-briefcase me-1"></i>งาน</a>
+            <a href="candidate_profile.html" class="nav-link-custom"><i class="fas fa-user me-1"></i>โปรไฟล์</a>
+            <a href="job_trend_analysis.html" class="nav-link-custom active"><i
+                    class="fas fa-chart-bar me-1"></i>ตลาดแรงงาน</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <div class="nav-avatar" id="navAvatar" title="โปรไฟล์">?</div>
+            <span class="text-white fw-bold" id="navName" style="font-size:.88rem;"></span>
+            <a href="index.html" class="nav-link-custom ms-2"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="header-title">
+            <i class="fas fa-chart-line"></i> Job Trend Analysis (แนวโน้มตลาดแรงงาน)
+        </div>
+        <p class="text-muted mb-4 fs-5">วิเคราะห์หาข้อมูลเชิงลึก (Diagnose)
+            ว่าตำแหน่งงานใดและทักษะไหนกำลังเป็นที่ต้องการในตลาดปัจจุบัน</p>
+
+        <div class="row">
+            <!-- 1. Monthly Trends -->
+            <div class="col-12">
+                <div class="chart-card" style="height: 350px;">
+                    <div class="chart-title">
+                        <i class="fas fa-calendar-alt text-primary"></i> แนวโน้มการเปิดรับสมัครงาน (6 เดือนล่าสุด)
+                    </div>
+                    <div class="chart-wrapper">
+                        <div id="loading1" class="loading-spinner">
+                            <div class="spinner-border" role="status"></div>
+                            <span class="mt-2 text-muted fw-bold">กำลังโหลดข้อมูล...</span>
+                        </div>
+                        <canvas id="monthlyTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Top Positions -->
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <i class="fas fa-briefcase text-primary"></i> 10 อันดับตำแหน่งงานที่เป็นที่ต้องการสูงสุด
+                    </div>
+                    <div class="chart-wrapper">
+                        <div id="loading2" class="loading-spinner">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                        <canvas id="positionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Top Skills -->
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <i class="fas fa-tools text-primary"></i> 10 อันดับทักษะ (Skills) ที่ตลาดต้องการมากที่สุด
+                    </div>
+                    <div class="chart-wrapper">
+                        <div id="loading3" class="loading-spinner">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        Chart.register(ChartDataLabels);
+        Chart.defaults.font.family = '"Sarabun", sans-serif';
+        Chart.defaults.color = '#374151';
+
+        async function fetchJobTrends() {
+            try {
+                const response = await fetch('http://127.0.0.1:5001/api/job_trends');
+                const data = await response.json();
+
+                // Hide loaders
+                document.getElementById('loading1').style.display = 'none';
+                document.getElementById('loading2').style.display = 'none';
+                document.getElementById('loading3').style.display = 'none';
+
+                renderMonthlyChart(data.monthly_trends);
+                renderPositionsChart(data.top_positions);
+                renderSkillsChart(data.top_skills);
+            } catch (err) {
+                console.error('Error fetching job trends:', err);
+                alert('เกิดข้อผิดพลาดในการโหลดข้อมูลแนวโน้มตลาดงาน');
+            }
+        }
+
+        // Setup Navbar Profile
+        function setupProfile() {
+            const userStr = localStorage.getItem('currentUser');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    let name = '';
+                    if (user.role === 'employer') {
+                        name = user.company_name || 'Employer';
+                    } else {
+                        name = user.first_name || 'Candidate';
+                    }
+                    if (document.getElementById('navName')) document.getElementById('navName').textContent = name;
+                    if (document.getElementById('navAvatar')) document.getElementById('navAvatar').textContent = name.charAt(0).toUpperCase();
+                } catch (e) { }
+            }
+        }
+        setupProfile();
+
+        function renderMonthlyChart(trendsData) {
+            const labels = trendsData.map(d => d.month);
+            const data = trendsData.map(d => d.count);
+
+            new Chart(document.getElementById('monthlyTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'จำนวนงานที่เปิดรับ (Jobs)',
+                        data: data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            align: 'top',
+                            color: '#059669',
+                            font: { weight: 'bold', size: 14 }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#E5E7EB', borderDash: [5, 5] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderPositionsChart(positionsData) {
+            const labels = positionsData.map(d => d.title.length > 25 ? d.title.substring(0, 25) + '...' : d.title);
+            const data = positionsData.map(d => d.count);
+
+            new Chart(document.getElementById('positionsChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ความต้องการ (ตำแหน่ง)',
+                        data: data,
+                        backgroundColor: '#34d399',
+                        borderRadius: 6,
+                        barThickness: 16
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end', align: 'right', offset: 4,
+                            color: '#059669', font: { weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: { display: false, max: Math.max(...data) * 1.2 },
+                        y: { grid: { display: false }, ticks: { font: { size: 13, weight: '500' } } }
+                    },
+                    layout: { padding: { right: 40 } }
+                }
+            });
+        }
+
+        function renderSkillsChart(skillsData) {
+            const labels = skillsData.map(d => d.skill);
+            const data = skillsData.map(d => d.count);
+
+            // Generate gradient-like colors based on primary
+            const colors = data.map((_, i) => `rgba(16, 185, 129, ${1 - (i * 0.05)})`);
+
+            new Chart(document.getElementById('skillsChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ความถี่ที่ถูกระบุในประกาศงาน',
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 6,
+                        barThickness: 16
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end', align: 'right', offset: 4,
+                            color: '#0f766e', font: { weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: { display: false, max: Math.max(...data) * 1.2 },
+                        y: { grid: { display: false }, ticks: { font: { size: 13, weight: '500' } } }
+                    },
+                    layout: { padding: { right: 40 } }
+                }
+            });
+        }
+
+        // Initialize fetching
+        fetchJobTrends();
+    </script>
+</body>
+
+</html>

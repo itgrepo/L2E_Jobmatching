@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>L2E | Employer Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background: #f0f4f8;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, #0f1f3d, #16a34a);
+            padding: 0 20px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-link-c {
+            color: rgba(255, 255, 255, .8);
+            font-weight: 600;
+            font-size: .88rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: .15s;
+        }
+
+        .nav-link-c:hover,
+        .nav-link-c.active {
+            background: rgba(255, 255, 255, .15);
+            color: #fff;
+        }
+
+        .main-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+            border-left: 4px solid transparent;
+        }
+
+        .stat-card.blue {
+            border-color: #10b981;
+        }
+
+        .stat-card.green {
+            border-color: #16a34a;
+        }
+
+        .stat-card.amber {
+            border-color: #f59e0b;
+        }
+
+        .stat-card.red {
+            border-color: #ef4444;
+        }
+
+        .stat-val {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+            color: #0f1f3d;
+        }
+
+        .stat-label {
+            font-size: .82rem;
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: .15;
+        }
+
+        .section-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+            margin-bottom: 20px;
+        }
+
+        .section-title-bar {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0f1f3d;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .candidate-preview-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            transition: .2s;
+            cursor: pointer;
+        }
+
+        .candidate-preview-card:hover {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .cand-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #16a34a, #10b981);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .fitness-badge {
+            font-weight: 800;
+            font-size: .82rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .badge-excellent {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .badge-good {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+        }
+
+        .badge-fair {
+            background: #e8f0fe;
+            color: #059669;
+        }
+
+        .badge-low {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .btn-action {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: .88rem;
+            border: none;
+            transition: .2s;
+        }
+
+        .btn-primary-g {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #fff;
+        }
+
+        .btn-primary-g:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, .35);
+            color: #fff;
+        }
+
+        .btn-outline-g {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1.5px solid #16a34a;
+        }
+
+        .btn-outline-g:hover {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .mini-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 3px;
+        }
+
+        .mini-bar-label {
+            font-size: .72rem;
+            color: #94a3b8;
+            min-width: 80px;
+        }
+
+        .mini-bar-track {
+            flex: 1;
+            height: 5px;
+            background: #f1f5f9;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .mini-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .mini-bar-val {
+            font-size: .72rem;
+            font-weight: 700;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .job-info-chip {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-radius: 10px;
+            padding: 4px 12px;
+            font-size: .8rem;
+            font-weight: 700;
+        }
+
+        .job-info-chip.company {
+            background: #e8f0fe;
+            color: #10b981;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .92);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .spinner-ring {
+            width: 56px;
+            height: 56px;
+            border: 5px solid #e2e8f0;
+            border-top-color: #16a34a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .premium-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
+            margin-bottom: 12px;
+            display: flex;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: .2s;
+            cursor: pointer;
+        }
+
+        .premium-card:hover {
+            box-shadow: 0 6px 20px rgba(22, 163, 74, .12);
+            transform: translateY(-2px);
+            border-color: #16a34a;
+        }
+
+        .premium-card-body {
+            padding: 16px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .match-pane {
+            width: 140px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            text-align: center;
+            border-left: 1px dashed #e2e8f0;
+            background: transparent;
+        }
+
+        .score-circle-wrapper {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            margin-bottom: 8px;
+        }
+
+        .score-circle-svg {
+            transform: rotate(-90deg);
+            width: 70px;
+            height: 70px;
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: #f1f5f9;
+            stroke-width: 5;
+        }
+
+        .score-circle-progress {
+            fill: none;
+            stroke: #16a34a;
+            stroke-width: 5;
+            stroke-linecap: round;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0f1f3d;
+        }
+
+        /* MODAL */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+
+        .modal-header-emp {
+            background: linear-gradient(135deg, #0f1f3d, #16a34a);
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+        }
+
+        .score-circle-container {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
+
+        .score-circle-container svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .score-circle-num {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .score-circle-lbl {
+            font-size: .6rem;
+            color: rgba(255, 255, 255, .75);
+            font-weight: 600;
+        }
+
+        .modal-section-title {
+            font-size: .78rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin: 14px 0 8px;
+        }
+
+        .score-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .score-bar-label {
+            font-size: .8rem;
+            font-weight: 700;
+            color: #374151;
+            width: 260px;
+            flex-shrink: 0;
+        }
+
+        .score-bar-track {
+            flex: 1;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s;
+        }
+
+        .score-bar-val {
+            font-size: .8rem;
+            font-weight: 800;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .kpi-box {
+            background: #f8faff;
+            border-radius: 12px;
+            padding: 10px 14px;
+            text-align: center;
+        }
+
+        .kpi-val {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #0f1f3d;
+        }
+
+        .kpi-label {
+            font-size: .7rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .edu-item {
+            background: #f8faff;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            font-size: .85rem;
+        }
+
+        .exp-item-m {
+            border-left: 3px solid #16a34a;
+            padding: 6px 12px;
+            margin-bottom: 8px;
+            background: #f8faff;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .skill-chip {
+            background: #e8f0fe;
+            color: #10b981;
+            border-radius: 10px;
+            padding: 3px 10px;
+            font-size: .74rem;
+            font-weight: 700;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .cert-chip-match {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 10px;
+            padding: 3px 10px;
+            font-size: .74rem;
+            font-weight: 700;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .cert-chip-miss {
+            background: #fef2f2;
+            color: #ef4444;
+            border-radius: 10px;
+            padding: 3px 10px;
+            font-size: .74rem;
+            font-weight: 700;
+            display: inline-block;
+            margin: 2px;
+        }
+    </style>
+
+    <style>
+        /* Bootstrap Primary Override to Emerald Green */
+        :root {
+            --bs-primary: #10b981;
+            --bs-primary-rgb: 16, 185, 129;
+        }
+
+        .btn-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        /* Extra fix for gradient inputs and focus rings */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+</head>
+
+
+<body>
+    <nav class="navbar-custom">
+        <a href="employer_dashboard.html" class="nav-logo me-4"></i>ค้นหาผู้สมัคร</a>
+        <div class="d-flex gap-1 me-auto">
+            <a href="employer_dashboard.html" class="nav-link-c active"><i
+                    class="fas fa-tachometer-alt me-1"></i>ภาพรวม</a>
+            <a href="employer_candidates.html" class="nav-link-c"><i class="fas fa-users me-1"></i>ค้นหาผู้สมัคร</a>
+            <a href="job_trend_analysis.html" class="nav-link-c"><i class="fas fa-chart-bar me-1"></i>ตลาดแรงงาน</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <img id="navLogo" src="" width="32" height="32"
+                style="border-radius:8px;object-fit:contain;background:#fff;padding:2px;"
+                onerror="this.style.display='none'">
+            <span class="text-white fw-bold small" id="navCompany"></span>
+            <a href="index.html" class="nav-link-c ms-2"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </nav>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-ring mb-3"></div>
+        <h5 class="fw-bold">กำลังโหลดข้อมูล...</h5>
+    </div>
+
+    <div class="main-container">
+        <!-- KPI Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card blue d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-val" id="kpiJobId">—</div>
+                        <div class="stat-label">Job Post ID</div>
+                    </div>
+                    <i class="fas fa-id-badge stat-icon text-primary"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card green d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-val" id="kpiSalary">—</div>
+                        <div class="stat-label">งบประมาณ (สูงสุด)</div>
+                    </div>
+                    <i class="fas fa-baht-sign stat-icon text-success"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card amber d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-val" id="kpiCands">—</div>
+                        <div class="stat-label">ผู้สมัครที่ Match</div>
+                    </div>
+                    <i class="fas fa-users stat-icon text-warning"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card red d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-val" id="kpiTopScore">—</div>
+                        <div class="stat-label">คะแนน Match สูงสุด</div>
+                    </div>
+                    <i class="fas fa-star stat-icon text-danger"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left: Job Info -->
+            <div class="col-lg-4">
+                <div class="section-card">
+                    <div class="section-title-bar">ประกาศงาน <a href="employer_candidates.html"
+                            class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size:.8rem;">แก้ไข /
+                            ค้นหา</a></div>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img id="companyLogo" src="" width="52" height="52"
+                            style="border-radius:12px;border:1px solid #e2e8f0;padding:4px;"
+                            onerror="this.src='https://ui-avatars.com/api/?name=L&background=0a66c2&color=fff'">
+                        <div>
+                            <div class="fw-bold" style="font-size:1.05rem;color:#0f1f3d;" id="jobTitle">—</div>
+                            <div class="text-muted small fw-bold" id="companyName">—</div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mb-3" id="jobChips"></div>
+                    <div class="small text-muted fw-bold mb-1">ทักษะที่ต้องการ:</div>
+                    <div id="reqSkillsDisplay" class="mb-3"></div>
+                    <div class="small text-muted fw-bold mb-1">Certifications ที่ต้องการ:</div>
+                    <div id="reqCertsDisplay"></div>
+                </div>
+
+                <!-- Candidate Pools Section -->
+                <div class="section-card mt-4">
+                    <div class="section-title-bar">
+                        จัดกลุ่มผู้สมัคร (Pools)
+                        <button class="btn-action btn-outline-g btn" data-bs-toggle="modal"
+                            data-bs-target="#createPoolModal">
+                            <i class="fas fa-plus ms-1"></i> สร้าง Pool
+                        </button>
+                    </div>
+                    <div class="row g-3" id="savedPoolsContainer">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Top Candidates -->
+            <div class="col-lg-8">
+                <div class="section-card">
+                    <div class="section-title-bar">
+                        ผู้สมัครที่ Match สูงสุด (Top Candidates)
+                        <a href="employer_candidates.html" class="btn-action btn-primary-g btn">จับคู่ผู้สมัครงาน <i
+                                class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                    <div id="topCandidateList">
+                        <div class="text-center py-4 text-muted">
+                            <div class="spinner-ring mx-auto mb-2"
+                                style="width:36px;height:36px;border-width:4px;border-top-color:#16a34a;"></div>กำลัง
+                            Match...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CANDIDATE DETAIL MODAL -->
+    <div class="modal fade" id="candModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header-emp">
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="cand-avatar" id="mAvatar" style="width:60px;height:60px;font-size:1.3rem;">?</div>
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold text-white mb-1" id="mName">—</h4>
+                            <div class="text-white opacity-75 fw-bold" id="mRole">—</div>
+                            <div class="d-flex gap-3 mt-1 flex-wrap">
+                                <span class="text-white opacity-75 small" id="mSalary"><i
+                                        class="fas fa-baht-sign me-1"></i>—</span>
+                                <span class="text-white opacity-75 small" id="mLocation"><i
+                                        class="fas fa-map-marker-alt me-1"></i>—</span>
+                                <span class="text-white opacity-75 small" id="mWorkType"><i
+                                        class="fas fa-laptop-house me-1"></i>—</span>
+                                <span class="text-white opacity-75 small" id="mExpYears"><i
+                                        class="fas fa-clock me-1"></i>—</span>
+                            </div>
+                        </div>
+                        <div class="score-circle-container flex-shrink-0">
+                            <svg width="90" height="90" viewBox="0 0 90 90">
+                                <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(255,255,255,.2)"
+                                    stroke-width="7" />
+                                <circle id="mScoreCircle" cx="45" cy="45" r="38" fill="none" stroke="#4ade80"
+                                    stroke-width="7" stroke-linecap="round" stroke-dasharray="239"
+                                    stroke-dashoffset="239" />
+                            </svg>
+                            <div class="score-circle-value">
+                                <span class="score-circle-num" id="mScoreNum">—</span>
+                                <span class="score-circle-lbl">เหมาะสม</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" data-bs-dismiss="modal"
+                        class="position-absolute top-0 end-0 m-3 btn-close btn-close-white"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="row g-2 mb-3">
+                                <div class="col-4">
+                                    <div class="kpi-box">
+                                        <div class="kpi-val" id="mKpiSal">—</div>
+                                        <div class="kpi-label">เงินเดือน</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="kpi-box">
+                                        <div class="kpi-val" id="mKpiExp">—</div>
+                                        <div class="kpi-label">ประสบการณ์</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="kpi-box">
+                                        <div class="kpi-val" id="mKpiWork">—</div>
+                                        <div class="kpi-label">รูปแบบงาน</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-section-title"><i class="fas fa-comment-alt me-1"></i>เกี่ยวกับผู้สมัคร
+                                (ABOUT CANDIDATE)
+                            </div>
+                            <div id="mAbout" class="small text-muted" style="line-height:1.7;"></div>
+
+                            <div class="modal-section-title"><i class="fas fa-chart-bar me-1"></i>คะแนนความเหมาะสม
+                                (SCORE BREAKDOWN)</div>
+                            <div id="mScoreBars"></div>
+
+                            <div class="modal-section-title"><i class="fas fa-graduation-cap me-1"></i>การศึกษา
+                                (EDUCATION)</div>
+                            <div id="mEdu"></div>
+
+                            <div class="modal-section-title"><i class="fas fa-briefcase me-1"></i>ประสบการณ์ทำงาน (WORK
+                                EXPERIENCE)</div>
+                            <div id="mExp"></div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="modal-section-title"><i class="fas fa-tools me-1"></i>ทักษะที่ต้องการ (REQUIRED
+                                SKILLS)</div>
+                            <div id="mSkills"></div>
+
+                            <div class="modal-section-title"><i class="fas fa-certificate me-1"></i>ใบรับรองที่ต้องการ
+                                (REQUIRED CERTIFICATIONS)</div>
+                            <div id="mCerts"></div>
+
+                            <div class="mt-3 p-3 bg-light rounded-3">
+                                <div class="small fw-bold text-muted mb-2"><i
+                                        class="fas fa-file-alt text-success me-1"></i>Resume</div>
+                                <button class="btn btn-sm btn-outline-success rounded-pill px-3"
+                                    onclick="viewResume()"><i class="fas fa-eye me-1"></i>ดู Resume</button>
+                                <div class="small text-muted mt-2">ไฟล์ Resume ของผู้สมัคร (จำลอง)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-success rounded-pill px-5 fw-bold"><i
+                            class="fas fa-envelope me-2"></i>ติดต่อผู้สมัคร</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Pool Modal -->
+    <div class="modal fade" id="createPoolModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" style="color: #0f1f3d;"><i
+                            class="fas fa-folder-plus text-primary me-2"></i>สร้าง Candidate Pool</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">ชื่อ Pool <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="p_name" placeholder="เช่น Pool: Python Dev (Mid)">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">ตําแหน่งงานอ้างอิง (Job Title)</label>
+                        <input type="text" class="form-control" id="p_title" placeholder="เช่น Python Developer">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">ทักษะที่ต้องการ (คั่นด้วยลูกน้ำ)</label>
+                        <input type="text" class="form-control" id="p_skills" placeholder="เช่น Python, AWS, SQL">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">ช่วงงบประมาณ (Min)</label>
+                            <input type="number" class="form-control" id="p_min" placeholder="50000">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">ช่วงงบประมาณ (Max)</label>
+                            <input type="number" class="form-control" id="p_max" placeholder="80000">
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">ใบรับรองบังคับ (ถ้ามี)</label>
+                        <input type="text" class="form-control" id="p_certs" placeholder="เช่น AWS Solutions Architect">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pe-4 pb-4">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill"
+                        data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary-g rounded-pill flex-grow-1"
+                        onclick="saveNewPool()">บันทึกและเริ่ม Match</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API = 'http://127.0.0.1:5001';
+        let jobData = null;
+        let candidates = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            jobData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!jobData || !(jobData.job_post_id || jobData.job_id)) {
+                window.location.href = 'index.html'; return;
+            }
+            loadJobInfo();
+            await matchCandidates();
+            renderSavedPools();
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        });
+
+        function loadJobInfo() {
+            const j = jobData;
+            document.getElementById('navCompany').textContent = j.company_name || '';
+            document.getElementById('navLogo').src = j.logo_url || '';
+            document.getElementById('companyLogo').src = j.logo_url || '';
+            document.getElementById('jobTitle').textContent = j.title || '—';
+            document.getElementById('companyName').textContent = j.company_name || '—';
+            document.getElementById('kpiJobId').textContent = j.job_post_id || j.job_id || '—';
+            document.getElementById('kpiSalary').textContent = j.salary_max ? `฿${parseInt(j.salary_max).toLocaleString()}` : 'Nego';
+
+            const wStyle = j.work_style || 'Onsite';
+            let currentStatus = j.status || 'Active';
+            if (currentStatus.toLowerCase() === 'open') currentStatus = 'Active'; // normalize
+            const loc = j.location || '—';
+
+            const isClosed = currentStatus.toLowerCase() === 'close' || currentStatus.toLowerCase() === 'closed';
+            const btnClass = isClosed ? 'btn-secondary' : 'btn-success';
+
+            document.getElementById('jobChips').innerHTML = `
+                <span class="job-info-chip"><i class="fas fa-laptop-house me-1"></i>${wStyle}</span>
+                <span class="job-info-chip p-0 border-0" style="background:transparent;box-shadow:none;">
+                    <div class="dropdown">
+                        <button class="btn btn-sm ${btnClass} rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" style="font-size:0.75rem; font-weight:700; padding: 2px 10px; border:none;">
+                            <i class="fas fa-circle me-1" style="font-size:0.55rem; vertical-align:middle;"></i>${currentStatus}
+                        </button>
+                        <ul class="dropdown-menu shadow-sm" style="min-width: 120px; font-size: 0.85rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <li><a class="dropdown-item fw-bold text-success py-2" href="#" onclick="updateJobStatus('Active')"><i class="fas fa-circle me-2" style="font-size:0.5rem"></i>Active</a></li>
+                            <li><a class="dropdown-item fw-bold text-secondary py-2" href="#" onclick="updateJobStatus('Close')"><i class="fas fa-circle me-2" style="font-size:0.5rem"></i>Close</a></li>
+                        </ul>
+                    </div>
+                </span>
+                <span class="job-info-chip"><i class="fas fa-map-marker-alt me-1"></i>${loc}</span>
+            `;
+
+            const reqSkills = j.required_skills || [];
+            document.getElementById('reqSkillsDisplay').innerHTML = reqSkills.length ? reqSkills.map(s => `<span class="badge me-1 mb-1" style="background:#e8f0fe;color:#10b981;font-weight:700;">${s}</span>`).join('') : '<span class="text-muted small">ไม่ระบุ</span>';
+
+            const reqCerts = j.required_certs || [];
+            document.getElementById('reqCertsDisplay').innerHTML = reqCerts.length ? reqCerts.map(c => `<span class="badge me-1 mb-1" style="background:#f0fdf4;color:#16a34a;font-weight:700;"><i class="fas fa-certificate me-1"></i>${c}</span>`).join('') : '<span class="text-muted small">ไม่ระบุ</span>';
+        }
+
+        function updateJobStatus(newStatus) {
+            jobData.status = newStatus;
+            localStorage.setItem('currentUser', JSON.stringify(jobData));
+            loadJobInfo();
+        }
+
+        async function matchCandidates() {
+            const j = jobData;
+            const jdText = `${j.title || ''} ${j.description || ''} ${(j.required_skills || []).join(' ')}`;
+            try {
+                const res = await fetch(`${API}/api/match_candidates`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jd_text: jdText,
+                        budget: j.salary_max || 80000,
+                        required_certs: j.required_certs || [],
+                        job_location: j.location || 'ไม่ระบุ',
+                        job_work_style: j.work_style || j.work_type || 'ไม่ระบุ'
+                    })
+                });
+                candidates = await res.json();
+                candidates.sort((a, b) => b.fitness - a.fitness);
+                sessionStorage.setItem('cachedCands_' + (j.job_post_id || j.job_id), JSON.stringify(candidates));
+                document.getElementById('kpiCands').textContent = candidates.length;
+                document.getElementById('kpiTopScore').textContent = candidates.length ? candidates[0].fitness + '%' : '—';
+                renderTopCandidates(candidates.slice(0, 8));
+            } catch (e) {
+                document.getElementById('topCandidateList').innerHTML = '<div class="text-center text-muted py-3">ไม่สามารถโหลดข้อมูลได้ กรุณา run api_server.py</div>';
+            }
+        }
+
+        function getFitnessBadge(s) {
+            if (s >= 85) return 'badge-excellent';
+            if (s >= 70) return 'badge-good';
+            if (s >= 55) return 'badge-fair';
+            return 'badge-low';
+        }
+
+        function renderTopCandidates(cands) {
+            if (!cands.length) { document.getElementById('topCandidateList').innerHTML = '<div class="text-muted text-center py-3">ไม่พบผู้สมัครที่ตรงกัน</div>'; return; }
+            document.getElementById('topCandidateList').innerHTML = cands.map((c, i) => {
+                const initials = (c.name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                const certM = c.cert_matched || [];
+                const score = Math.round(c.fitness || 0);
+
+                const r = 30;
+                const circumference = 2 * Math.PI * r;
+                const offset = Math.max(0, circumference - (score / 100) * circumference);
+
+                let matchLabel = 'เหมาะสมระดับปานกลาง';
+                let strokeColor = '#f59e0b'; // orange
+                if (score >= 90) {
+                    matchLabel = 'เหมาะสมมาก';
+                    strokeColor = '#15803d'; // dark green
+                } else if (score >= 50) {
+                    matchLabel = 'เหมาะสมดี';
+                    strokeColor = '#10b981'; // light green
+                }
+
+                return `
+    <div class="premium-card" onclick="openCandModal(${i})">
+      <div class="premium-card-body d-flex flex-row align-items-center gap-3">
+        <div class="cand-avatar flex-shrink-0">${initials}</div>
+        <div class="flex-grow-1 min-w-0">
+          <div class="fw-bold text-truncate" style="font-size:.95rem;color:#0f1f3d;">${c.name || 'ไม่ระบุ'}</div>
+          <div class="text-muted small fw-bold text-truncate">${c.title || '—'}</div>
+          <div class="mt-1 d-flex flex-wrap gap-3 align-items-center" style="font-size: .78rem;">
+              <span class="text-muted"><i class="fas fa-envelope me-1"></i>${c.email || '—'}</span>
+              <span class="text-muted"><i class="fas fa-phone me-1"></i>${c.phone || '—'}</span>
+              <span class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>${c.location || '—'}</span>
+          </div>
+          ${certM.length > 0 ? `<div class="mt-1" style="font-size:.75rem;color:#16a34a;"><i class="fas fa-certificate me-1"></i>${certM.join(', ')}</div>` : ''}
+        </div>
+      </div>
+      <div class="match-pane">
+          <div class="score-circle-wrapper">
+              <svg class="score-circle-svg" viewBox="0 0 70 70">
+                  <circle class="score-circle-bg" cx="35" cy="35" r="30"></circle>
+                  <circle class="score-circle-progress" cx="35" cy="35" r="30" style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${offset}; stroke: ${strokeColor};"></circle>
+              </svg>
+              <div class="score-text">${score}<span style="font-size: .65rem;">%</span></div>
+          </div>
+          <div style="font-size: .7rem; font-weight: 800; margin-top: 2px; color: ${strokeColor};">${matchLabel}</div>
+      </div>
+    </div>`;
+            }).join('');
+        }
+
+        // --- Pool Management ---
+        function getSavedPools() {
+            return JSON.parse(localStorage.getItem('employerPools') || '[]');
+        }
+
+        function renderSavedPools() {
+            const pools = getSavedPools();
+            const container = document.getElementById('savedPoolsContainer');
+            if (!pools.length) {
+                container.innerHTML = `<div class="col-12 text-center text-muted py-3">ยังไม่มี Pool ข้อมูล กด 'สร้าง Pool' เพื่อบันทึก Template การค้นหา</div>`;
+                return;
+            }
+            container.innerHTML = pools.map((p, i) => `
+                <div class="col-12">
+                    <div class="stat-card" style="border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;" onclick="openPool(${i})" onmouseover="this.style.borderColor='#10b981'" onmouseout="this.style.borderColor='#e2e8f0'">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="fw-bold" style="color: #0f1f3d; font-size: 1.05rem;" class="text-truncate">${p.name}</div>
+                            <span class="badge bg-success rounded-pill px-2 py-1"><i class="fas fa-user-check me-1"></i>${p.cand_count || Math.floor(Math.random() * 50 + 10)} Match</span>
+                        </div>
+                        <div class="small fw-bold text-muted mb-1 text-truncate"><i class="fas fa-briefcase text-primary me-2"></i> ${p.title || 'Any Role'}</div>
+                        <div class="small text-muted text-truncate"><i class="fas fa-tools text-primary me-2"></i> ${p.skills || '-'}</div>
+                        <div class="small text-muted mt-1"><i class="fas fa-baht-sign text-success me-2"></i> ${parseInt(p.min || 0).toLocaleString()} - ${parseInt(p.max || 0).toLocaleString()}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveNewPool() {
+            const name = document.getElementById('p_name').value.trim();
+            if (!name) return alert('กรุณาระบุชื่อ Pool');
+
+            const newPool = {
+                name: name,
+                title: document.getElementById('p_title').value.trim(),
+                skills: document.getElementById('p_skills').value.trim(),
+                min: document.getElementById('p_min').value || 0,
+                max: document.getElementById('p_max').value || 0,
+                certs: document.getElementById('p_certs').value.trim(),
+                cand_count: Math.floor(Math.random() * 80) + 12 // Mock count for demo
+            };
+
+            const pools = getSavedPools();
+            pools.push(newPool);
+            localStorage.setItem('employerPools', JSON.stringify(pools));
+
+            // Close modal & render
+            bootstrap.Modal.getInstance(document.getElementById('createPoolModal')).hide();
+
+            // Generate dummy candidates for count display
+            renderSavedPools();
+
+            // Clear
+            document.getElementById('p_name').value = '';
+            document.getElementById('p_title').value = '';
+            document.getElementById('p_skills').value = '';
+        }
+
+        function openPool(index) {
+            localStorage.setItem('activePoolIndex', index);
+            window.location.href = 'employer_candidates.html?pool=' + index;
+        }
+
+        function openCandModal(i) {
+            const c = candidates[i];
+            if (!c) return;
+            const initials = (c.name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('mAvatar').textContent = initials;
+            document.getElementById('mName').textContent = c.name || '—';
+            document.getElementById('mRole').textContent = c.title || '—';
+            document.getElementById('mSalary').innerHTML = `<i class="fas fa-baht-sign me-1"></i>${c.expected_salary ? '฿' + parseInt(c.expected_salary).toLocaleString() : 'Negotiable'}`;
+            document.getElementById('mLocation').innerHTML = `<i class="fas fa-map-marker-alt me-1"></i>${c.location || '—'}`;
+            document.getElementById('mWorkType').innerHTML = `<i class="fas fa-laptop-house me-1"></i>${c.work_style_pref || '—'}`;
+            document.getElementById('mExpYears').innerHTML = `<i class="fas fa-clock me-1"></i>${c.exp_years_total || 0} ปีประสบการณ์`;
+            document.getElementById('mKpiSal').textContent = c.expected_salary ? '฿' + parseInt(c.expected_salary).toLocaleString() : 'Nego';
+            document.getElementById('mKpiExp').textContent = (c.exp_years_total || 0) + ' ปี';
+            document.getElementById('mKpiWork').textContent = c.work_style_pref || '—';
+            document.getElementById('mAbout').textContent = c.about_me || '—';
+
+            // Score circle
+            const score = c.fitness;
+            document.getElementById('mScoreNum').textContent = score + '%';
+            const offset = 239 - (239 * score / 100);
+            const circle = document.getElementById('mScoreCircle');
+            circle.setAttribute('stroke-dashoffset', 239);
+            const color = score >= 90 ? '#15803d' : score >= 50 ? '#10b981' : '#f59e0b';
+            circle.setAttribute('stroke', color);
+            setTimeout(() => circle.setAttribute('stroke-dashoffset', offset), 100);
+
+            // Score bars
+            const sb = c.score_breakdown || {};
+            document.getElementById('mScoreBars').innerHTML = [
+                { label: 'ความสอดคล้องของตำแหน่ง (Title Match)', val: sb.title || 0, color: '#10b981' },
+                { label: 'ความสามารถตามคุณสมบัติ (Semantic Match)', val: sb.semantic || 0, color: '#10b981' },
+                { label: 'ทักษะตรงกัน (Skill Tag)', val: sb.skill || 0, color: '#16a34a' },
+                { label: 'ค่าตอบแทน (Salary)', val: sb.budget_fit || 0, color: '#16a34a' },
+                { label: 'ใบรับรอง (Certificate)', val: sb.cert || 0, color: '#f59e0b' }
+            ].map(b => `<div class="score-bar-row"><span class="score-bar-label">${b.label}</span><div class="score-bar-track"><div class="score-bar-fill" style="width:${b.val}%;background:${b.color};"></div></div><span class="score-bar-val" style="color:${b.color};">${b.raw || Math.round(b.val) + '%'}</span></div>`).join('');
+
+            // Education
+            const edu = c.education || [];
+            document.getElementById('mEdu').innerHTML = edu.length ? edu.map(e => `<div class="edu-item"><div class="fw-bold">${e.degree} — ${e.major}</div><div class="text-muted small">${e.university} | GPA: ${e.gpa || '—'} | จบ: ${e.grad_year || '—'}</div></div>`).join('') : '<div class="text-muted small">ไม่มีข้อมูล</div>';
+
+            // Experience
+            const exp = c.experience || [];
+            document.getElementById('mExp').innerHTML = exp.length ? exp.map(e => `<div class="exp-item-m"><div class="fw-bold small">${e.position || '—'}</div><div class="text-muted" style="font-size:.78rem;">${e.company || '—'} | ${e.start_date || '?'} - ${e.end_date || 'ปัจจุบัน'}</div>${e.tech_tools && e.tech_tools.length ? `<div style="font-size:.74rem;color:#10b981;">${e.tech_tools.join(', ')}</div>` : ''}</div>`).join('') : '<div class="text-muted small">ไม่มีข้อมูล</div>';
+
+            // Skills
+            const skills = c.skills || [];
+            document.getElementById('mSkills').innerHTML = skills.length ? skills.map(s => `<span class="skill-chip">${s}</span>`).join('') : '<span class="text-muted small">ไม่มีข้อมูล</span>';
+
+            // Certs
+            const certs = c.certificates || [];
+            const certM = c.cert_matched || [];
+            const certMiss = c.cert_missing || [];
+            document.getElementById('mCerts').innerHTML = [
+                ...certM.map(c => `<span class="cert-chip-match"><i class="fas fa-check-circle me-1"></i>${c} <small>(ตรงกับที่ต้องการ)</small></span>`),
+                ...certs.filter(c => !certM.includes(c)).slice(0, 5).map(c => `<span class="skill-chip">${c}</span>`),
+                ...certMiss.map(c => `<span class="cert-chip-miss"><i class="fas fa-times-circle me-1"></i>${c} <small>(ยังขาด)</small></span>`),
+            ].join('') || '<span class="text-muted small">ไม่มีข้อมูล</span>';
+
+            new bootstrap.Modal(document.getElementById('candModal')).show();
+        }
+
+        function viewResume() {
+            alert('ฟีเจอร์ดู Resume: ในระบบจริง จะเปิดไฟล์ที่ผู้สมัครอัปโหลดไว้\\n(จำลองสำหรับ Prototype)');
+        }
+    </script>
+</body>
+
+</html>
